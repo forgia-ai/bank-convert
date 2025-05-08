@@ -1,0 +1,19 @@
+node_modules
+build
+dist
+.next
+coverage
+artifacts
+cache
+coverage*
+gasReporterOutput.json
+package.json
+img
+.env
+# .*
+README.md
+coverage.json
+deployments
+instruction.md
+.windsurfrules
+.cursorrules
