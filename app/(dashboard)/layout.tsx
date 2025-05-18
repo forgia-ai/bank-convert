@@ -1,5 +1,5 @@
 // app/(dashboard)/layout.tsx
-import UserNavbar from "@/components/navigation/user-navbar"
+import AppNavbar from "@/components/navigation/AppNavbar"
 import { PropsWithChildren } from "react"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <UserNavbar />
+      <AppNavbar />
       <main className="flex-grow p-6 md:p-8">
         {/* Dashboard page content will be rendered here */}
         {children}
