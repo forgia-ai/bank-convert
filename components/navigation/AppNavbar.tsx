@@ -1,37 +1,129 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import type { getDictionary } from "@/lib/getDictionary" // For type only
+
+type NavStringsType = Awaited<ReturnType<typeof getDictionary>>["navbar"]
+
+interface AppNavbarProps {
+  navStrings: NavStringsType
+}
+import { useRouter, usePathname } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Layers3, Settings, CreditCard, BarChart3, Menu, X } from "lucide-react" // Icons for app nav
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Layers3,
+  Settings,
+  CreditCard,
+  BarChart3,
+  Menu,
+  X,
+  Globe,
+  KeyRound,
+  UserPlus,
+} from "lucide-react"
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton } from "@clerk/nextjs"
+import { i18n, type Locale } from "@/i18n-config"
+
+// Helper to extract locale and pathname from the full path
+const getLocaleAndPathname = (fullPathname: string, locales: readonly Locale[]) => {
+  const segments = fullPathname.split("/").filter(Boolean)
+  let currentLocale: Locale = i18n.defaultLocale
+  let pathWithoutLocale = fullPathname
+
+  if (segments.length > 0 && (locales as string[]).includes(segments[0])) {
+    currentLocale = segments[0] as Locale
+    pathWithoutLocale = "/" + segments.slice(1).join("/")
+  } else if (fullPathname === "/") {
+    pathWithoutLocale = "/"
+  }
+
+  // Ensure pathWithoutLocale always starts with a slash, or is just "/"
+  if (!pathWithoutLocale.startsWith("/") && pathWithoutLocale !== "") {
+    pathWithoutLocale = "/" + pathWithoutLocale
+  } else if (pathWithoutLocale === "") {
+    pathWithoutLocale = "/" // Handles cases like /en becoming pathWithoutLocale = ""
+  }
+  if (pathWithoutLocale === "//") pathWithoutLocale = "/" // Additional safeguard
+
+  return { currentLocale, pathWithoutLocale }
+}
 
 /**
  * AppNavbar is a unified navigation bar that adapts its content based on
  * the user's authentication status, with responsive behavior for mobile.
  */
-export default function AppNavbar() {
-  const pathname = usePathname()
+export default function AppNavbar({ navStrings }: AppNavbarProps) {
+  const router = useRouter()
+  const fullPathname = usePathname() // e.g., /en/dashboard or /dashboard
+
+  const { currentLocale, pathWithoutLocale } = getLocaleAndPathname(fullPathname, i18n.locales)
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
+  // Generate display languages from i18n config
+  const displayLanguages = i18n.locales.map((loc) =>
+    loc === "en" ? navStrings.lang_en : navStrings.lang_es,
+  )
+
+  const handleLanguageChange = (newLang: string) => {
+    const targetLang = newLang.toLowerCase()
+    // Always construct the path with the target locale prefix
+    let newPath = `/${targetLang}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`
+
+    // Preserve query parameters
+    const currentSearch = window.location.search
+    if (newPath.endsWith("/") && newPath !== "/") {
+      // Avoid double slash for root path, e.g. /es// -> /es/
+      newPath = newPath.slice(0, -1)
+    }
+    if (pathWithoutLocale === "/") newPath = `/${targetLang}` // Ensure root path is just /<lang>
+
+    if (currentSearch) {
+      newPath += currentSearch
+    }
+
+    router.push(newPath)
+
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false)
+    }
+  }
+
   const marketingLinks = [
-    { href: "/pricing", label: "Pricing" },
-    { href: "/about", label: "About Us" },
-    { href: "/contact", label: "Contact" },
-    // { href: "/features", label: "Features" }, // Example, can be added back
+    { href: "/pricing", label: navStrings.pricing },
+    { href: "/about", label: navStrings.about_us },
+    { href: "/contact", label: navStrings.contact },
+    // { href: "/features", label: navStrings.features }, // Example, if added to dictionary
   ]
 
   const appLinks = [
-    { href: "/dashboard", label: "Convert", icon: <Layers3 className="h-4 w-4" /> },
-    { href: "/dashboard/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
-    { href: "/dashboard/billing", label: "Billing", icon: <CreditCard className="h-4 w-4" /> },
+    { href: "/dashboard", label: navStrings.convert, icon: <Layers3 className="h-4 w-4" /> },
+    {
+      href: "/dashboard/settings",
+      label: navStrings.settings,
+      icon: <Settings className="h-4 w-4" />,
+    },
+    {
+      href: "/dashboard/billing",
+      label: navStrings.billing,
+      icon: <CreditCard className="h-4 w-4" />,
+    },
   ]
 
   const commonLinkClasses = "text-muted-foreground hover:text-foreground"
   const activeAppPath = (href: string) => {
-    if (href === "/dashboard") return pathname === href
-    return pathname.startsWith(href)
+    // pathWithoutLocale will be like "/" or "/dashboard" or "/dashboard/settings"
+    if (href === "/") return pathWithoutLocale === href
+    if (href === "/dashboard")
+      return pathWithoutLocale === "/dashboard" || pathWithoutLocale.startsWith("/dashboard/") // handles /dashboard and /dashboard/subpage
+    return pathWithoutLocale.startsWith(href)
   }
 
   const handleLinkClick = () => {
@@ -44,7 +136,8 @@ export default function AppNavbar() {
         {/* Left Section: Logo */}
         <div className="flex items-center gap-2">
           <Link
-            href="/"
+            href="/" // Base path is always root
+            locale={currentLocale} // Let Next.js Link handle prefixing
             className="flex items-center gap-2 font-bold text-lg"
             onClick={handleLinkClick}
           >
@@ -90,7 +183,7 @@ export default function AppNavbar() {
                 size="sm"
                 className="font-medium"
               >
-                <Link href={link.href} className="flex items-center gap-2">
+                <Link href={link.href} locale={currentLocale} className="flex items-center gap-2">
                   {link.icon}
                   {link.label}
                 </Link>
@@ -102,6 +195,7 @@ export default function AppNavbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                locale={currentLocale}
                 className={`${commonLinkClasses} px-3 py-2 text-sm font-medium rounded-md hover:bg-muted`}
               >
                 {link.label}
@@ -114,27 +208,57 @@ export default function AppNavbar() {
         <div className="flex items-center gap-2">
           <SignedIn>
             {/* Placeholder: Usage Tracker - can be part of app layout or specific pages */}
-            <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-1.5">
+            <Button variant="outline" size="sm" className="hidden md:flex items-center gap-1.5">
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
                 Pages: <span className="font-semibold text-foreground">0/500</span>{" "}
                 {/* TODO: Dynamic data */}
               </span>
             </Button>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton
+              afterSignOutUrl={currentLocale === i18n.defaultLocale ? "/" : `/${currentLocale}`}
+            />
           </SignedIn>
           <SignedOut>
             <SignInButton mode="modal">
-              <Button variant="outline" size="sm" asChild>
-                <span className="cursor-pointer">Login</span>
+              <Button variant="outline" size="sm" asChild className="hidden md:inline-flex">
+                <span className="cursor-pointer">{navStrings.login}</span>
               </Button>
             </SignInButton>
             <SignUpButton mode="modal">
               <Button size="sm" asChild>
-                <span className="cursor-pointer">Sign Up</span>
+                <span className="cursor-pointer">{navStrings.signup}</span>
               </Button>
             </SignUpButton>
           </SignedOut>
+
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:flex items-center gap-1.5 w-20"
+                aria-label={`Change language, current language ${currentLocale === "en" ? navStrings.lang_en : navStrings.lang_es}`}
+              >
+                <Globe className="h-4 w-4" />
+                <span className="text-xs font-medium">
+                  {currentLocale === "en" ? navStrings.lang_en : navStrings.lang_es}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {displayLanguages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang}
+                  onClick={() => handleLanguageChange(lang)}
+                  className={currentLocale.toUpperCase() === lang ? "bg-muted" : ""}
+                >
+                  {lang}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Mobile Menu Toggle */}
           <div className="md:hidden">
@@ -159,6 +283,7 @@ export default function AppNavbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  locale={currentLocale}
                   onClick={handleLinkClick}
                   className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${activeAppPath(link.href) ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
                 >
@@ -166,19 +291,63 @@ export default function AppNavbar() {
                   {link.label}
                 </Link>
               ))}
+              {/* Mobile Usage Tracker */}
+              <div className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground">
+                <BarChart3 className="h-5 w-5" />
+                <span>
+                  Pages: <span className="font-semibold text-foreground/80">0/500</span>
+                </span>
+              </div>
             </SignedIn>
             <SignedOut>
               {marketingLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
+                  locale={currentLocale}
                   onClick={handleLinkClick}
-                  className={`block w-full px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                  className={`block w-full px-3 py-2 rounded-md text-base font-medium ${pathWithoutLocale === link.href ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
                 >
                   {link.label}
                 </Link>
               ))}
+              {/* Mobile Login Button */}
+              <SignInButton mode="modal">
+                <button
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <KeyRound className="h-5 w-5" />
+                  {navStrings.login}
+                </button>
+              </SignInButton>
+              {/* Mobile Sign Up Button */}
+              <SignUpButton mode="modal">
+                <button
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <UserPlus className="h-5 w-5" />
+                  {navStrings.signup}
+                </button>
+              </SignUpButton>
             </SignedOut>
+
+            {/* Common Language Selection for Mobile Menu */}
+            <div className="w-full mt-2 pt-2 border-t">
+              {displayLanguages.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => {
+                    handleLanguageChange(lang)
+                  }}
+                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${currentLocale.toUpperCase() === lang ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                >
+                  <Globe className="h-5 w-5 opacity-70" />
+                  {lang}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

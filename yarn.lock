@@ -245,6 +245,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@formatjs/intl-localematcher@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "@formatjs/intl-localematcher@npm:0.6.1"
+  dependencies:
+    tslib: "npm:^2.8.0"
+  checksum: 10c0/bacbedd508519c1bb5ca2620e89dc38f12101be59439aa14aa472b222915b462cb7d679726640f6dcf52a05dd218b5aa27ccd60f2e5010bb96f1d4929848cde0
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -1492,6 +1501,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/negotiator@npm:^0.6.3":
+  version: 0.6.3
+  resolution: "@types/negotiator@npm:0.6.3"
+  checksum: 10c0/d182002d9d7d3248139008e29857dddbc98bd7ada1fddbb33c96fce2f62821698a1ac62e90a92ea004c594abc6865e143f50146e21123a0aeb0641c2bf832aa3
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^20":
   version: 20.17.46
   resolution: "@types/node@npm:20.17.46"
@@ -2002,6 +2018,7 @@ __metadata:
   dependencies:
     "@clerk/nextjs": "npm:^6.19.4"
     "@eslint/eslintrc": "npm:^3"
+    "@formatjs/intl-localematcher": "npm:^0.6.1"
     "@radix-ui/react-accordion": "npm:^1.2.10"
     "@radix-ui/react-avatar": "npm:^1.1.9"
     "@radix-ui/react-dropdown-menu": "npm:^2.1.14"
@@ -2012,6 +2029,7 @@ __metadata:
     "@radix-ui/react-switch": "npm:^1.2.4"
     "@radix-ui/react-tabs": "npm:^1.1.11"
     "@tailwindcss/postcss": "npm:^4"
+    "@types/negotiator": "npm:^0.6.3"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
@@ -2021,6 +2039,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:15.3.2"
     lucide-react: "npm:^0.509.0"
+    negotiator: "npm:^1.0.0"
     next: "npm:15.3.2"
     next-themes: "npm:^0.4.6"
     pino: "npm:^9.6.0"

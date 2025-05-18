@@ -1,0 +1,70 @@
+{
+  "navbar": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "settings": "Configuración",
+    "billing": "Facturación",
+    "pricing": "Precios",
+    "about_us": "Sobre Nosotros",
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "convert": "Convertir",
+    "lang_en": "Inglés",
+    "lang_es": "Español"
+  },
+  "footer": {
+    "copyright": "© 2024 BankConvert. Todos los derechos reservados.",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad"
+  },
+  "homepage": {
+    "title": "Bienvenido a Bank Convert",
+    "subtitle": "Tu solución fácil para la conversión de extractos bancarios."
+  },
+  "dashboard_page": {
+    "title": "Panel de Control",
+    "file_upload_area_title": "Subir Extracto Bancario",
+    "start_conversion_button": "Iniciar Conversión"
+  },
+  "marketing_homepage": {
+    "howItWorksTitle": "Cómo Funciona en 3 Simples Pasos",
+    "step1Title": "Sube tu Extracto",
+    "step1Description": "Sube de forma segura tu extracto bancario en PDF o CSV.",
+    "step2Title": "IA Extrae los Datos",
+    "step2Description": "Nuestra IA inteligente procesa y estructura tus datos de transacciones con precisión.",
+    "step3Title": "Descarga Excel",
+    "step3Description": "Obtén un archivo Excel limpio y organizado, listo para tus necesidades.",
+    "featuresTitle": "Desbloquea Funciones Poderosas",
+    "feature1Title": "Soporte Multi-Formato",
+    "feature1Description": "Convierte sin esfuerzo extractos bancarios PDF y CSV en archivos Excel limpios.",
+    "feature2Title": "Precisión Impulsada por IA",
+    "feature2Description": "Aprovecha la IA avanzada para asegurar la extracción precisa de todos los detalles de las transacciones.",
+    "feature3Title": "Seguro y Confidencial",
+    "feature3Description": "Tus datos financieros están encriptados y se procesan con la máxima privacidad.",
+    "feature4Title": "Velocidad Asombrosa",
+    "feature4Description": "Obtén tus archivos convertidos en segundos, no en minutos. Ahorra tiempo valioso.",
+    "feature5Title": "Interfaz Multi-idioma",
+    "feature5Description": "Accede y utiliza el conversor en tu idioma preferido para una mejor experiencia.",
+    "feature6Title": "Vista Consolidada",
+    "feature6Description": "Combina datos de múltiples extractos para una visión financiera completa.",
+    "testimonialsTitle": "Amado por Usuarios Como Tú",
+    "testimonial1Quote": "¡Esta herramienta me ahorró horas de ingreso manual de datos! Convertir extractos PDF a Excel ahora es pan comido.",
+    "testimonial1Author": "Sarah L.",
+    "faqTitle": "Preguntas Frecuentes",
+    "faq1Question": "¿Es seguro Bank Convert?",
+    "faq1Answer": "Sí, absolutamente. Priorizamos la seguridad y privacidad de tus datos. Todas las cargas y procesamientos están encriptados y cumplimos con estrictas políticas de protección de datos. No almacenamos tus archivos después del procesamiento.",
+    "faq2Question": "¿Qué formatos de archivo son compatibles?",
+    "faq2Answer": "Actualmente, Bank Convert admite archivos PDF y CSV. Estamos trabajando continuamente para ampliar nuestro soporte a otros formatos.",
+    "faq3Question": "¿Qué tan precisa es la extracción de datos?",
+    "faq3Answer": "Nuestra IA está entrenada con una gran cantidad de extractos bancarios para garantizar una alta precisión. Si bien buscamos la perfección, recomendamos una revisión rápida del archivo Excel convertido, especialmente para extractos complejos.",
+    "faq4Question": "¿Existe un límite en el tamaño del archivo o número de páginas?",
+    "faq4Answer": "Nuestro plan gratuito tiene ciertas limitaciones. Los planes de pago ofrecen límites más altos en el tamaño del archivo y la cantidad de páginas que puedes convertir por mes. Consulta nuestra página de Precios para más detalles.",
+    "faq5Question": "¿Puedo usar Bank Convert en mi dispositivo móvil?",
+    "faq5Answer": "Sí, Bank Convert está diseñado para ser responsivo y se puede acceder desde cualquier dispositivo, incluyendo computadoras de escritorio, tabletas y teléfonos inteligentes.",
+    "ctaTitle": "¿Listo para Simplificar la Conversión de tus Extractos Bancarios?",
+    "ctaSubtitle": "Deja de perder tiempo en la entrada manual de datos. Comienza a convertir tus extractos bancarios a Excel sin esfuerzo hoy mismo.",
+    "ctaButtonText": "Comienza Gratis"
+  }
+}
