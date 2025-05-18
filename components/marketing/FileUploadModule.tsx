@@ -1,0 +1,187 @@
+// This component will handle the file upload functionality,
+// including a drag-and-drop zone and a file input button.
+"use client"
+
+import React, { useCallback, useState, useImperativeHandle, forwardRef } from "react"
+import { useDropzone, FileRejection } from "react-dropzone"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
+
+export interface FileUploadModuleRef {
+  openFileDialog: () => void
+}
+
+interface FileUploadModuleProps {
+  onFileUpload: (file: File) => void
+  maxFileSize?: number
+  acceptedFileTypes?: Record<string, string[]>
+  hideSelectFileButton?: boolean // New prop
+}
+
+const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
+  (
+    {
+      onFileUpload,
+      maxFileSize = 5 * 1024 * 1024,
+      acceptedFileTypes = { "application/pdf": [".pdf"], "text/csv": [".csv"] },
+      hideSelectFileButton = false,
+    },
+    ref,
+  ) => {
+    const [file, setFile] = useState<File | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [progress, setProgress] = useState<number | null>(null)
+
+    const onDrop = useCallback(
+      (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+        setError(null)
+        setFile(null)
+        setProgress(null)
+
+        if (fileRejections.length > 0) {
+          const firstRejection = fileRejections[0]
+          if (firstRejection.errors && firstRejection.errors.length > 0) {
+            const firstError = firstRejection.errors[0]
+            if (firstError.code === "file-too-large") {
+              setError(`File is too large. Max size is ${maxFileSize / (1024 * 1024)}MB.`)
+            } else if (firstError.code === "file-invalid-type") {
+              setError("Invalid file type. Please upload a PDF or CSV file.")
+            } else {
+              setError(firstError.message)
+            }
+          } else {
+            setError("File upload failed. Please try again.")
+          }
+          return
+        }
+
+        if (acceptedFiles.length > 0) {
+          const selectedFile = acceptedFiles[0]
+          setFile(selectedFile)
+          setProgress(0)
+          let currentProgress = 0
+          const interval = setInterval(() => {
+            currentProgress += 10
+            if (currentProgress <= 100) {
+              setProgress(currentProgress)
+            } else {
+              clearInterval(interval)
+              setProgress(100)
+              onFileUpload(selectedFile)
+            }
+          }, 200)
+        }
+      },
+      [onFileUpload, maxFileSize],
+    )
+
+    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+      onDrop,
+      accept: acceptedFileTypes,
+      maxSize: maxFileSize,
+      multiple: false,
+      noClick: false, // Allow clicking on the dropzone to open file dialog
+    })
+
+    // Expose the open function via ref
+    useImperativeHandle(ref, () => ({
+      openFileDialog: open,
+    }))
+
+    const handleRemoveFile = () => {
+      setFile(null)
+      setError(null)
+      setProgress(null)
+    }
+
+    return (
+      <div className="w-full max-w-lg mx-auto p-6 border border-dashed border-muted-foreground/30 rounded-lg bg-background shadow-sm text-center">
+        {error && (
+          <Alert variant="destructive" className="mb-4 text-left">
+            <XCircle className="h-4 w-4" />
+            <AlertTitle>Upload Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {!file && !progress && (
+          <div
+            {...getRootProps()}
+            className={`p-8 border-2 border-dashed rounded-md cursor-pointer 
+            ${isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/50 hover:border-primary/70"}
+            transition-colors duration-200 ease-in-out`}
+          >
+            <input {...getInputProps()} />
+            <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            {isDragActive ? (
+              <p className="text-primary font-semibold">Drop the file here ...</p>
+            ) : (
+              <>
+                <p className="mb-2 text-sm text-muted-foreground">
+                  <span className="font-semibold text-primary">Click to upload</span> or drag and
+                  drop
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  PDF or CSV (max. {maxFileSize / (1024 * 1024)}MB)
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
+        {progress !== null && file && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2 text-sm">
+                <FileIcon className="h-5 w-5 text-muted-foreground" />
+                <span className="font-medium truncate max-w-[200px]">{file.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                </span>
+              </div>
+              {progress === 100 ? (
+                <XCircle
+                  className="h-5 w-5 text-destructive cursor-pointer"
+                  onClick={handleRemoveFile}
+                />
+              ) : (
+                <span className="text-sm font-medium">{progress}%</span>
+              )}
+            </div>
+            <Progress value={progress} className="w-full h-2" />
+            {progress === 100 && (
+              <p className="text-xs text-green-600 mt-1">File ready for processing!</p>
+            )}
+          </div>
+        )}
+
+        {!file && !progress && !hideSelectFileButton && (
+          <Button onClick={open} variant="outline" className="mt-6">
+            Or Select File
+          </Button>
+        )}
+
+        {file && progress === 100 && (
+          <>
+            <div className="mt-6 p-4 border rounded-md bg-muted/20">
+              <p className="text-sm text-muted-foreground">
+                File processed (simulated). Display sample data and download options here.
+              </p>
+            </div>
+            <div className="mt-4 flex gap-2 justify-center">
+              <Button onClick={handleRemoveFile} variant="outline">
+                Upload Another File
+              </Button>
+              <Button variant="default">Download Sample XLSX</Button>
+            </div>
+          </>
+        )}
+      </div>
+    )
+  },
+)
+
+FileUploadModule.displayName = "FileUploadModule" // for better debugging
+export default FileUploadModule
