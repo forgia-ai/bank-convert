@@ -11,16 +11,23 @@ import { getDictionary } from "@/lib/getDictionary"
 import { type Locale } from "@/i18n-config"
 
 export default async function MarketingHomePage({
-  params: { lang },
+  params: paramsPromise, // Renamed to avoid conflict
 }: {
-  params: { lang: Locale }
+  params: Promise<{ lang: Locale }>
 }) {
+  const { lang } = await paramsPromise
   const dictionary = await getDictionary(lang)
 
   return (
     <>
       <main>
-        <InteractiveHeroSection />
+        <InteractiveHeroSection
+          heroTitle={dictionary.marketing_homepage.heroTitle}
+          heroSubtitle={dictionary.marketing_homepage.heroSubtitle}
+          heroCtaButton={dictionary.marketing_homepage.heroCtaButton}
+          heroTrustText={dictionary.marketing_homepage.heroTrustText}
+          fileUploadModuleStrings={dictionary.marketing_homepage.file_upload_module_strings}
+        />
         {/* How It Works Section */}
         <section id="how-it-works" className="py-16 md:py-24 bg-muted/30">
           <div className="container mx-auto px-4 md:px-8">

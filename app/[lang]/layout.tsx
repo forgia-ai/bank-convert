@@ -2,9 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "../globals.css" // Adjusted path for CSS from app/[lang] to app/globals.css
 import { ClerkProvider } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
-import AppNavbar from "@/components/navigation/AppNavbar"
-import Footer from "@/components/layout/Footer"
-import { getDictionary } from "@/lib/getDictionary" // Using path alias for i18n-config
+// AppNavbar and Footer will be imported by specific route group layouts
+// import { getDictionary } from "@/lib/getDictionary" // No longer needed here
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,22 +33,23 @@ export async function generateStaticParams() {
 
 export default async function RootLayout({
   children,
-  params,
+  params: paramsPromise, // Renamed to avoid conflict with destructured params
 }: Readonly<{
   children: React.ReactNode
-  params: { lang: Locale }
+  params: Promise<{ lang: Locale }>
 }>) {
-  const dictionary = await getDictionary(params.lang)
+  const { lang } = await paramsPromise
+  // const dictionary = await getDictionary(lang) // Dictionary will be fetched by route group layouts
   return (
     <ClerkProvider afterSignInUrl="/dashboard" afterSignUpUrl="/dashboard">
       {/* Set the lang attribute dynamically */}
-      <html lang={params.lang} suppressHydrationWarning={true}>
+      <html lang={lang} suppressHydrationWarning={true}>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
         >
-          <AppNavbar navStrings={dictionary.navbar} />
+          {/* AppNavbar will be rendered by the specific route group layout */}
           <main className="flex-grow">{children}</main>
-          <Footer footerStrings={dictionary.footer} currentLocale={params.lang} />
+          {/* Footer will be rendered by the specific route group layout */}
         </body>
       </html>
     </ClerkProvider>

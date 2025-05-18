@@ -12,10 +12,11 @@
     "logout": "Logout",
     "convert": "Convert",
     "lang_en": "English",
-    "lang_es": "Spanish"
+    "lang_es": "Spanish",
+    "lang_pt": "Portuguese"
   },
   "footer": {
-    "copyright": "© 2024 BankConvert. All rights reserved.",
+    "copyright": " 2024 BankConvert. All rights reserved.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy"
   },
@@ -26,9 +27,44 @@
   "dashboard_page": {
     "title": "Dashboard",
     "file_upload_area_title": "Upload Bank Statement",
-    "start_conversion_button": "Start Conversion"
+    "start_conversion_button": "Start Conversion",
+    "file_upload_area_strings": {
+      "removeButton": "Remove",
+      "dragDropDefaultText": "Drag & drop your statement, or click to browse",
+      "dragDropDraggingText": "Drop your file here",
+      "supportedTypesPrefix": "Supported types: ",
+      "maxSizePrefix": ". Max size: ",
+      "mbUnit": "MB",
+      "errorInvalidType": "Invalid file type. Accepted types: ",
+      "errorFileTooLarge": "File too large. Max size: "
+    }
   },
   "marketing_homepage": {
+    "heroTitle": "Convert Bank Statements to Excel in Seconds",
+    "heroSubtitle": "Upload PDF or CSV, get structured data instantly. Try it free!",
+    "heroCtaButton": "Upload Statement & Convert",
+    "heroTrustText": "Trusted by professionals for secure and accurate data handling.",
+    "file_upload_module_strings": {
+      "errorFileTooLargePrefix": "File is too large. Max size is ",
+      "errorFileTooLargeSuffix": "MB.",
+      "errorInvalidFileType": "Invalid file type. Please upload a PDF or CSV file.",
+      "errorGenericUpload": "File upload failed. Please try again.",
+      "dropzoneDraggingText": "Drop the file here ...",
+      "dropzoneDefaultTextClick": "Click to upload",
+      "dropzoneDefaultTextDrag": " or drag and drop",
+      "dropzoneHintPrefix": "PDF or CSV (max. ",
+      "dropzoneHintSuffix": "MB)",
+      "fileInfoUnit": " MB",
+      "progressFileReady": "File ready for processing!",
+      "buttonOrSelectFile": "Or Select File",
+      "placeholderFileProcessed": "File processed (simulated). Display sample data and download options here.",
+      "buttonUploadAnother": "Upload Another File",
+      "buttonDownloadSample": "Download Sample XLSX",
+      "alertTitleUploadError": "Upload Error"
+    },
+    "top_authority_bar": {
+      "trust_message": "Trusted by 10,000+ Happy Users Worldwide!"
+    },
     "howItWorksTitle": "How It Works in 3 Simple Steps",
     "step1Title": "Upload Your Statement",
     "step1Description": "Securely upload your PDF or CSV bank statement.",

@@ -13,11 +13,31 @@ export interface FileUploadModuleRef {
   openFileDialog: () => void
 }
 
+export interface FileUploadModuleStrings {
+  errorFileTooLargePrefix: string
+  errorFileTooLargeSuffix: string
+  errorInvalidFileType: string
+  errorGenericUpload: string
+  dropzoneDraggingText: string
+  dropzoneDefaultTextClick: string
+  dropzoneDefaultTextDrag: string
+  dropzoneHintPrefix: string
+  dropzoneHintSuffix: string
+  fileInfoUnit: string
+  progressFileReady: string
+  buttonOrSelectFile: string
+  placeholderFileProcessed: string
+  buttonUploadAnother: string
+  buttonDownloadSample: string
+  alertTitleUploadError: string
+}
+
 interface FileUploadModuleProps {
   onFileUpload: (file: File) => void
   maxFileSize?: number
   acceptedFileTypes?: Record<string, string[]>
   hideSelectFileButton?: boolean // New prop
+  strings: FileUploadModuleStrings
 }
 
 const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
@@ -27,6 +47,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       maxFileSize = 5 * 1024 * 1024,
       acceptedFileTypes = { "application/pdf": [".pdf"], "text/csv": [".csv"] },
       hideSelectFileButton = false,
+      strings,
     },
     ref,
   ) => {
@@ -45,14 +66,16 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           if (firstRejection.errors && firstRejection.errors.length > 0) {
             const firstError = firstRejection.errors[0]
             if (firstError.code === "file-too-large") {
-              setError(`File is too large. Max size is ${maxFileSize / (1024 * 1024)}MB.`)
+              setError(
+                `${strings.errorFileTooLargePrefix}${maxFileSize / (1024 * 1024)}${strings.errorFileTooLargeSuffix}`,
+              )
             } else if (firstError.code === "file-invalid-type") {
-              setError("Invalid file type. Please upload a PDF or CSV file.")
+              setError(strings.errorInvalidFileType)
             } else {
               setError(firstError.message)
             }
           } else {
-            setError("File upload failed. Please try again.")
+            setError(strings.errorGenericUpload)
           }
           return
         }
@@ -74,7 +97,14 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           }, 200)
         }
       },
-      [onFileUpload, maxFileSize],
+      [
+        onFileUpload,
+        maxFileSize,
+        strings.errorFileTooLargePrefix,
+        strings.errorFileTooLargeSuffix,
+        strings.errorInvalidFileType,
+        strings.errorGenericUpload,
+      ],
     )
 
     const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -101,7 +131,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         {error && (
           <Alert variant="destructive" className="mb-4 text-left">
             <XCircle className="h-4 w-4" />
-            <AlertTitle>Upload Error</AlertTitle>
+            <AlertTitle>{strings.alertTitleUploadError}</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -116,15 +146,19 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             <input {...getInputProps()} />
             <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             {isDragActive ? (
-              <p className="text-primary font-semibold">Drop the file here ...</p>
+              <p className="text-primary font-semibold">{strings.dropzoneDraggingText}</p>
             ) : (
               <>
                 <p className="mb-2 text-sm text-muted-foreground">
-                  <span className="font-semibold text-primary">Click to upload</span> or drag and
-                  drop
+                  <span className="font-semibold text-primary">
+                    {strings.dropzoneDefaultTextClick}
+                  </span>
+                  {strings.dropzoneDefaultTextDrag}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PDF or CSV (max. {maxFileSize / (1024 * 1024)}MB)
+                  {strings.dropzoneHintPrefix}
+                  {maxFileSize / (1024 * 1024)}
+                  {strings.dropzoneHintSuffix}
                 </p>
               </>
             )}
@@ -138,7 +172,8 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
                 <FileIcon className="h-5 w-5 text-muted-foreground" />
                 <span className="font-medium truncate max-w-[200px]">{file.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+                  ({(file.size / (1024 * 1024)).toFixed(2)}
+                  {strings.fileInfoUnit})
                 </span>
               </div>
               {progress === 100 ? (
@@ -152,29 +187,27 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             </div>
             <Progress value={progress} className="w-full h-2" />
             {progress === 100 && (
-              <p className="text-xs text-green-600 mt-1">File ready for processing!</p>
+              <p className="text-xs text-green-600 mt-1">{strings.progressFileReady}</p>
             )}
           </div>
         )}
 
         {!file && !progress && !hideSelectFileButton && (
           <Button onClick={open} variant="outline" className="mt-6">
-            Or Select File
+            {strings.buttonOrSelectFile}
           </Button>
         )}
 
         {file && progress === 100 && (
           <>
             <div className="mt-6 p-4 border rounded-md bg-muted/20">
-              <p className="text-sm text-muted-foreground">
-                File processed (simulated). Display sample data and download options here.
-              </p>
+              <p className="text-sm text-muted-foreground">{strings.placeholderFileProcessed}</p>
             </div>
             <div className="mt-4 flex gap-2 justify-center">
               <Button onClick={handleRemoveFile} variant="outline">
-                Upload Another File
+                {strings.buttonUploadAnother}
               </Button>
-              <Button variant="default">Download Sample XLSX</Button>
+              <Button variant="default">{strings.buttonDownloadSample}</Button>
             </div>
           </>
         )}

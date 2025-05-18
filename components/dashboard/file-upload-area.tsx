@@ -6,10 +6,22 @@ import { UploadCloud, FileText, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils" // For conditional class names
 
+interface FileUploadAreaStrings {
+  removeButton: string
+  dragDropDefaultText: string
+  dragDropDraggingText: string
+  supportedTypesPrefix: string
+  maxSizePrefix: string
+  mbUnit: string
+  errorInvalidType: string // Example: "Invalid file type. Accepted types: " - {0} will be appended
+  errorFileTooLarge: string // Example: "File too large. Max size: " - {0}{1} will be appended
+}
+
 interface FileUploadAreaProps {
   onFileSelect: (file: File | null) => void
   acceptedFileTypes?: string[] // e.g., ['application/pdf', 'text/csv']
   maxFileSize?: number // in bytes
+  strings: FileUploadAreaStrings
 }
 
 const DEFAULT_ACCEPTED_TYPES = [
@@ -25,6 +37,7 @@ export function FileUploadArea({
   onFileSelect,
   acceptedFileTypes = DEFAULT_ACCEPTED_TYPES,
   maxFileSize = DEFAULT_MAX_SIZE_BYTES,
+  strings,
 }: FileUploadAreaProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -34,17 +47,24 @@ export function FileUploadArea({
   const handleValidation = useCallback(
     (file: File): boolean => {
       if (!acceptedFileTypes.includes(file.type)) {
-        setError(`Invalid file type. Accepted types: ${acceptedFileTypes.join(", ")}`)
+        setError(`${strings.errorInvalidType}${acceptedFileTypes.join(", ")}`)
         return false
       }
       if (file.size > maxFileSize) {
-        setError(`File too large. Max size: ${DEFAULT_MAX_SIZE_MB}MB`)
+        setError(`${strings.errorFileTooLarge}${DEFAULT_MAX_SIZE_MB}${strings.mbUnit}`)
         return false
       }
       setError(null)
       return true
     },
-    [acceptedFileTypes, maxFileSize],
+    [
+      acceptedFileTypes,
+      maxFileSize,
+      setError,
+      strings.errorInvalidType,
+      strings.errorFileTooLarge,
+      strings.mbUnit,
+    ],
   )
 
   const handleFileChange = useCallback(
@@ -166,7 +186,7 @@ export function FileUploadArea({
                 removeSelectedFile()
               }}
             >
-              <XCircle className="h-4 w-4 mr-1" /> Remove
+              <XCircle className="h-4 w-4 mr-1" /> {strings.removeButton}
             </Button>
           </div>
         ) : (
@@ -184,12 +204,14 @@ export function FileUploadArea({
                 error ? "text-destructive" : "text-foreground",
               )}
             >
-              {isDragging
-                ? "Drop your file here"
-                : error || "Drag & drop your statement, or click to browse"}
+              {isDragging ? strings.dragDropDraggingText : error || strings.dragDropDefaultText}
             </p>
             <p className="text-xs text-muted-foreground">
-              Supported types: {acceptedTypesString}. Max size: {DEFAULT_MAX_SIZE_MB}MB.
+              {strings.supportedTypesPrefix}
+              {acceptedTypesString}
+              {strings.maxSizePrefix}
+              {DEFAULT_MAX_SIZE_MB}
+              {strings.mbUnit}.
             </p>
           </>
         )}

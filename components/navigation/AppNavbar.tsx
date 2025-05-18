@@ -68,12 +68,15 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Generate display languages from i18n config
-  const displayLanguages = i18n.locales.map((loc) =>
-    loc === "en" ? navStrings.lang_en : navStrings.lang_es,
-  )
+  const displayLanguages: { code: Locale; name: string }[] = i18n.locales.map((loc) => {
+    if (loc === "en") return { code: loc, name: navStrings.lang_en }
+    if (loc === "es") return { code: loc, name: navStrings.lang_es }
+    if (loc === "pt") return { code: loc, name: navStrings.lang_pt }
+    // Fallback should ideally not be reached if all locales are mapped
+    return { code: i18n.defaultLocale, name: navStrings.lang_en }
+  })
 
-  const handleLanguageChange = (newLang: string) => {
-    const targetLang = newLang.toLowerCase()
+  const handleLanguageChange = (targetLang: Locale) => {
     // Always construct the path with the target locale prefix
     let newPath = `/${targetLang}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`
 
@@ -136,8 +139,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
         {/* Left Section: Logo */}
         <div className="flex items-center gap-2">
           <Link
-            href="/" // Base path is always root
-            locale={currentLocale} // Let Next.js Link handle prefixing
+            href={`/${currentLocale}`}
             className="flex items-center gap-2 font-bold text-lg"
             onClick={handleLinkClick}
           >
@@ -173,7 +175,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
         </div>
 
         {/* Center Section: Desktop Navigation Links */}
-        <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-1">
+        <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4">
           <SignedIn>
             {appLinks.map((link) => (
               <Button
@@ -183,7 +185,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 size="sm"
                 className="font-medium"
               >
-                <Link href={link.href} locale={currentLocale} className="flex items-center gap-2">
+                <Link href={`/${currentLocale}${link.href}`} className="flex items-center gap-2">
                   {link.icon}
                   {link.label}
                 </Link>
@@ -194,9 +196,8 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
             {marketingLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
-                locale={currentLocale}
-                className={`${commonLinkClasses} px-3 py-2 text-sm font-medium rounded-md hover:bg-muted`}
+                href={`/${currentLocale}${link.href}`}
+                className={`${commonLinkClasses} ${activeAppPath(link.href) ? "font-semibold text-foreground" : ""}`}
               >
                 {link.label}
               </Link>
@@ -239,22 +240,28 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 variant="outline"
                 size="sm"
                 className="hidden md:flex items-center gap-1.5 w-20"
-                aria-label={`Change language, current language ${currentLocale === "en" ? navStrings.lang_en : navStrings.lang_es}`}
+                aria-label={`Change language, current language ${currentLocale === "en" ? navStrings.lang_en : currentLocale === "es" ? navStrings.lang_es : currentLocale === "pt" ? navStrings.lang_pt : navStrings.lang_en}`}
               >
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-medium">
-                  {currentLocale === "en" ? navStrings.lang_en : navStrings.lang_es}
+                  {currentLocale === "en"
+                    ? navStrings.lang_en
+                    : currentLocale === "es"
+                      ? navStrings.lang_es
+                      : currentLocale === "pt"
+                        ? navStrings.lang_pt
+                        : navStrings.lang_en}
                 </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {displayLanguages.map((lang) => (
+              {displayLanguages.map((language) => (
                 <DropdownMenuItem
-                  key={lang}
-                  onClick={() => handleLanguageChange(lang)}
-                  className={currentLocale.toUpperCase() === lang ? "bg-muted" : ""}
+                  key={language.code}
+                  onClick={() => handleLanguageChange(language.code)}
+                  className={currentLocale === language.code ? "bg-muted" : ""}
                 >
-                  {lang}
+                  {language.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -335,16 +342,17 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
 
             {/* Common Language Selection for Mobile Menu */}
             <div className="w-full mt-2 pt-2 border-t">
-              {displayLanguages.map((lang) => (
+              {displayLanguages.map((language) => (
                 <button
-                  key={lang}
+                  key={language.code}
                   onClick={() => {
-                    handleLanguageChange(lang)
+                    handleLanguageChange(language.code)
+                    setIsMobileMenuOpen(false) // Close menu on selection
                   }}
-                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${currentLocale.toUpperCase() === lang ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${currentLocale === language.code ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
                 >
-                  <Globe className="h-5 w-5 opacity-70" />
-                  {lang}
+                  <Globe className="h-5 w-5" />
+                  {language.name}
                 </button>
               ))}
             </div>

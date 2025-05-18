@@ -12,7 +12,8 @@
     "logout": "Cerrar Sesión",
     "convert": "Convertir",
     "lang_en": "Inglés",
-    "lang_es": "Español"
+    "lang_es": "Español",
+    "lang_pt": "Portugués"
   },
   "footer": {
     "copyright": "© 2024 BankConvert. Todos los derechos reservados.",
@@ -26,9 +27,44 @@
   "dashboard_page": {
     "title": "Panel de Control",
     "file_upload_area_title": "Subir Extracto Bancario",
-    "start_conversion_button": "Iniciar Conversión"
+    "start_conversion_button": "Iniciar Conversión",
+    "file_upload_area_strings": {
+      "removeButton": "Quitar",
+      "dragDropDefaultText": "Arrastra y suelta tu extracto, o haz clic para buscar",
+      "dragDropDraggingText": "Suelta tu archivo aquí",
+      "supportedTypesPrefix": "Tipos soportados: ",
+      "maxSizePrefix": ". Tamaño máx.: ",
+      "mbUnit": "MB",
+      "errorInvalidType": "Tipo de archivo inválido. Tipos aceptados: ",
+      "errorFileTooLarge": "Archivo demasiado grande. Tamaño máx.: "
+    }
   },
   "marketing_homepage": {
+    "heroTitle": "Convierte Extractos Bancarios a Excel en Segundos",
+    "heroSubtitle": "Sube PDF o CSV, obtén datos estructurados al instante. ¡Pruébalo gratis!",
+    "heroCtaButton": "Subir Extracto y Convertir",
+    "heroTrustText": "Confiado por profesionales para un manejo de datos seguro y preciso.",
+    "file_upload_module_strings": {
+      "errorFileTooLargePrefix": "El archivo es demasiado grande. El tamaño máximo es ",
+      "errorFileTooLargeSuffix": "MB.",
+      "errorInvalidFileType": "Tipo de archivo inválido. Por favor, sube un archivo PDF o CSV.",
+      "errorGenericUpload": "Falló la carga del archivo. Por favor, inténtalo de nuevo.",
+      "dropzoneDraggingText": "Suelta el archivo aquí ...",
+      "dropzoneDefaultTextClick": "Haz clic para subir",
+      "dropzoneDefaultTextDrag": " o arrastra y suelta",
+      "dropzoneHintPrefix": "PDF o CSV (máx. ",
+      "dropzoneHintSuffix": "MB)",
+      "fileInfoUnit": " MB",
+      "progressFileReady": "¡Archivo listo para procesar!",
+      "buttonOrSelectFile": "O Seleccionar Archivo",
+      "placeholderFileProcessed": "Archivo procesado (simulado). Muestra datos de ejemplo y opciones de descarga aquí.",
+      "buttonUploadAnother": "Subir Otro Archivo",
+      "buttonDownloadSample": "Descargar XLSX de Muestra",
+      "alertTitleUploadError": "Error de Carga"
+    },
+    "top_authority_bar": {
+      "trust_message": "¡Confiado por más de 10,000 usuarios satisfechos en todo el mundo!"
+    },
     "howItWorksTitle": "Cómo Funciona en 3 Simples Pasos",
     "step1Title": "Sube tu Extracto",
     "step1Description": "Sube de forma segura tu extracto bancario en PDF o CSV.",

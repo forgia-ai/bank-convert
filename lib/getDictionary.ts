@@ -7,6 +7,7 @@ import { i18n } from "../i18n-config"
 const dictionaries = {
   en: () => import("../dictionaries/en.json").then((module) => module.default),
   es: () => import("../dictionaries/es.json").then((module) => module.default),
+  pt: () => import("../dictionaries/pt.json").then((module) => module.default),
   // Add other locales from i18n.locales here
 } as const
 
