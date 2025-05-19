@@ -67,13 +67,15 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // Generate display languages from i18n config
+  const nativeLanguageNames: Record<Locale, string> = {
+    en: "English",
+    es: "Español",
+    pt: "Português",
+  }
+
+  // Generate display languages using native names
   const displayLanguages: { code: Locale; name: string }[] = i18n.locales.map((loc) => {
-    if (loc === "en") return { code: loc, name: navStrings.lang_en }
-    if (loc === "es") return { code: loc, name: navStrings.lang_es }
-    if (loc === "pt") return { code: loc, name: navStrings.lang_pt }
-    // Fallback should ideally not be reached if all locales are mapped
-    return { code: i18n.defaultLocale, name: navStrings.lang_en }
+    return { code: loc, name: nativeLanguageNames[loc] || loc.toUpperCase() } // Fallback to uppercase code if native name missing
   })
 
   const handleLanguageChange = (targetLang: Locale) => {
@@ -175,7 +177,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
         </div>
 
         {/* Center Section: Desktop Navigation Links */}
-        <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4">
+        <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-12">
           <SignedIn>
             {appLinks.map((link) => (
               <Button
@@ -206,7 +208,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
         </div>
 
         {/* Right Section: Auth Buttons / User Info & Mobile Menu Toggle */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <SignedIn>
             {/* Placeholder: Usage Tracker - can be part of app layout or specific pages */}
             <Button variant="outline" size="sm" className="hidden md:flex items-center gap-1.5">
@@ -239,18 +241,12 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:flex items-center gap-1.5 w-20"
-                aria-label={`Change language, current language ${currentLocale === "en" ? navStrings.lang_en : currentLocale === "es" ? navStrings.lang_es : currentLocale === "pt" ? navStrings.lang_pt : navStrings.lang_en}`}
+                className="hidden md:flex items-center gap-1.5 w-30"
+                aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
               >
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-medium">
-                  {currentLocale === "en"
-                    ? navStrings.lang_en
-                    : currentLocale === "es"
-                      ? navStrings.lang_es
-                      : currentLocale === "pt"
-                        ? navStrings.lang_pt
-                        : navStrings.lang_en}
+                  {nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}
                 </span>
               </Button>
             </DropdownMenuTrigger>

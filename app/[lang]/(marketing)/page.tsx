@@ -118,7 +118,14 @@ export default async function MarketingHomePage({
                 quote={dictionary.marketing_homepage.testimonial1Quote}
                 author={dictionary.marketing_homepage.testimonial1Author}
               />
-              {/* TODO: Add more TestimonialCard components here, using dictionary entries for other testimonials */}
+              <TestimonialCard
+                quote={dictionary.marketing_homepage.testimonial2Quote}
+                author={dictionary.marketing_homepage.testimonial2Author}
+              />
+              <TestimonialCard
+                quote={dictionary.marketing_homepage.testimonial3Quote}
+                author={dictionary.marketing_homepage.testimonial3Author}
+              />
             </div>
           </div>
         </section>

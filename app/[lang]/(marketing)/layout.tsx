@@ -19,7 +19,7 @@ export default async function MarketingLayout({
         trustMessage={dictionary.marketing_homepage.top_authority_bar.trust_message}
       />
       <AppNavbar navStrings={dictionary.navbar} />
-      <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
+      <main className="flex-grow pt-8">{children}</main>
       <Footer footerStrings={dictionary.footer} currentLocale={lang} />
     </div>
   )
