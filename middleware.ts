@@ -1,8 +1,14 @@
-import { clerkMiddleware } from "@clerk/nextjs/server"
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 import { NextRequest, NextResponse } from "next/server"
 import { i18n } from "./i18n-config"
 import { match as matchLocale } from "@formatjs/intl-localematcher"
 import Negotiator from "negotiator"
+
+const isProtectedRoute = createRouteMatcher([
+  "/:lang/dashboard(.*)", // Matches /en/dashboard, /es/dashboard/profile, etc.
+  "/:lang/billing(.*)", // Matches /en/billing, /es/billing/invoices, etc.
+  "/:lang/settings(.*)", // Matches /en/settings, /es/settings/account, etc.
+])
 
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {}
@@ -29,18 +35,25 @@ const I18N_BYPASS_PATTERNS: RegExp[] = [
   // favicon.ico and other extension-based static assets are typically excluded by the config.matcher
 ]
 
-export default clerkMiddleware((auth, request: NextRequest) => {
+export default clerkMiddleware(async (auth, request: NextRequest) => {
   const { pathname } = request.nextUrl
 
-  // Check if the path should bypass i18n and go directly to Clerk/app logic
+  // Check if the path should bypass i18n (e.g., Clerk routes, API routes)
   const shouldBypassI18n = I18N_BYPASS_PATTERNS.some((pattern) => pattern.test(pathname))
 
   if (shouldBypassI18n) {
     // For these paths, Clerk handles auth based on its config, no i18n redirect.
+    // The rest of the middleware (including auth.protect if applicable via Clerk's internal config) will run.
     return NextResponse.next()
   }
 
-  // Handle i18n localization for all other routes (assumed to be pages)
+  // Check if the route is one of the protected dashboard routes
+  if (isProtectedRoute(request)) {
+    await auth.protect() // Redirects if unauthenticated. Execution stops here for unauth.
+  }
+
+  // If the route is not protected, or if auth.protect() allowed the request (user is authenticated),
+  // proceed with the i18n localization logic.
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
   )
@@ -49,13 +62,13 @@ export default clerkMiddleware((auth, request: NextRequest) => {
     const locale = getLocale(request)
 
     // Redirect to the same path with the locale prefix
-    // e.g., /products -> /en/products, or / -> /en
     return NextResponse.redirect(
       new URL(`/${locale}${pathname === "/" ? "" : pathname}`, request.url),
     )
   }
 
-  // If locale is present, or for routes that bypassed i18n, let Clerk proceed.
+  // If locale is present and the route was not protected (or user was authenticated),
+  // let the request proceed.
   return NextResponse.next()
 })
 

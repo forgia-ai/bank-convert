@@ -18,11 +18,6 @@ export default async function DashboardLayout({
 }) {
   const { lang } = await paramsPromise // Await the params Promise
   const dictionary = await getDictionary(lang)
-  // Here you would typically add logic to ensure the user is authenticated.
-  // For example, using Clerk's <Protect> component or a similar mechanism.
-  // If not authenticated, you might redirect to a login page.
-  // For now, we'll assume authentication is handled and proceed to show the layout.
-
   return (
     <div className="flex flex-col min-h-screen">
       <AppNavbar navStrings={dictionary.navbar} />
