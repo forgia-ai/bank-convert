@@ -41,7 +41,7 @@ export default async function RootLayout({
   const { lang } = await paramsPromise
   // const dictionary = await getDictionary(lang) // Dictionary will be fetched by route group layouts
   return (
-    <ClerkProvider afterSignInUrl="/dashboard" afterSignUpUrl="/dashboard">
+    <ClerkProvider>
       {/* Set the lang attribute dynamically */}
       <html lang={lang} suppressHydrationWarning={true}>
         <body
