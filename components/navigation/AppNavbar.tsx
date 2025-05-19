@@ -218,9 +218,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 {/* TODO: Dynamic data */}
               </span>
             </Button>
-            <UserButton
-              afterSignOutUrl={currentLocale === i18n.defaultLocale ? "/" : `/${currentLocale}`}
-            />
+            <UserButton />
           </SignedIn>
           <SignedOut>
             <SignInButton mode="modal">

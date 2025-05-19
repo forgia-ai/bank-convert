@@ -1,9 +1,9 @@
 // app/(dashboard)/layout.tsx
 import AppNavbar from "@/components/navigation/AppNavbar"
 import { getDictionary } from "@/lib/getDictionary"
-import { type Locale } from "@/i18n-config"
-import { PropsWithChildren } from "react"
 import { Toaster } from "@/components/ui/sonner"
+import type { Locale } from "@/i18n-config"
+import type { ReactNode } from "react"
 
 /**
  * Layout for all pages within the authenticated user dashboard.
@@ -11,9 +11,13 @@ import { Toaster } from "@/components/ui/sonner"
  */
 export default async function DashboardLayout({
   children,
-  params,
-}: PropsWithChildren<{ params: { lang: Locale } }>) {
-  const dictionary = await getDictionary(params.lang)
+  params: paramsPromise, // Rename to avoid conflict
+}: {
+  children: ReactNode
+  params: Promise<{ lang: Locale }> // Expect a Promise for params
+}) {
+  const { lang } = await paramsPromise // Await the params Promise
+  const dictionary = await getDictionary(lang)
   // Here you would typically add logic to ensure the user is authenticated.
   // For example, using Clerk's <Protect> component or a similar mechanism.
   // If not authenticated, you might redirect to a login page.

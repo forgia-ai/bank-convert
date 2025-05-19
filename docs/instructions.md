@@ -326,9 +326,9 @@ This plan outlines the development phases, starting with frontend UI and mock da
 5.  **[ ] User Profile/Settings UI (Mock & Basic Clerk):**
     - [ ] UI for managing profile settings (e.g., change password - leveraging Clerk where possible).
     - [ ] UI for viewing current subscription plan and (mock) upgrade options.
-6.  **[ ] Language Support UI (Initial Setup):**
-    - [ ] Basic UI elements for language selection.
-    - [ ] Set up i18n (e.g., `next-i18next`) with placeholder translations for UI text.
+6.  **[x] Language Support UI (Initial Setup):**
+    - [x] Basic UI elements for language selection.
+    - [x] Set up i18n (e.g., `next-i18next`) with placeholder translations for UI text.
 7.  **[ ] Responsive Design & Basic Accessibility:**
     - [ ] Ensure all UI is responsive across common device sizes.
     - [ ] Perform initial accessibility checks.
