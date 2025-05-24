@@ -17,17 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Layers3,
-  Settings,
-  CreditCard,
-  BarChart3,
-  Menu,
-  X,
-  Globe,
-  KeyRound,
-  UserPlus,
-} from "lucide-react"
+import { Layers3, CreditCard, BarChart3, Menu, X, Globe, KeyRound, UserPlus } from "lucide-react"
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
 
@@ -111,11 +101,6 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
   const appLinks = [
     { href: "/viewer", label: navStrings.convert, icon: <Layers3 className="h-4 w-4" /> },
     {
-      href: "/viewer/settings",
-      label: navStrings.settings,
-      icon: <Settings className="h-4 w-4" />,
-    },
-    {
       href: "/viewer/billing",
       label: navStrings.billing,
       icon: <CreditCard className="h-4 w-4" />,
@@ -124,7 +109,7 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
 
   const commonLinkClasses = "text-muted-foreground hover:text-foreground"
   const activeAppPath = (href: string) => {
-    // pathWithoutLocale will be like "/" or "/viewer" or "/viewer/settings"
+    // pathWithoutLocale will be like "/" or "/viewer" or "/viewer/billing"
     if (href === "/") return pathWithoutLocale === href
     if (href === "/viewer")
       return pathWithoutLocale === "/viewer" || pathWithoutLocale.startsWith("/viewer/") // handles /viewer and /viewer/subpage
@@ -256,6 +241,34 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 {/* TODO: Dynamic data */}
               </span>
             </Button>
+
+            {/* Compact Language Selector for authenticated users */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:flex items-center gap-1.5 px-2"
+                  aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium">{currentLocale.toUpperCase()}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {displayLanguages.map((language) => (
+                  <DropdownMenuItem
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
+                    className={currentLocale === language.code ? "bg-muted" : ""}
+                  >
+                    <Globe className="h-4 w-4 mr-2" />
+                    {language.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <UserButton />
           </SignedIn>
           <SignedOut>
@@ -269,35 +282,34 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 <span className="cursor-pointer">{navStrings.signup}</span>
               </Button>
             </SignUpButton>
-          </SignedOut>
-
-          {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden md:flex items-center gap-1.5 w-30"
-                aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
-              >
-                <Globe className="h-4 w-4" />
-                <span className="text-xs font-medium">
-                  {nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {displayLanguages.map((language) => (
-                <DropdownMenuItem
-                  key={language.code}
-                  onClick={() => handleLanguageChange(language.code)}
-                  className={currentLocale === language.code ? "bg-muted" : ""}
+            {/* Language Selector for non-authenticated users */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex items-center gap-1.5 w-30"
+                  aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
                 >
-                  {language.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium">
+                    {nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {displayLanguages.map((language) => (
+                  <DropdownMenuItem
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
+                    className={currentLocale === language.code ? "bg-muted" : ""}
+                  >
+                    {language.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SignedOut>
 
           {/* Mobile Menu Toggle */}
           <div className="md:hidden">
@@ -370,24 +382,23 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                   {navStrings.signup}
                 </button>
               </SignUpButton>
+              {/* Language Selection for Mobile Menu - Non-authenticated users only */}
+              <div className="w-full mt-2 pt-2 border-t">
+                {displayLanguages.map((language) => (
+                  <button
+                    key={language.code}
+                    onClick={() => {
+                      handleLanguageChange(language.code)
+                      setIsMobileMenuOpen(false) // Close menu on selection
+                    }}
+                    className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${currentLocale === language.code ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                  >
+                    <Globe className="h-5 w-5" />
+                    {language.name}
+                  </button>
+                ))}
+              </div>
             </SignedOut>
-
-            {/* Common Language Selection for Mobile Menu */}
-            <div className="w-full mt-2 pt-2 border-t">
-              {displayLanguages.map((language) => (
-                <button
-                  key={language.code}
-                  onClick={() => {
-                    handleLanguageChange(language.code)
-                    setIsMobileMenuOpen(false) // Close menu on selection
-                  }}
-                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium ${currentLocale === language.code ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                >
-                  <Globe className="h-5 w-5" />
-                  {language.name}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       )}
