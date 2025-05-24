@@ -106,5 +106,47 @@
     "ctaTitle": "Ready to Simplify Your Bank Statement Conversions?",
     "ctaSubtitle": "Stop wasting time on manual data entry. Start converting your bank statements to Excel effortlessly today.",
     "ctaButtonText": "Get Started for Free"
+  },
+  "viewer_page": {
+    "title": "Bank Statement Converter",
+    "upload_headline": "Upload Your Bank Statement",
+    "success_message": "Extraction Complete!",
+    "results_for_prefix": "Results for: ",
+    "download_xlsx_button": "Download XLSX",
+    "process_another_button": "Process Another File",
+    "clear_upload_button": "Clear & Upload New",
+    "try_again_button": "Try Again",
+    "upload_different_button": "Upload a Different File",
+    "backend_error_generic": "An unexpected error occurred while processing your file. Please try again.",
+    "backend_error_extraction_failed": "Extraction failed. We couldn't read the data from this file.",
+    "file_upload_module_strings": {
+      "errorFileTooLargePrefix": "File is too large. Max size is ",
+      "errorFileTooLargeSuffix": "MB.",
+      "errorInvalidFileType": "Invalid file type. Please upload a PDF file.",
+      "errorGenericUpload": "File upload failed. Please try again.",
+      "dropzoneDraggingText": "Drop the PDF file here ...",
+      "dropzoneDefaultTextClick": "Click to upload",
+      "dropzoneDefaultTextDrag": " or drag and drop",
+      "dropzoneHintPrefix": "PDF file (max. ",
+      "dropzoneHintSuffix": "MB)",
+      "fileInfoUnit": " MB",
+      "progressFileReady": "File ready for processing!",
+      "buttonOrSelectFile": "Or Select File",
+      "placeholderFileProcessed": "Processing your bank statement...",
+      "buttonUploadAnother": "Upload Another File",
+      "buttonDownloadSample": "Download XLSX",
+      "alertTitleUploadError": "Upload Error"
+    },
+    "processing_message": "Processing your bank statement, please wait...",
+    "processing_extracting": "Extracting transactions...",
+    "table_columns": {
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "currency": "Currency",
+      "type": "Type"
+    },
+    "transaction_count_singular": "1 transaction found.",
+    "transaction_count_plural": "{count} transactions found."
   }
 }

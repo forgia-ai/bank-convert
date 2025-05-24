@@ -109,14 +109,14 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
   ]
 
   const appLinks = [
-    { href: "/dashboard", label: navStrings.convert, icon: <Layers3 className="h-4 w-4" /> },
+    { href: "/viewer", label: navStrings.convert, icon: <Layers3 className="h-4 w-4" /> },
     {
-      href: "/dashboard/settings",
+      href: "/viewer/settings",
       label: navStrings.settings,
       icon: <Settings className="h-4 w-4" />,
     },
     {
-      href: "/dashboard/billing",
+      href: "/viewer/billing",
       label: navStrings.billing,
       icon: <CreditCard className="h-4 w-4" />,
     },
@@ -124,10 +124,10 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
 
   const commonLinkClasses = "text-muted-foreground hover:text-foreground"
   const activeAppPath = (href: string) => {
-    // pathWithoutLocale will be like "/" or "/dashboard" or "/dashboard/settings"
+    // pathWithoutLocale will be like "/" or "/viewer" or "/viewer/settings"
     if (href === "/") return pathWithoutLocale === href
-    if (href === "/dashboard")
-      return pathWithoutLocale === "/dashboard" || pathWithoutLocale.startsWith("/dashboard/") // handles /dashboard and /dashboard/subpage
+    if (href === "/viewer")
+      return pathWithoutLocale === "/viewer" || pathWithoutLocale.startsWith("/viewer/") // handles /viewer and /viewer/subpage
     return pathWithoutLocale.startsWith(href)
   }
 
@@ -140,40 +140,78 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
       <div className="flex h-16 items-center justify-between px-6 md:px-8 relative">
         {/* Left Section: Logo */}
         <div className="flex items-center gap-2">
-          <Link
-            href={`/${currentLocale}`}
-            className="flex items-center gap-2 font-bold text-lg"
-            onClick={handleLinkClick}
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 120 120"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-primary"
+          <SignedIn>
+            <Link
+              href={`/${currentLocale}/viewer`}
+              className="flex items-center gap-2 font-bold text-lg"
+              onClick={handleLinkClick}
             >
-              <path d="M60 0L120 34.64V103.92L60 120L0 103.92V34.64L60 0Z" fill="currentColor" />
-              <path
-                d="M60 120L0 103.92V34.64L60 0L120 34.64V103.92L60 120ZM5 36.93V101.63L58.5 117.19V117.2L60 117.97L61.5 117.2V117.19L115 101.63V36.93L61.5 2.81V2.79L60 2.03L58.5 2.79V2.81L5 36.93Z"
-                fill="white"
-                fillOpacity="0.3"
-              />
-              <path
-                d="M60 10.3L10 40V90L60 119.7L110 90V40L60 10.3ZM100 85.36L60 109.16L20 85.36V44.64L60 20.84L100 44.64V85.36Z"
-                fill="white"
-                fillOpacity="0.6"
-              />
-              <path d="M60 60L20 40L60 20L100 40L60 60Z" fill="white" />
-              <path
-                d="M20 40V80L60 100L100 80V40"
-                stroke="white"
-                strokeWidth="3"
-                strokeOpacity="0.5"
-              />
-            </svg>
-            <span className="font-semibold">BankConvert</span>
-          </Link>
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 120 120"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-primary"
+              >
+                <path d="M60 0L120 34.64V103.92L60 120L0 103.92V34.64L60 0Z" fill="currentColor" />
+                <path
+                  d="M60 120L0 103.92V34.64L60 0L120 34.64V103.92L60 120ZM5 36.93V101.63L58.5 117.19V117.2L60 117.97L61.5 117.2V117.19L115 101.63V36.93L61.5 2.81V2.79L60 2.03L58.5 2.79V2.81L5 36.93Z"
+                  fill="white"
+                  fillOpacity="0.3"
+                />
+                <path
+                  d="M60 10.3L10 40V90L60 119.7L110 90V40L60 10.3ZM100 85.36L60 109.16L20 85.36V44.64L60 20.84L100 44.64V85.36Z"
+                  fill="white"
+                  fillOpacity="0.6"
+                />
+                <path d="M60 60L20 40L60 20L100 40L60 60Z" fill="white" />
+                <path
+                  d="M20 40V80L60 100L100 80V40"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeOpacity="0.5"
+                />
+              </svg>
+              <span className="font-semibold">BankConvert</span>
+            </Link>
+          </SignedIn>
+          <SignedOut>
+            <Link
+              href={`/${currentLocale}`}
+              className="flex items-center gap-2 font-bold text-lg"
+              onClick={handleLinkClick}
+            >
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 120 120"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-primary"
+              >
+                <path d="M60 0L120 34.64V103.92L60 120L0 103.92V34.64L60 0Z" fill="currentColor" />
+                <path
+                  d="M60 120L0 103.92V34.64L60 0L120 34.64V103.92L60 120ZM5 36.93V101.63L58.5 117.19V117.2L60 117.97L61.5 117.2V117.19L115 101.63V36.93L61.5 2.81V2.79L60 2.03L58.5 2.79V2.81L5 36.93Z"
+                  fill="white"
+                  fillOpacity="0.3"
+                />
+                <path
+                  d="M60 10.3L10 40V90L60 119.7L110 90V40L60 10.3ZM100 85.36L60 109.16L20 85.36V44.64L60 20.84L100 44.64V85.36Z"
+                  fill="white"
+                  fillOpacity="0.6"
+                />
+                <path d="M60 60L20 40L60 20L100 40L60 60Z" fill="white" />
+                <path
+                  d="M20 40V80L60 100L100 80V40"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeOpacity="0.5"
+                />
+              </svg>
+              <span className="font-semibold">BankConvert</span>
+            </Link>
+          </SignedOut>
         </div>
 
         {/* Center Section: Desktop Navigation Links */}

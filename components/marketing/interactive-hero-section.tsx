@@ -4,8 +4,10 @@ import React, { useRef } from "react" // Added useRef
 import { Button } from "@/components/ui/button"
 // Removed Card and CardContent as FileUploadModule handles its own presentation
 import FileUploadModule, { FileUploadModuleRef, FileUploadModuleStrings } from "./FileUploadModule" // Import the Ref and Strings type
+import type { Locale } from "@/i18n-config" // Added for lang prop
 
 interface InteractiveHeroSectionProps {
+  lang: Locale // Added lang prop
   heroTitle: string
   heroSubtitle: string
   heroCtaButton: string
@@ -14,6 +16,7 @@ interface InteractiveHeroSectionProps {
 }
 
 export default function InteractiveHeroSection({
+  lang, // Added lang prop
   heroTitle,
   heroSubtitle,
   heroCtaButton,
@@ -63,6 +66,7 @@ export default function InteractiveHeroSection({
             onFileUpload={handleFileUpload}
             hideSelectFileButton={true} // Hide the internal button
             strings={fileUploadModuleStrings}
+            lang={lang} // Pass lang prop
           />
         </div>
       </div>

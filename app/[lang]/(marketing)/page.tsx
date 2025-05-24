@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
 import InteractiveHeroSection from "@/components/marketing/interactive-hero-section"
 import FeatureCard from "@/components/marketing/feature-card"
 import TestimonialCard from "@/components/marketing/testimonial-card"
@@ -16,6 +18,13 @@ export default async function MarketingHomePage({
   params: Promise<{ lang: Locale }>
 }) {
   const { lang } = await paramsPromise
+
+  // Check if user is signed in - if so, redirect to viewer
+  const { userId } = await auth()
+  if (userId) {
+    redirect(`/${lang}/viewer`)
+  }
+
   const dictionary = await getDictionary(lang)
 
   return (
@@ -26,6 +35,7 @@ export default async function MarketingHomePage({
           heroSubtitle={dictionary.marketing_homepage.heroSubtitle}
           heroCtaButton={dictionary.marketing_homepage.heroCtaButton}
           heroTrustText={dictionary.marketing_homepage.heroTrustText}
+          lang={lang} // Ensure this line is present
           fileUploadModuleStrings={dictionary.marketing_homepage.file_upload_module_strings}
         />
         {/* How It Works Section */}

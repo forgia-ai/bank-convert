@@ -3,11 +3,13 @@
 "use client"
 
 import React, { useCallback, useState, useImperativeHandle, forwardRef } from "react"
+import { useRouter } from "next/navigation"
 import { useDropzone, FileRejection } from "react-dropzone"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
+import type { Locale } from "@/i18n-config"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -25,18 +27,20 @@ export interface FileUploadModuleStrings {
   dropzoneHintSuffix: string
   fileInfoUnit: string
   progressFileReady: string
-  buttonOrSelectFile: string
-  placeholderFileProcessed: string
-  buttonUploadAnother: string
-  buttonDownloadSample: string
+  buttonOrSelectFile: string // Used if hideSelectFileButton is false
+  placeholderFileProcessed: string // Used when file is processed
+  buttonUploadAnother: string // Used when file is processed
+  buttonDownloadSample: string // Used when file is processed
   alertTitleUploadError: string
 }
 
 interface FileUploadModuleProps {
   onFileUpload: (file: File) => void
+  lang: Locale // Added lang prop
   maxFileSize?: number
   acceptedFileTypes?: Record<string, string[]>
-  hideSelectFileButton?: boolean // New prop
+  hideSelectFileButton?: boolean
+  disableRedirect?: boolean // Add prop to disable automatic redirection
   strings: FileUploadModuleStrings
 }
 
@@ -44,13 +48,17 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
   (
     {
       onFileUpload,
+      lang, // Added lang prop
       maxFileSize = 5 * 1024 * 1024,
       acceptedFileTypes = { "application/pdf": [".pdf"], "text/csv": [".csv"] },
       hideSelectFileButton = false,
+      disableRedirect = false, // Default to false for backwards compatibility
       strings,
     },
     ref,
   ) => {
+    const router = useRouter() // Added for redirection
+    console.log("FileUploadModule rendered/updated. lang prop:", lang) // DEBUG LOG
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
@@ -93,6 +101,15 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               clearInterval(interval)
               setProgress(100)
               onFileUpload(selectedFile)
+              console.log("onDrop: lang before push:", lang) // DEBUG LOG
+              // Programmatic redirection after file processing (only if not disabled)
+              if (!disableRedirect && lang) {
+                router.push(`/${lang}/viewer`)
+              } else if (!disableRedirect) {
+                console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
+                // Optionally, handle this error case, e.g., redirect to a generic error page or homepage
+                // router.push("/error");
+              }
             }
           }, 200)
         }
@@ -104,6 +121,9 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         strings.errorFileTooLargeSuffix,
         strings.errorInvalidFileType,
         strings.errorGenericUpload,
+        router, // Added router to dependencies
+        lang, // Added lang to dependencies
+        disableRedirect, // Added disableRedirect to dependencies
       ],
     )
 

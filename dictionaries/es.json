@@ -106,5 +106,47 @@
     "ctaTitle": "¿Listo para Simplificar la Conversión de tus Extractos Bancarios?",
     "ctaSubtitle": "Deja de perder tiempo en la entrada manual de datos. Comienza a convertir tus extractos bancarios a Excel sin esfuerzo hoy mismo.",
     "ctaButtonText": "Comienza Gratis"
+  },
+  "viewer_page": {
+    "title": "Conversor de Extractos Bancarios",
+    "upload_headline": "Sube tu Extracto Bancario",
+    "success_message": "¡Extracción Completa!",
+    "results_for_prefix": "Resultados para: ",
+    "download_xlsx_button": "Descargar XLSX",
+    "process_another_button": "Procesar Otro Archivo",
+    "clear_upload_button": "Limpiar y Subir Nuevo",
+    "try_again_button": "Intentar de Nuevo",
+    "upload_different_button": "Subir un Archivo Diferente",
+    "backend_error_generic": "Ocurrió un error inesperado al procesar tu archivo. Por favor, inténtalo de nuevo.",
+    "backend_error_extraction_failed": "La extracción falló. No pudimos leer los datos de este archivo.",
+    "file_upload_module_strings": {
+      "errorFileTooLargePrefix": "El archivo es demasiado grande. El tamaño máximo es ",
+      "errorFileTooLargeSuffix": "MB.",
+      "errorInvalidFileType": "Tipo de archivo inválido. Por favor, sube un archivo PDF.",
+      "errorGenericUpload": "Falló la carga del archivo. Por favor, inténtalo de nuevo.",
+      "dropzoneDraggingText": "Suelta el archivo PDF aquí ...",
+      "dropzoneDefaultTextClick": "Haz clic para subir",
+      "dropzoneDefaultTextDrag": " o arrastra y suelta",
+      "dropzoneHintPrefix": "Archivo PDF (máx. ",
+      "dropzoneHintSuffix": "MB)",
+      "fileInfoUnit": " MB",
+      "progressFileReady": "¡Archivo listo para procesar!",
+      "buttonOrSelectFile": "O Seleccionar Archivo",
+      "placeholderFileProcessed": "Procesando tu extracto bancario...",
+      "buttonUploadAnother": "Subir Otro Archivo",
+      "buttonDownloadSample": "Descargar XLSX",
+      "alertTitleUploadError": "Error de Carga"
+    },
+    "processing_message": "Procesando tu extracto bancario, por favor espera...",
+    "processing_extracting": "Extrayendo transacciones...",
+    "table_columns": {
+      "date": "Fecha",
+      "description": "Descripción",
+      "amount": "Cantidad",
+      "currency": "Moneda",
+      "type": "Tipo"
+    },
+    "transaction_count_singular": "1 transacción encontrada.",
+    "transaction_count_plural": "{count} transacciones encontradas."
   }
 }
