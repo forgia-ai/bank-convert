@@ -318,14 +318,14 @@ WHERE user_id = ?
 
 #### 1.2 Usage Tracking Components
 
-- [ ] **Create `UsageTracker` component** (`/components/dashboard/usage-tracker.tsx`)
+- [x] **Create `UsageTracker` component** (`/components/dashboard/usage-tracker.tsx`)
 
   - Progress bar for page usage
   - Text display: "Pages used: X/Y total" or "X/Y this month"
   - Different styling for different user types
   - Include mock usage data in component
 
-- [ ] **Create `UpgradePrompt` component** (`/components/dashboard/upgrade-prompt.tsx`)
+- [x] **Create `UpgradePrompt` component** (`/components/dashboard/upgrade-prompt.tsx`)
   - Contextual upgrade messages
   - Different variants for different usage levels
   - CTA buttons for pricing/upgrade
@@ -379,7 +379,7 @@ WHERE user_id = ?
 
 #### 2.3 Navigation Updates
 
-- [ ] **Update `AppNavbar`** (`/components/navigation/AppNavbar.tsx`)
+- [x] **Update `AppNavbar`** (`/components/navigation/AppNavbar.tsx`)
   - Connect existing usage tracker to real data (currently shows static "0/500")
   - Show different CTAs based on user type (free vs paid)
   - Add upgrade button for free users approaching limits
@@ -429,7 +429,7 @@ This comprehensive plan ensures a smooth user journey from anonymous visitor to 
 
 ## Implementation Status
 
-### ✅ **Completed Items (Phase 1 - Preview Page UI)**
+### ✅ **Completed Items (Phase 1 - Usage Tracking & Upgrade Components)**
 
 #### **Frontend Components:**
 
@@ -444,6 +444,13 @@ This comprehensive plan ensures a smooth user journey from anonymous visitor to 
 - [x] **Multi-language Support** - All copy translated for EN, PT, ES
 - [x] **Responsive Design** - Mobile, tablet, and desktop layouts tested
 - [x] **Mock Data Integration** - Preview data generation and localStorage handling
+- [x] **UsageTracker Component** - Progress bar, usage display, warnings, and upgrade prompts
+- [x] **UpgradePrompt Component** - Contextual upgrade messaging with multiple variants
+- [x] **AppNavbar Integration** - UsageTracker integrated into navigation for authenticated users
+- [x] **Viewer Page Integration** - Usage tracking and upgrade prompts integrated into viewer workflow
+- [x] **ViewerBottomSection Component** - Dedicated bottom section for usage tracking and upgrade prompts
+- [x] **Enhanced Copy & Messaging** - Updated upgrade prompts to focus on "Extract More Statements" with credits-based messaging
+- [x] **Button Styling & UX** - Improved button variants, cursor pointers, and vertical centering
 
 #### **Key Features Implemented:**
 
@@ -463,15 +470,15 @@ This comprehensive plan ensures a smooth user journey from anonymous visitor to 
 
 #### **Advanced Components:**
 
-- [ ] `UsageTracker` component for authenticated users
-- [ ] `UpgradePrompt` component for contextual messaging
+- [x] `UsageTracker` component for authenticated users
+- [x] `UpgradePrompt` component for contextual messaging
 - [ ] `LimitReachedModal` and `RateLimitModal` components
 - [ ] User limits context and custom hooks
 
 #### **Enhanced Features:**
 
-- [ ] Viewer page updates for authenticated users
-- [ ] Navigation updates with usage tracking
+- [x] Viewer page updates for authenticated users
+- [x] Navigation updates with usage tracking
 - [ ] Pricing page enhancements
 - [ ] Complete user journey testing
 

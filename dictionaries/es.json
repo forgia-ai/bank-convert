@@ -163,5 +163,30 @@
     "feature_growth_plan": "Crecimiento: 100 páginas/mes",
     "feature_premium_plan": "Premium: 500 páginas/mes",
     "feature_priority_support": "Soporte prioritario"
+  },
+  "usage_tracker": {
+    "title": "Uso",
+    "pages_unit": "páginas",
+    "remaining_prefix": "Restantes:",
+    "monthly_reset": "Se reinicia mensualmente",
+    "lifetime_limit": "Límite de por vida",
+    "warning_critical": "¡Casi te quedas sin páginas! Considera actualizar.",
+    "warning_high": "Estás usando la mayor parte de tu asignación de páginas.",
+    "upgrade_prompt": "¿Necesitas más páginas? ¡Actualiza para asignaciones mensuales!"
+  },
+  "upgrade_prompt": {
+    "urgent_title": "¡Casi Sin Páginas!",
+    "urgent_description": "Has usado la mayoría de tus páginas gratuitas. Actualiza ahora para continuar extrayendo extractos bancarios.",
+    "urgent_button": "Aumentar Límite",
+    "urgent_badge": "Acción Requerida",
+    "prominent_title": "Pocas Páginas Restantes",
+    "prominent_description": "Estás usando la mayor parte de tu asignación gratuita. Actualiza para extraer más extractos bancarios mensualmente.",
+    "prominent_button": "Extraer Más",
+    "prominent_badge": "Recomendado",
+    "subtle_title": "Extrae Más Extractos",
+    "subtle_description": "Obtén créditos mensuales para extraer más extractos bancarios con nuestros planes de pago.",
+    "subtle_button": "Aumentar Límite",
+    "subtle_badge": "Consejo Pro",
+    "contact_sales": "Contactar Ventas"
   }
 }

@@ -441,7 +441,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
       {/* Conversion Section - Conditional rendering based on state */}
       <div className="space-y-6">
         {(uploadState === "idle" || uploadState === "uploading") && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <h2 className="text-xl font-medium text-center">
               {dictionary.viewer_page?.upload_headline as string}
             </h2>

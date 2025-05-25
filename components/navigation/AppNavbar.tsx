@@ -7,6 +7,8 @@ type NavStringsType = Awaited<ReturnType<typeof getDictionary>>["navbar"]
 
 interface AppNavbarProps {
   navStrings: NavStringsType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dictionary?: Record<string, any> // TODO: Type this properly
 }
 import { useRouter, usePathname } from "next/navigation"
 import { useState } from "react"
@@ -17,9 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Layers3, CreditCard, BarChart3, Menu, X, Globe, KeyRound, UserPlus } from "lucide-react"
+import { Layers3, CreditCard, Menu, X, Globe, KeyRound, UserPlus } from "lucide-react"
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
+import UsageTracker from "@/components/dashboard/usage-tracker"
 
 // Helper to extract locale and pathname from the full path
 const getLocaleAndPathname = (fullPathname: string, locales: readonly Locale[]) => {
@@ -49,7 +52,7 @@ const getLocaleAndPathname = (fullPathname: string, locales: readonly Locale[]) 
  * AppNavbar is a unified navigation bar that adapts its content based on
  * the user's authentication status, with responsive behavior for mobile.
  */
-export default function AppNavbar({ navStrings }: AppNavbarProps) {
+export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProps) {
   const router = useRouter()
   const fullPathname = usePathname() // e.g., /en/dashboard or /dashboard
 
@@ -233,14 +236,15 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
         {/* Right Section: Auth Buttons / User Info & Mobile Menu Toggle */}
         <div className="flex items-center gap-4">
           <SignedIn>
-            {/* Placeholder: Usage Tracker - can be part of app layout or specific pages */}
-            <Button variant="outline" size="sm" className="hidden md:flex items-center gap-1.5">
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">
-                Pages: <span className="font-semibold text-foreground">0/500</span>{" "}
-                {/* TODO: Dynamic data */}
-              </span>
-            </Button>
+            {/* Usage Tracker - Compact version for navbar */}
+            <div className="hidden md:block">
+              <UsageTracker
+                lang={currentLocale}
+                dictionary={dictionary}
+                userType="free" // TODO: Get from user context
+                context="navbar"
+              />
+            </div>
 
             {/* Compact Language Selector for authenticated users */}
             <DropdownMenu>
@@ -343,11 +347,12 @@ export default function AppNavbar({ navStrings }: AppNavbarProps) {
                 </Link>
               ))}
               {/* Mobile Usage Tracker */}
-              <div className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground">
-                <BarChart3 className="h-5 w-5" />
-                <span>
-                  Pages: <span className="font-semibold text-foreground/80">0/500</span>
-                </span>
+              <div className="w-full px-3 py-2">
+                <UsageTracker
+                  lang={currentLocale}
+                  dictionary={dictionary}
+                  userType="free" // TODO: Get from user context
+                />
               </div>
             </SignedIn>
             <SignedOut>

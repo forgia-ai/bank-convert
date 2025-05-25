@@ -163,5 +163,30 @@
     "feature_growth_plan": "Crescimento: 100 páginas/mês",
     "feature_premium_plan": "Premium: 500 páginas/mês",
     "feature_priority_support": "Suporte prioritário"
+  },
+  "usage_tracker": {
+    "title": "Uso",
+    "pages_unit": "páginas",
+    "remaining_prefix": "Restantes:",
+    "monthly_reset": "Reinicia mensalmente",
+    "lifetime_limit": "Limite vitalício",
+    "warning_critical": "Você está quase sem páginas! Considere fazer upgrade.",
+    "warning_high": "Você está usando a maior parte da sua cota de páginas.",
+    "upgrade_prompt": "Precisa de mais páginas? Faça upgrade para cotas mensais!"
+  },
+  "upgrade_prompt": {
+    "urgent_title": "Quase Sem Páginas!",
+    "urgent_description": "Você usou a maior parte das suas páginas gratuitas. Faça upgrade agora para continuar extraindo extratos bancários.",
+    "urgent_button": "Aumentar Limite",
+    "urgent_badge": "Ação Necessária",
+    "prominent_title": "Poucas Páginas Restantes",
+    "prominent_description": "Você está usando a maior parte da sua cota gratuita. Faça upgrade para extrair mais extratos bancários mensalmente.",
+    "prominent_button": "Extrair Mais",
+    "prominent_badge": "Recomendado",
+    "subtle_title": "Extraia Mais Extratos",
+    "subtle_description": "Obtenha créditos mensais para extrair mais extratos bancários com nossos planos pagos.",
+    "subtle_button": "Aumentar Limite",
+    "subtle_badge": "Dica Pro",
+    "contact_sales": "Contatar Vendas"
   }
 }

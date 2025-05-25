@@ -1,5 +1,6 @@
 import AppNavbar from "@/components/navigation/AppNavbar"
 import Footer from "@/components/layout/Footer"
+import ViewerBottomSection from "@/components/viewer/viewer-bottom-section"
 import { getDictionary } from "@/lib/getDictionary"
 import { type Locale } from "@/i18n-config"
 
@@ -15,8 +16,9 @@ export default async function ViewerLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AppNavbar navStrings={dictionary.navbar} />
+      <AppNavbar navStrings={dictionary.navbar} dictionary={dictionary} />
       <main className="flex-grow container mx-auto px-4 md:px-8 py-8">{children}</main>
+      <ViewerBottomSection lang={lang} dictionary={dictionary} />
       <Footer footerStrings={dictionary.footer} currentLocale={lang} />
     </div>
   )

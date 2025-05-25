@@ -163,5 +163,30 @@
     "feature_growth_plan": "Growth: 100 pages/month",
     "feature_premium_plan": "Premium: 500 pages/month",
     "feature_priority_support": "Priority support"
+  },
+  "usage_tracker": {
+    "title": "Usage",
+    "pages_unit": "pages",
+    "remaining_prefix": "Remaining:",
+    "monthly_reset": "Resets monthly",
+    "lifetime_limit": "Lifetime limit",
+    "warning_critical": "You're almost out of pages! Consider upgrading.",
+    "warning_high": "You're using most of your page allowance.",
+    "upgrade_prompt": "Need more pages? Upgrade for monthly allowances!"
+  },
+  "upgrade_prompt": {
+    "urgent_title": "Almost Out of Pages!",
+    "urgent_description": "You've used most of your free pages. Upgrade now to continue extracting bank statements.",
+    "urgent_button": "Increase Limit",
+    "urgent_badge": "Action Required",
+    "prominent_title": "Running Low on Pages",
+    "prominent_description": "You're using most of your free allowance. Upgrade to extract more bank statements monthly.",
+    "prominent_button": "Extract More",
+    "prominent_badge": "Recommended",
+    "subtle_title": "Extract More Statements",
+    "subtle_description": "Get monthly credits to extract more bank statements with our paid plans.",
+    "subtle_button": "Increase Limit",
+    "subtle_badge": "Pro Tip",
+    "contact_sales": "Contact Sales"
   }
 }
