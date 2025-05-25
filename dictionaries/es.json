@@ -147,5 +147,21 @@
     },
     "transaction_count_singular": "1 transacción encontrada.",
     "transaction_count_plural": "{count} transacciones encontradas."
+  },
+  "preview_page": {
+    "no_data_title": "No Hay Datos de Vista Previa Disponibles",
+    "no_data_description": "Por favor, sube un archivo desde la página de inicio para ver una vista previa.",
+    "go_to_homepage": "Ir a Página de Inicio",
+    "download_preview_csv": "Descargar XLSX de Vista Previa",
+    "success_message": "✅ Análisis Completo: Encontradas {transactions} transacciones en {pages} páginas",
+    "limited_preview_message": "🔒 ¡Vista Previa Limitada! Estás viendo las primeras 10 transacciones de las {total} encontradas.",
+    "signup_button": "Regístrate Gratis - Gana 50 Páginas",
+    "pricing_button": "Ver Planes de Precios",
+    "feature_extract_pages": "Extrae 50 páginas gratis",
+    "feature_excel_export": "Exportación completa a Excel",
+    "feature_no_credit_card": "No se requiere tarjeta de crédito",
+    "feature_growth_plan": "Crecimiento: 100 páginas/mes",
+    "feature_premium_plan": "Premium: 500 páginas/mes",
+    "feature_priority_support": "Soporte prioritario"
   }
 }

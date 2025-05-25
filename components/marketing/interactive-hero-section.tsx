@@ -33,6 +33,15 @@ export default function InteractiveHeroSection({
     // or trigger an API call for processing.
   }
 
+  // Handler for preview data generation (for unauthenticated users)
+  const handlePreviewGenerated = (data: import("./FileUploadModule").PreviewData) => {
+    console.log("Preview data generated:", data)
+    // Store preview data in localStorage or context for the preview page
+    if (typeof window !== "undefined") {
+      localStorage.setItem("previewData", JSON.stringify(data))
+    }
+  }
+
   const handleCtaButtonClick = () => {
     fileUploadModuleRef.current?.openFileDialog() // Call the exposed function
   }
@@ -67,6 +76,9 @@ export default function InteractiveHeroSection({
             hideSelectFileButton={true} // Hide the internal button
             strings={fileUploadModuleStrings}
             lang={lang} // Pass lang prop
+            isAuthenticated={false} // Homepage is for unauthenticated users
+            userType="anonymous"
+            onPreviewGenerated={handlePreviewGenerated}
           />
         </div>
       </div>

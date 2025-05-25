@@ -147,5 +147,21 @@
     },
     "transaction_count_singular": "1 transaction found.",
     "transaction_count_plural": "{count} transactions found."
+  },
+  "preview_page": {
+    "no_data_title": "No Preview Data Available",
+    "no_data_description": "Please upload a file from the homepage to see a preview.",
+    "go_to_homepage": "Go to Homepage",
+    "download_preview_csv": "Download Preview XLSX",
+    "success_message": "✅ Analysis Complete: Found {transactions} transactions across {pages} pages",
+    "limited_preview_message": "🔒 Limited Preview! You're seeing the first 10 transactions of the {total} found.",
+    "signup_button": "Sign Up Free - Get 50 Pages",
+    "pricing_button": "View Pricing Plans",
+    "feature_extract_pages": "Extract 50 pages for free",
+    "feature_excel_export": "Full Excel export",
+    "feature_no_credit_card": "No credit card required",
+    "feature_growth_plan": "Growth: 100 pages/month",
+    "feature_premium_plan": "Premium: 500 pages/month",
+    "feature_priority_support": "Priority support"
   }
 }

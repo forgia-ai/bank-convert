@@ -35,6 +35,7 @@ interface DataTableProps {
   data?: Transaction[]
   columns?: ColumnLabels
   transactionCountStrings?: TransactionCountStrings
+  customFooterMessage?: string // New prop for custom footer message
 }
 
 const defaultData: Transaction[] = [
@@ -86,6 +87,7 @@ const DataTable: React.FC<DataTableProps> = ({
   data = defaultData,
   columns = defaultColumns,
   transactionCountStrings = defaultTransactionCountStrings,
+  customFooterMessage,
 }) => {
   // Helper function to format amount with currency symbol
   const formatAmount = (amount: number, currency?: string) => {
@@ -161,9 +163,11 @@ const DataTable: React.FC<DataTableProps> = ({
         </Table>
       </div>
 
-      {/* Fixed footer with transaction count */}
+      {/* Fixed footer with transaction count or custom message */}
       <div className="bg-muted/20 border-t px-4 py-2 text-center">
-        <p className="text-sm text-muted-foreground">{formatTransactionCount(data.length)}</p>
+        <p className="text-sm text-muted-foreground">
+          {customFooterMessage || formatTransactionCount(data.length)}
+        </p>
       </div>
     </div>
   )

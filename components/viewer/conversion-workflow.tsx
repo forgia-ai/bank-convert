@@ -481,8 +481,8 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
         {uploadState === "completed" && extractedData.length > 0 && (
           <div className="space-y-6">
             {/* Action Buttons - Moved to top */}
-            <div className="flex justify-between items-center">
-              <div>
+            <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
+              <div className="text-center lg:text-left">
                 <p className="text-lg text-green-600 font-medium">
                   {dictionary.viewer_page?.success_message as string}
                 </p>
@@ -493,10 +493,10 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
                   </p>
                 )}
               </div>
-              <div className="flex space-x-4">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
                 <Button
                   onClick={handleDownloadXLSX}
-                  className="flex items-center space-x-2 cursor-pointer"
+                  className="flex items-center justify-center space-x-2 cursor-pointer w-full sm:w-auto"
                 >
                   <Download className="h-4 w-4" />
                   <span>{dictionary.viewer_page?.download_xlsx_button as string}</span>
@@ -504,7 +504,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
                 <Button
                   variant="outline"
                   onClick={handleClearAndUploadNew}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-full sm:w-auto"
                 >
                   {dictionary.viewer_page?.process_another_button as string}
                 </Button>

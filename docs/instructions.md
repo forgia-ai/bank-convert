@@ -317,11 +317,11 @@ This plan outlines the development phases, starting with frontend UI and mock da
 3.  **[x] Authentication UI (Clerk Dev Integration):**
     - [x] Integrate Clerk development components for Login, Signup, Forgot Password pages.
     - [x] Set up basic client-side authentication flows using Clerk.
-4.  **[ ] Dashboard & Core App UI (Mock Data):**
+4.  **[x] Dashboard & Core App UI (Mock Data):**
     - [x] Design and implement the main dashboard layout.
-    - [ ] **File Upload UI:** Interface for selecting and uploading files.
-    - [ ] **Transaction Display UI:** Table to display extracted transactions (using mock data).
-    - [ ] **Export UI:** Button to trigger mock data export.
+    - [x] **File Upload UI:** Interface for selecting and uploading files.
+    - [x] **Transaction Display UI:** Table to display extracted transactions (using mock data).
+    - [x] **Export UI:** Button to trigger mock data export.
     - [ ] **Usage Tracking UI:** Display for consumed pages (mock data).
 5.  **[ ] User Profile/Settings UI (Mock & Basic Clerk):**
     - [ ] UI for managing profile settings (e.g., change password - leveraging Clerk where possible).

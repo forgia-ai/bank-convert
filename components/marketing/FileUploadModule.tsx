@@ -34,6 +34,20 @@ export interface FileUploadModuleStrings {
   alertTitleUploadError: string
 }
 
+// Preview data interface for unauthenticated users
+export interface PreviewData {
+  totalTransactions: number
+  totalPages: number
+  previewTransactions: Array<{
+    date: string
+    description: string
+    amount: number
+    currency: string
+    type: string
+  }>
+  filename: string
+}
+
 interface FileUploadModuleProps {
   onFileUpload: (file: File) => void
   lang: Locale // Added lang prop
@@ -42,6 +56,10 @@ interface FileUploadModuleProps {
   hideSelectFileButton?: boolean
   disableRedirect?: boolean // Add prop to disable automatic redirection
   strings: FileUploadModuleStrings
+  // New props for unauthenticated flow
+  isAuthenticated?: boolean
+  userType?: "anonymous" | "free" | "paid"
+  onPreviewGenerated?: (data: PreviewData) => void
 }
 
 const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
@@ -54,6 +72,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       hideSelectFileButton = false,
       disableRedirect = false, // Default to false for backwards compatibility
       strings,
+      // New props for unauthenticated flow
+      isAuthenticated = true, // Default to authenticated for backwards compatibility
+      userType = "free", // eslint-disable-line @typescript-eslint/no-unused-vars
+      onPreviewGenerated,
     },
     ref,
   ) => {
@@ -62,6 +84,94 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
+
+    // Mock function to generate preview data for unauthenticated users
+    const generateMockPreviewData = (file: File): PreviewData => {
+      // Generate mock transaction data
+      const mockTransactions = [
+        {
+          date: "2024-01-15",
+          description: "Grocery Store Purchase",
+          amount: -85.42,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-14",
+          description: "Salary Deposit",
+          amount: 3500.0,
+          currency: "USD",
+          type: "credit",
+        },
+        {
+          date: "2024-01-13",
+          description: "Gas Station",
+          amount: -45.2,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-12",
+          description: "Online Transfer",
+          amount: -200.0,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-11",
+          description: "Restaurant",
+          amount: -67.89,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-10",
+          description: "ATM Withdrawal",
+          amount: -100.0,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-09",
+          description: "Utility Bill Payment",
+          amount: -125.5,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-08",
+          description: "Coffee Shop",
+          amount: -12.75,
+          currency: "USD",
+          type: "debit",
+        },
+        {
+          date: "2024-01-07",
+          description: "Freelance Payment",
+          amount: 850.0,
+          currency: "USD",
+          type: "credit",
+        },
+        {
+          date: "2024-01-06",
+          description: "Subscription Service",
+          amount: -15.99,
+          currency: "USD",
+          type: "debit",
+        },
+      ]
+
+      // Simulate different document sizes based on file size
+      const totalTransactions = Math.floor(Math.random() * 40) + 30 // 30-70 transactions
+      const totalPages = Math.ceil(totalTransactions / 15) // ~15 transactions per page
+
+      return {
+        totalTransactions,
+        totalPages,
+        previewTransactions: mockTransactions.slice(0, 10), // Show first 10
+        filename: file.name,
+      }
+    }
 
     const onDrop = useCallback(
       (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -102,9 +212,20 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               setProgress(100)
               onFileUpload(selectedFile)
               console.log("onDrop: lang before push:", lang) // DEBUG LOG
-              // Programmatic redirection after file processing (only if not disabled)
+
+              // Handle different user types and redirection
               if (!disableRedirect && lang) {
-                router.push(`/${lang}/viewer`)
+                if (!isAuthenticated) {
+                  // For unauthenticated users, generate preview data and redirect to preview page
+                  const previewData = generateMockPreviewData(selectedFile)
+                  if (onPreviewGenerated) {
+                    onPreviewGenerated(previewData)
+                  }
+                  router.push(`/${lang}/preview`)
+                } else {
+                  // For authenticated users, redirect to viewer as before
+                  router.push(`/${lang}/viewer`)
+                }
               } else if (!disableRedirect) {
                 console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
                 // Optionally, handle this error case, e.g., redirect to a generic error page or homepage
@@ -124,6 +245,8 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         router, // Added router to dependencies
         lang, // Added lang to dependencies
         disableRedirect, // Added disableRedirect to dependencies
+        isAuthenticated, // Added for unauthenticated flow
+        onPreviewGenerated, // Added for preview data callback
       ],
     )
 
