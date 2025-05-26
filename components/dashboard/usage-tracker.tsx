@@ -5,55 +5,32 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { BarChart3 } from "lucide-react"
 import { type Locale } from "@/i18n-config"
+import { useUserLimits } from "@/contexts/user-limits-context"
 
 interface UsageTrackerProps {
   lang: Locale
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dictionary: Record<string, any> // TODO: Type this properly
-  userType?: "free" | "paid"
-  currentUsage?: number
-  totalLimit?: number
-  isMonthly?: boolean // true for paid users (monthly reset), false for free users (lifetime)
   context?: "dashboard" | "navbar" // Add navbar context for compact display
-}
-
-// Mock function to get usage data - replace with real API call later
-const getMockUsageData = (userType: "free" | "paid") => {
-  if (userType === "free") {
-    return {
-      currentUsage: 23,
-      totalLimit: 50,
-      isMonthly: false,
-      planName: "Free",
-    }
-  } else {
-    return {
-      currentUsage: 127,
-      totalLimit: 500,
-      isMonthly: true,
-      planName: "Growth",
-    }
-  }
 }
 
 export default function UsageTracker({
   lang, // eslint-disable-line @typescript-eslint/no-unused-vars
   dictionary,
-  userType = "free",
-  currentUsage,
-  totalLimit,
-  isMonthly,
   context = "dashboard",
 }: UsageTrackerProps) {
-  // Use provided props or fall back to mock data
-  const mockData = getMockUsageData(userType)
-  const usage = currentUsage ?? mockData.currentUsage
-  const limit = totalLimit ?? mockData.totalLimit
-  const monthly = isMonthly ?? mockData.isMonthly
-  const planName = mockData.planName
+  // Get user limits from context
+  const { userLimits } = useUserLimits()
 
-  const usagePercentage = Math.min((usage / limit) * 100, 100)
+  const usage = userLimits.currentUsage
+  const limit = userLimits.limit
+  const monthly = userLimits.isMonthlyLimit
+  const userType = userLimits.userType
+  const usagePercentage = userLimits.usagePercentage
   const remainingPages = Math.max(limit - usage, 0)
+
+  // Get plan name based on user type
+  const planName = userType === "paid" ? "Growth" : userType === "free" ? "Free" : "Anonymous"
 
   // Determine badge variant based on user type
   const getBadgeVariant = () => {

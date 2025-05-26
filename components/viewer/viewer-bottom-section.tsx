@@ -14,18 +14,8 @@ export default function ViewerBottomSection({ lang, dictionary }: ViewerBottomSe
   return (
     <div className="container mx-auto px-4 md:px-8 py-8">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
-        <UsageTracker
-          lang={lang}
-          dictionary={dictionary}
-          userType="free" // TODO: Get from user context
-        />
-        <UpgradePrompt
-          lang={lang}
-          dictionary={dictionary}
-          userType="free" // TODO: Get from user context
-          usagePercentage={46} // TODO: Get from actual usage context
-          context="dashboard"
-        />
+        <UsageTracker lang={lang} dictionary={dictionary} />
+        <UpgradePrompt lang={lang} dictionary={dictionary} context="dashboard" />
       </div>
     </div>
   )

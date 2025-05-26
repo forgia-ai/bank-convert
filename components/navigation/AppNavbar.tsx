@@ -238,12 +238,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
           <SignedIn>
             {/* Usage Tracker - Compact version for navbar */}
             <div className="hidden md:block">
-              <UsageTracker
-                lang={currentLocale}
-                dictionary={dictionary}
-                userType="free" // TODO: Get from user context
-                context="navbar"
-              />
+              <UsageTracker lang={currentLocale} dictionary={dictionary} context="navbar" />
             </div>
 
             {/* Compact Language Selector for authenticated users */}
@@ -348,11 +343,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
               ))}
               {/* Mobile Usage Tracker */}
               <div className="w-full px-3 py-2">
-                <UsageTracker
-                  lang={currentLocale}
-                  dictionary={dictionary}
-                  userType="free" // TODO: Get from user context
-                />
+                <UsageTracker lang={currentLocale} dictionary={dictionary} />
               </div>
             </SignedIn>
             <SignedOut>

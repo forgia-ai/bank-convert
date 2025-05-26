@@ -7,38 +7,30 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Zap, Star, TrendingUp } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import Link from "next/link"
+import { useUpgradePrompts } from "@/hooks/use-upgrade-prompts"
 
 interface UpgradePromptProps {
   lang: Locale
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dictionary: Record<string, any> // TODO: Type this properly
-  variant?: "subtle" | "prominent" | "urgent"
-  userType?: "free" | "paid"
-  usagePercentage?: number
   context?: "dashboard" | "limit-reached" | "processing"
 }
 
 export default function UpgradePrompt({
   lang,
   dictionary,
-  variant = "subtle",
-  userType = "free",
-  usagePercentage = 0,
   context = "dashboard",
 }: UpgradePromptProps) {
-  // Don't show upgrade prompts for paid users
-  if (userType === "paid") {
+  // Get upgrade prompt configuration from hook
+  const { getUpgradePromptConfig } = useUpgradePrompts()
+  const promptConfig = getUpgradePromptConfig(context)
+
+  // Don't show if not needed
+  if (!promptConfig.shouldShow) {
     return null
   }
 
-  // Determine the appropriate variant based on usage if not explicitly set
-  const getVariantFromUsage = () => {
-    if (usagePercentage >= 90) return "urgent"
-    if (usagePercentage >= 75) return "prominent"
-    return "subtle"
-  }
-
-  const effectiveVariant = variant === "subtle" ? getVariantFromUsage() : variant
+  const effectiveVariant = promptConfig.variant
 
   // Get content based on variant and context
   const getPromptContent = () => {

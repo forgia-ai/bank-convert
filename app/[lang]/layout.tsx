@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "../globals.css" // Adjusted path for CSS from app/[lang] to app/globals.css
 import { ClerkProvider } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
+import { UserLimitsProvider } from "@/contexts/user-limits-context"
 // AppNavbar and Footer will be imported by specific route group layouts
 // import { getDictionary } from "@/lib/getDictionary" // No longer needed here
 
@@ -47,9 +48,11 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
         >
-          {/* AppNavbar will be rendered by the specific route group layout */}
-          <main className="flex-grow">{children}</main>
-          {/* Footer will be rendered by the specific route group layout */}
+          <UserLimitsProvider>
+            {/* AppNavbar will be rendered by the specific route group layout */}
+            <main className="flex-grow">{children}</main>
+            {/* Footer will be rendered by the specific route group layout */}
+          </UserLimitsProvider>
         </body>
       </html>
     </ClerkProvider>
