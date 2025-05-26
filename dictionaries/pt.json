@@ -188,5 +188,40 @@
     "subtle_button": "Aumentar Limite",
     "subtle_badge": "Dica Pro",
     "contact_sales": "Contatar Vendas"
+  },
+  "limit_reached_modal": {
+    "anonymous_title": "Cadastre-se para Páginas Grátis",
+    "anonymous_description": "Crie uma conta gratuita para obter 50 páginas totais e continuar processando seus extratos bancários.",
+    "anonymous_badge": "Conta Gratuita",
+    "anonymous_primary": "Cadastrar Grátis",
+    "anonymous_secondary": "Ver Preços",
+    "free_title": "Páginas Gratuitas Esgotadas",
+    "free_description": "Você usou todas as suas páginas gratuitas. Faça upgrade para obter cotas mensais de páginas e extrair extratos bancários ilimitados.",
+    "free_badge": "Upgrade Necessário",
+    "free_primary": "Aumentar Limite",
+    "free_secondary": "Ver Uso",
+    "free_tip": "💡 Planos pagos incluem cotas mensais de páginas que se renovam todo mês, para que você nunca fique sem páginas.",
+    "paid_title": "Limite Mensal Atingido",
+    "paid_description": "Você usou todas as páginas deste mês. Seu limite será renovado no próximo mês, ou faça upgrade para páginas ilimitadas.",
+    "paid_badge": "Limite Mensal",
+    "paid_primary": "Fazer Upgrade do Plano",
+    "paid_secondary": "Ver Uso",
+    "usage_label": "Páginas Usadas"
+  },
+  "rate_limit_modal": {
+    "title": "Limite Mensal Atingido",
+    "description": "Você usou sua análise mensal gratuita. Cadastre-se para acesso imediato a 50 páginas totais sem esperar.",
+    "badge": "Limite de Taxa",
+    "reset_info": "Informações de Renovação do Limite",
+    "current_limit": "Análises gratuitas usadas",
+    "reset_in": "Renova em",
+    "benefits_title": "Benefícios do Cadastro",
+    "benefit_1": "50 páginas totais (sem espera mensal)",
+    "benefit_2": "Extração completa de transações",
+    "benefit_3": "Downloads limpos de Excel/CSV",
+    "benefit_4": "Sem limites de taxa ou períodos de espera",
+    "primary_button": "Cadastrar Grátis",
+    "secondary_button": "Ver Preços",
+    "footer_text": "Cadastro gratuito leva 30 segundos. Não é necessário cartão de crédito."
   }
 }

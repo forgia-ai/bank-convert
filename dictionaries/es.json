@@ -188,5 +188,40 @@
     "subtle_button": "Aumentar Límite",
     "subtle_badge": "Consejo Pro",
     "contact_sales": "Contactar Ventas"
+  },
+  "limit_reached_modal": {
+    "anonymous_title": "Regístrate para Páginas Gratis",
+    "anonymous_description": "Crea una cuenta gratuita para obtener 50 páginas totales y continuar procesando tus extractos bancarios.",
+    "anonymous_badge": "Cuenta Gratuita",
+    "anonymous_primary": "Registrarse Gratis",
+    "anonymous_secondary": "Ver Precios",
+    "free_title": "Páginas Gratuitas Agotadas",
+    "free_description": "Has usado todas tus páginas gratuitas. Actualiza para obtener asignaciones mensuales de páginas y extraer extractos bancarios ilimitados.",
+    "free_badge": "Actualización Requerida",
+    "free_primary": "Aumentar Límite",
+    "free_secondary": "Ver Uso",
+    "free_tip": "💡 Los planes de pago incluyen asignaciones mensuales de páginas que se reinician cada mes, para que nunca te quedes sin páginas.",
+    "paid_title": "Límite Mensual Alcanzado",
+    "paid_description": "Has usado todas las páginas de este mes. Tu límite se reiniciará el próximo mes, o actualiza para páginas ilimitadas.",
+    "paid_badge": "Límite Mensual",
+    "paid_primary": "Actualizar Plan",
+    "paid_secondary": "Ver Uso",
+    "usage_label": "Páginas Usadas"
+  },
+  "rate_limit_modal": {
+    "title": "Límite Mensual Alcanzado",
+    "description": "Has usado tu análisis mensual gratuito. Regístrate para acceso inmediato a 50 páginas totales sin esperar.",
+    "badge": "Límite de Velocidad",
+    "reset_info": "Información de Reinicio de Límite",
+    "current_limit": "Análisis gratuitos usados",
+    "reset_in": "Se reinicia en",
+    "benefits_title": "Beneficios del Registro",
+    "benefit_1": "50 páginas totales (sin espera mensual)",
+    "benefit_2": "Extracción completa de transacciones",
+    "benefit_3": "Descargas limpias de Excel/CSV",
+    "benefit_4": "Sin límites de velocidad o períodos de espera",
+    "primary_button": "Registrarse Gratis",
+    "secondary_button": "Ver Precios",
+    "footer_text": "El registro gratuito toma 30 segundos. No se requiere tarjeta de crédito."
   }
 }
