@@ -30,7 +30,9 @@ export function useUpgradePrompts() {
         case "processing":
           return userLimits.isNearLimit // 75%+
         case "dashboard":
-          return userLimits.usagePercentage >= 60 // Show at 60%+ for dashboard
+          return (
+            userLimits.usagePercentage >= 60 && !userLimits.isAtLimit && !userLimits.isCritical
+          ) // Show at 60%+ for dashboard, but not when at limit or critical
         default:
           return false
       }

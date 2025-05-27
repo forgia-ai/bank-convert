@@ -7,8 +7,11 @@ import FileUploadModule, {
 import DataTable from "@/components/viewer/data-table"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, Download } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { AlertCircle, Download, Zap, ArrowRight } from "lucide-react"
 import { type Locale } from "@/i18n-config"
+import { useUserLimits } from "@/contexts/user-limits-context"
 
 // Define the possible states for the conversion process
 type UploadState = "idle" | "uploading" | "processing" | "completed" | "error"
@@ -58,7 +61,11 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   const [extractedData, setExtractedData] = useState<Transaction[]>([])
   const [currentFile, setCurrentFile] = useState<File | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>("")
+  const [isLimitError, setIsLimitError] = useState<boolean>(false)
   const fileUploadRef = useRef<FileUploadModuleRef>(null)
+
+  // Get user limits context for mock processing
+  const { processDocument, canProcessPages, userLimits } = useUserLimits()
 
   // Handle file upload from FileUploadModule
   const handleFileUpload = async (file: File) => {
@@ -66,14 +73,34 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
     setUploadState("processing")
     setErrorMessage("")
 
-    try {
-      // Simulate backend processing
-      // TODO: Replace with actual API call to backend extraction service
-      await simulateBackendProcessing(file)
-    } catch {
+    // Mock: Simulate 10 pages per document
+    const mockPageCount = 10
+
+    // Check if user can process this document
+    if (!canProcessPages(mockPageCount)) {
       setUploadState("error")
+      setIsLimitError(true)
+      setErrorMessage("You've reached your page limit. Please upgrade to process more documents.")
+      return
+    }
+
+    try {
+      // Use mock processing from context
+      const success = await processDocument(mockPageCount)
+
+      if (success) {
+        // Generate mock transaction data on successful processing
+        await simulateBackendProcessing(file)
+      } else {
+        throw new Error("Processing failed - limit reached")
+      }
+    } catch (error) {
+      setUploadState("error")
+      setIsLimitError(false) // Regular processing error, not limit error
       setErrorMessage(
-        (dictionary?.viewer_page?.backend_error_generic as string) || "Processing failed",
+        error instanceof Error
+          ? error.message
+          : (dictionary?.viewer_page?.backend_error_generic as string) || "Processing failed",
       )
     }
   }
@@ -425,6 +452,12 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
     setExtractedData([])
     setCurrentFile(null)
     setErrorMessage("")
+    setIsLimitError(false)
+  }
+
+  // Handle redirect to pricing page
+  const handleUpgradeRedirect = () => {
+    window.open(`/${lang}/pricing`, "_blank")
   }
 
   // Handle retry for errors
@@ -531,25 +564,82 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
         )}
 
         {uploadState === "error" && (
-          <div className="space-y-4">
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Processing Error</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
+          <div className="space-y-6">
+            {isLimitError ? (
+              // Special upgrade CTA for limit exceeded errors
+              <div className="space-y-4">
+                <Card className="border-orange-200 bg-orange-50 border-2 w-3/5 mx-auto">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-5 w-5 text-orange-600" />
+                        <CardTitle className="text-lg text-orange-800">
+                          {dictionary.viewer_page?.limit_error_title as string}
+                        </CardTitle>
+                      </div>
+                      <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                        {(dictionary.viewer_page?.limit_error_badge as string)
+                          ?.replace("{planName}", userLimits.planName)
+                          ?.replace("{currentUsage}", userLimits.currentUsage.toString())
+                          ?.replace("{limit}", userLimits.limit.toString())}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-orange-700">
+                      {(dictionary.viewer_page?.limit_error_description as string)?.replace(
+                        "{limit}",
+                        userLimits.limit.toString(),
+                      )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={handleUpgradeRedirect}
+                        className="w-1/2 cursor-pointer bg-orange-600 hover:bg-orange-700"
+                      >
+                        {dictionary.viewer_page?.limit_error_upgrade_button as string}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <div className="flex justify-center space-x-4">
-              <Button onClick={handleRetry} className="cursor-pointer">
-                {dictionary.viewer_page?.try_again_button as string}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleClearAndUploadNew}
-                className="cursor-pointer"
-              >
-                {dictionary.viewer_page?.upload_different_button as string}
-              </Button>
-            </div>
+                {/* Action button for uploading another file */}
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={handleClearAndUploadNew}
+                    className="cursor-pointer"
+                  >
+                    {dictionary.viewer_page?.upload_different_button as string}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              // Regular error display
+              <div className="space-y-4">
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>
+                    {dictionary.viewer_page?.processing_error_title as string}
+                  </AlertTitle>
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+
+                <div className="flex justify-center space-x-4">
+                  <Button onClick={handleRetry} className="cursor-pointer">
+                    {dictionary.viewer_page?.try_again_button as string}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleClearAndUploadNew}
+                    className="cursor-pointer"
+                  >
+                    {dictionary.viewer_page?.upload_different_button as string}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

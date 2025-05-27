@@ -19,6 +19,7 @@ interface PricingCardProps {
   ctaText: string
   isPopular?: boolean
   className?: string
+  onPlanSelect?: (planName: string) => void // Add click handler
 }
 
 export default function PricingCard({
@@ -30,6 +31,7 @@ export default function PricingCard({
   ctaText,
   isPopular = false,
   className = "",
+  onPlanSelect,
 }: PricingCardProps) {
   return (
     <Card
@@ -66,7 +68,12 @@ export default function PricingCard({
         </ul>
       </CardContent>
       <CardFooter>
-        <Button size="lg" className="w-full" variant={isPopular ? "default" : "outline"}>
+        <Button
+          size="lg"
+          className="w-full cursor-pointer"
+          variant={isPopular ? "default" : "outline"}
+          onClick={() => onPlanSelect?.(planName)}
+        >
           {ctaText}
         </Button>
       </CardFooter>

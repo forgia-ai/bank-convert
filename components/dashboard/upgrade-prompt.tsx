@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +9,7 @@ import { ArrowRight, Zap, Star, TrendingUp } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import Link from "next/link"
 import { useUpgradePrompts } from "@/hooks/use-upgrade-prompts"
+import { useUserLimits } from "@/contexts/user-limits-context"
 
 interface UpgradePromptProps {
   lang: Locale
@@ -21,9 +23,22 @@ export default function UpgradePrompt({
   dictionary,
   context = "dashboard",
 }: UpgradePromptProps) {
+  const router = useRouter()
+  const { subscribeToPlan } = useUserLimits()
+
   // Get upgrade prompt configuration from hook
   const { getUpgradePromptConfig } = useUpgradePrompts()
   const promptConfig = getUpgradePromptConfig(context)
+
+  // Mock quick upgrade handler (subscribes to Growth plan)
+  const handleQuickUpgrade = async () => {
+    try {
+      await subscribeToPlan("growth")
+      router.push(`/${lang}/viewer`)
+    } catch (error) {
+      console.error("Failed to upgrade:", error)
+    }
+  }
 
   // Don't show if not needed
   if (!promptConfig.shouldShow) {
@@ -96,10 +111,17 @@ export default function UpgradePrompt({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              variant={content.buttonVariant}
+              className="flex-1 cursor-pointer"
+              onClick={handleQuickUpgrade}
+            >
+              Upgrade to Growth
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
             <Link href={`/${lang}/pricing`} className="flex-1">
-              <Button variant={content.buttonVariant} className="w-full cursor-pointer">
-                {content.buttonText}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button variant="outline" className="w-full cursor-pointer">
+                View All Plans
               </Button>
             </Link>
           </div>

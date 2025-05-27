@@ -1,6 +1,7 @@
 "use client" // For the toggle functionality later
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import PricingCard from "@/components/marketing/pricing-card" // New import
@@ -10,9 +11,41 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion" // New import
+import { useUserLimits, type SubscriptionPlan } from "@/contexts/user-limits-context"
+import { useAuth } from "@clerk/nextjs"
 
 export default function PricingPage() {
+  const router = useRouter()
+  const { isSignedIn } = useAuth()
+  const { subscribeToPlan } = useUserLimits()
   const [isAnnual, setIsAnnual] = useState(false)
+
+  // Mock subscription handler
+  const handlePlanSelection = async (planName: string) => {
+    if (!isSignedIn) {
+      // Redirect to sign up if not authenticated
+      router.push("/sign-up")
+      return
+    }
+
+    // Map plan names to subscription plans
+    const planMap: Record<string, SubscriptionPlan> = {
+      Free: "free",
+      Growth: "growth",
+      Premium: "premium",
+    }
+
+    const plan = planMap[planName]
+    if (plan) {
+      try {
+        await subscribeToPlan(plan)
+        // Redirect to viewer after successful subscription
+        router.push("/viewer")
+      } catch (error) {
+        console.error("Failed to subscribe to plan:", error)
+      }
+    }
+  }
 
   const plans = [
     {
@@ -20,7 +53,7 @@ export default function PricingPage() {
       monthlyPrice: 0,
       annualPrice: 0,
       description: "Perfect for quick, occasional conversions.",
-      features: ["1 page per day", "Basic email support"],
+      features: ["50 pages total", "Basic email support"],
       cta: "Get Started",
       popular: false,
     },
@@ -39,7 +72,7 @@ export default function PricingPage() {
       annualPrice: 14, // per month, billed annually ($168/year)
       description: "Best for power users and small businesses.",
       features: [
-        "1000 pages/month",
+        "Unlimited pages/month",
         "Dedicated chat support",
         "Advanced analytics",
         "Early access to new features",
@@ -142,6 +175,7 @@ export default function PricingPage() {
               features={plan.features}
               ctaText={plan.cta}
               isPopular={plan.popular}
+              onPlanSelect={handlePlanSelection}
             />
           ))}
         </div>

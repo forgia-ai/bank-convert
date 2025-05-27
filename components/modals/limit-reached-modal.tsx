@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, Zap, ArrowRight, Star } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import Link from "next/link"
+import { useUserLimits } from "@/contexts/user-limits-context"
 
 interface LimitReachedModalProps {
   isOpen: boolean
@@ -34,6 +36,19 @@ export default function LimitReachedModal({
   currentUsage = 0,
   limit = 50,
 }: LimitReachedModalProps) {
+  const router = useRouter()
+  const { subscribeToPlan } = useUserLimits()
+
+  // Mock quick upgrade handler
+  const handleQuickUpgrade = async () => {
+    try {
+      await subscribeToPlan("growth")
+      onClose()
+      router.push(`/${lang}/viewer`)
+    } catch (error) {
+      console.error("Failed to upgrade:", error)
+    }
+  }
   // Get content based on user type
   const getModalContent = () => {
     switch (userType) {
@@ -141,12 +156,26 @@ export default function LimitReachedModal({
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link href={content.primaryHref} className="flex-1">
-            <Button className="w-full cursor-pointer" onClick={onClose}>
-              {content.primaryButton}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          {userType === "free" ? (
+            <>
+              <Button className="flex-1 cursor-pointer" onClick={handleQuickUpgrade}>
+                Upgrade to Growth
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Link href={content.primaryHref} className="flex-1">
+                <Button variant="outline" className="w-full cursor-pointer" onClick={onClose}>
+                  View All Plans
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <Link href={content.primaryHref} className="flex-1">
+              <Button className="w-full cursor-pointer" onClick={onClose}>
+                {content.primaryButton}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Additional messaging for free users */}

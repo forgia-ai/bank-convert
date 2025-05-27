@@ -146,7 +146,12 @@
       "type": "Tipo"
     },
     "transaction_count_singular": "1 transação encontrada.",
-    "transaction_count_plural": "{count} transações encontradas."
+    "transaction_count_plural": "{count} transações encontradas.",
+    "limit_error_title": "Limite de Páginas Atingido",
+    "limit_error_badge": "{planName}: {currentUsage}/{limit} páginas usadas",
+    "limit_error_description": "Este extrato excederia seu limite atual de {limit} páginas. Mude para o plano Crescimento para obter 500 páginas por mês e continuar processando extratos bancários ilimitados.",
+    "limit_error_upgrade_button": "Atualize seu plano",
+    "processing_error_title": "Erro de Processamento"
   },
   "preview_page": {
     "no_data_title": "Nenhum Dado de Visualização Disponível",

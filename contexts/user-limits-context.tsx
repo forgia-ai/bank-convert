@@ -4,9 +4,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 // Types
 export type UserType = "anonymous" | "free" | "paid"
+export type SubscriptionPlan = "free" | "growth" | "premium"
 
 export interface UserLimitsData {
   userType: UserType
+  subscriptionPlan: SubscriptionPlan
   currentUsage: number
   limit: number
   usagePercentage: number
@@ -15,6 +17,8 @@ export interface UserLimitsData {
   isCritical: boolean // 90%+
   resetDate?: string // For paid users (monthly reset)
   isMonthlyLimit: boolean // true for paid, false for free (lifetime)
+  planName: string // Display name for the plan
+  planPrice: string // Display price for the plan
 }
 
 export interface UserLimitsContextType {
@@ -25,6 +29,10 @@ export interface UserLimitsContextType {
   incrementUsage: (pages: number) => void
   refreshLimits: () => Promise<void>
 
+  // Mock subscription actions
+  subscribeToPlan: (plan: SubscriptionPlan) => Promise<void>
+  processDocument: (pageCount: number) => Promise<boolean> // Returns success/failure
+
   // Helpers
   canProcessPages: (pages: number) => boolean
   getRemainingPages: () => number
@@ -32,22 +40,36 @@ export interface UserLimitsContextType {
 }
 
 // Mock data - TODO: Replace with real API calls
-const getMockUserLimits = (mockUserType: UserType = "free"): UserLimitsData => {
+const getMockUserLimits = (
+  mockUserType: UserType = "free",
+  mockPlan: SubscriptionPlan = "free",
+): UserLimitsData => {
   // TODO: Get from authentication context or API
   const userType = mockUserType
+  const subscriptionPlan = mockPlan
 
   // Mock usage data - TODO: Fetch from API
   const mockUsage = {
     anonymous: { current: 0, limit: 1 }, // 1 document per month
-    free: { current: 23, limit: 50 }, // 50 pages total
+    free: { current: 46, limit: 50 }, // 50 pages total
     paid: { current: 127, limit: 500 }, // 500 pages per month
   }
 
-  const { current, limit } = mockUsage[userType]
+  // Plan details
+  const planDetails = {
+    free: { name: "Plano Gratuito", price: "$0", limit: 50 },
+    growth: { name: "Plano Crescimento", price: "$8/mês", limit: 500 },
+    premium: { name: "Plano Premium", price: "$15/mês", limit: 999999 }, // Unlimited
+  }
+
+  const { current, limit: defaultLimit } = mockUsage[userType]
+  const planInfo = planDetails[subscriptionPlan]
+  const limit = subscriptionPlan === "free" ? planInfo.limit : planInfo.limit
   const usagePercentage = (current / limit) * 100
 
   return {
     userType,
+    subscriptionPlan,
     currentUsage: current,
     limit,
     usagePercentage,
@@ -59,6 +81,8 @@ const getMockUserLimits = (mockUserType: UserType = "free"): UserLimitsData => {
         ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
         : undefined,
     isMonthlyLimit: userType === "paid",
+    planName: planInfo.name,
+    planPrice: planInfo.price,
   }
 }
 
@@ -100,7 +124,52 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     // setUserLimits(freshData)
 
     // For now, just refresh with mock data
-    setUserLimits(getMockUserLimits())
+    setUserLimits(getMockUserLimits(userLimits.userType, userLimits.subscriptionPlan))
+  }
+
+  // Mock function to subscribe to a plan - TODO: Replace with Stripe integration
+  const subscribeToPlan = async (plan: SubscriptionPlan) => {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Determine new user type based on plan
+    const newUserType: UserType = plan === "free" ? "free" : "paid"
+
+    // Reset usage for new plan (simulate fresh start)
+    const newUsage = plan === "free" ? 0 : 0 // Fresh start for all plans
+
+    setUserLimits(getMockUserLimits(newUserType, plan))
+
+    // Update usage to current value if needed
+    setUserLimits((prev) => ({
+      ...prev,
+      currentUsage: newUsage,
+      usagePercentage: (newUsage / prev.limit) * 100,
+      isAtLimit: newUsage >= prev.limit,
+      isNearLimit: (newUsage / prev.limit) * 100 >= 75,
+      isCritical: (newUsage / prev.limit) * 100 >= 90,
+    }))
+
+    // TODO: Integrate with Stripe and backend
+    // await subscribeToStripeAPI(plan)
+    console.log(`Mock: Subscribed to ${plan} plan`)
+  }
+
+  // Mock function to process a document - TODO: Replace with actual processing
+  const processDocument = async (pageCount: number): Promise<boolean> => {
+    // Check if user can process this many pages
+    if (!canProcessPages(pageCount)) {
+      return false
+    }
+
+    // Simulate processing delay
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    // Increment usage
+    incrementUsage(pageCount)
+
+    console.log(`Mock: Processed document with ${pageCount} pages`)
+    return true
   }
 
   // Helper to check if user can process pages
@@ -130,6 +199,8 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     userLimits,
     incrementUsage,
     refreshLimits,
+    subscribeToPlan,
+    processDocument,
     canProcessPages,
     getRemainingPages,
     getUpgradePromptVariant,

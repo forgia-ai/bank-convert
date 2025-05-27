@@ -146,7 +146,12 @@
       "type": "Type"
     },
     "transaction_count_singular": "1 transaction found.",
-    "transaction_count_plural": "{count} transactions found."
+    "transaction_count_plural": "{count} transactions found.",
+    "limit_error_title": "Page Limit Reached",
+    "limit_error_badge": "{planName}: {currentUsage}/{limit} pages used",
+    "limit_error_description": "This statement would exceed your current limit of {limit} pages. Upgrade to Growth plan to get 500 pages per month and continue processing unlimited bank statements.",
+    "limit_error_upgrade_button": "Upgrade to Growth",
+    "processing_error_title": "Processing Error"
   },
   "preview_page": {
     "no_data_title": "No Preview Data Available",

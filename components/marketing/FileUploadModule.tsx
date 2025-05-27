@@ -2,7 +2,7 @@
 // including a drag-and-drop zone and a file input button.
 "use client"
 
-import React, { useCallback, useState, useImperativeHandle, forwardRef } from "react"
+import React, { useCallback, useState, useImperativeHandle, forwardRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useDropzone, FileRejection } from "react-dropzone"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
 import type { Locale } from "@/i18n-config"
+import RateLimitModal from "@/components/modals/rate-limit-modal"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -84,6 +85,39 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
+    const [showRateLimitModal, setShowRateLimitModal] = useState(false)
+    const [isRateLimited, setIsRateLimited] = useState(false)
+
+    // Mock rate limiting for anonymous users
+    const checkAnonymousRateLimit = useCallback((): boolean => {
+      if (isAuthenticated) return false // No rate limiting for authenticated users
+
+      const lastUploadKey = "anonymous_last_upload"
+      const lastUpload = localStorage.getItem(lastUploadKey)
+
+      if (!lastUpload) return false // No previous upload
+
+      const lastUploadDate = new Date(lastUpload)
+      const now = new Date()
+
+      // Check if it's been less than a month (30 days)
+      const daysDiff = (now.getTime() - lastUploadDate.getTime()) / (1000 * 3600 * 24)
+
+      return daysDiff < 30 // Rate limited if less than 30 days
+    }, [isAuthenticated])
+
+    const recordAnonymousUpload = useCallback(() => {
+      if (!isAuthenticated) {
+        localStorage.setItem("anonymous_last_upload", new Date().toISOString())
+      }
+    }, [isAuthenticated])
+
+    // Check rate limit on component mount for anonymous users
+    useEffect(() => {
+      if (!isAuthenticated) {
+        setIsRateLimited(checkAnonymousRateLimit())
+      }
+    }, [isAuthenticated, checkAnonymousRateLimit])
 
     // Mock function to generate preview data for unauthenticated users
     const generateMockPreviewData = (file: File): PreviewData => {
@@ -179,6 +213,12 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         setFile(null)
         setProgress(null)
 
+        // Check rate limiting for anonymous users
+        if (!isAuthenticated && checkAnonymousRateLimit()) {
+          setShowRateLimitModal(true)
+          return
+        }
+
         if (fileRejections.length > 0) {
           const firstRejection = fileRejections[0]
           if (firstRejection.errors && firstRejection.errors.length > 0) {
@@ -211,6 +251,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               clearInterval(interval)
               setProgress(100)
               onFileUpload(selectedFile)
+
+              // Record upload for anonymous users (for rate limiting)
+              recordAnonymousUpload()
+
               console.log("onDrop: lang before push:", lang) // DEBUG LOG
 
               // Handle different user types and redirection
@@ -247,6 +291,8 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         disableRedirect, // Added disableRedirect to dependencies
         isAuthenticated, // Added for unauthenticated flow
         onPreviewGenerated, // Added for preview data callback
+        checkAnonymousRateLimit, // Added for rate limiting
+        recordAnonymousUpload, // Added for rate limiting
       ],
     )
 
@@ -280,32 +326,64 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         )}
 
         {!file && !progress && (
-          <div
-            {...getRootProps()}
-            className={`p-8 border-2 border-dashed rounded-md cursor-pointer 
-            ${isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/50 hover:border-primary/70"}
-            transition-colors duration-200 ease-in-out`}
-          >
-            <input {...getInputProps()} />
-            <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            {isDragActive ? (
-              <p className="text-primary font-semibold">{strings.dropzoneDraggingText}</p>
-            ) : (
-              <>
-                <p className="mb-2 text-sm text-muted-foreground">
-                  <span className="font-semibold text-primary">
-                    {strings.dropzoneDefaultTextClick}
-                  </span>
-                  {strings.dropzoneDefaultTextDrag}
+          <>
+            <div
+              {...(isRateLimited ? {} : getRootProps())}
+              className={`p-8 border-2 border-dashed rounded-md 
+              ${
+                isRateLimited
+                  ? "border-red-300 bg-red-50"
+                  : isDragActive
+                    ? "border-primary bg-primary/10 cursor-pointer"
+                    : "border-muted-foreground/50 hover:border-primary/70 cursor-pointer"
+              }
+              transition-colors duration-200 ease-in-out`}
+            >
+              {!isRateLimited && <input {...getInputProps()} />}
+              <UploadCloud
+                className={`mx-auto h-12 w-12 mb-4 ${isRateLimited ? "text-red-400" : "text-muted-foreground"}`}
+              />
+              {isRateLimited ? (
+                <>
+                  <p className="text-red-600 font-semibold mb-2">Upload Limit Reached</p>
+                  <p className="text-xs text-red-500 mb-4">
+                    You&apos;ve used your free upload for this month.
+                  </p>
+                </>
+              ) : isDragActive ? (
+                <p className="text-primary font-semibold">{strings.dropzoneDraggingText}</p>
+              ) : (
+                <>
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold text-primary">
+                      {strings.dropzoneDefaultTextClick}
+                    </span>
+                    {strings.dropzoneDefaultTextDrag}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {strings.dropzoneHintPrefix}
+                    {maxFileSize / (1024 * 1024)}
+                    {strings.dropzoneHintSuffix}
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Sign Up CTA for rate limited users */}
+            {isRateLimited && (
+              <div className="mt-4">
+                <Button
+                  onClick={() => router.push(`/${lang}/sign-up`)}
+                  className="w-full cursor-pointer"
+                >
+                  Sign Up Free - Get 50 Pages
+                </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Create a free account to continue processing bank statements
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {strings.dropzoneHintPrefix}
-                  {maxFileSize / (1024 * 1024)}
-                  {strings.dropzoneHintSuffix}
-                </p>
-              </>
+              </div>
             )}
-          </div>
+          </>
         )}
 
         {progress !== null && file && (
@@ -335,7 +413,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           </div>
         )}
 
-        {!file && !progress && !hideSelectFileButton && (
+        {!file && !progress && !hideSelectFileButton && !isRateLimited && (
           <Button onClick={open} variant="outline" className="mt-6">
             {strings.buttonOrSelectFile}
           </Button>
@@ -354,6 +432,22 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             </div>
           </>
         )}
+
+        {/* Rate Limit Modal for Anonymous Users */}
+        <RateLimitModal
+          isOpen={showRateLimitModal}
+          onClose={() => setShowRateLimitModal(false)}
+          lang={lang}
+          dictionary={{
+            rate_limit_modal: {
+              title: "Upload Limit Reached",
+              description:
+                "You&apos;ve used your free upload for this month. Sign up to get 50 pages total and continue processing your bank statements.",
+              signup_button: "Sign Up Free",
+              pricing_button: "See Pricing",
+            },
+          }}
+        />
       </div>
     )
   },
