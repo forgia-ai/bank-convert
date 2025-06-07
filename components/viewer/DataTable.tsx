@@ -16,6 +16,7 @@ interface Transaction {
   amount: number
   currency?: string
   type?: string
+  originalType?: "credit" | "debit"
 }
 
 interface ColumnLabels {
@@ -48,6 +49,7 @@ const defaultData: Transaction[] = [
     amount: -5.75,
     currency: "USD",
     type: "Debit",
+    originalType: "debit",
   },
   {
     date: "2024-01-16",
@@ -55,6 +57,7 @@ const defaultData: Transaction[] = [
     amount: 2500,
     currency: "USD",
     type: "Credit",
+    originalType: "credit",
   },
   {
     date: "2024-01-17",
@@ -62,14 +65,23 @@ const defaultData: Transaction[] = [
     amount: -78.99,
     currency: "USD",
     type: "Debit",
+    originalType: "debit",
   },
-  { date: "2024-01-18", description: "Groceries", amount: -120.5, currency: "USD", type: "Debit" },
+  {
+    date: "2024-01-18",
+    description: "Groceries",
+    amount: -120.5,
+    currency: "USD",
+    type: "Debit",
+    originalType: "debit",
+  },
   {
     date: "2024-01-19",
     description: "Rent Payment",
     amount: -1500,
     currency: "USD",
     type: "Debit",
+    originalType: "debit",
   },
 ]
 
@@ -149,7 +161,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 <TableCell className="w-[100px]">
                   <span
                     className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      transaction.type === "Credit"
+                      transaction.originalType === "credit"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}

@@ -25,6 +25,7 @@ interface Transaction {
   amount: number
   currency?: string
   type?: string
+  originalType?: "credit" | "debit"
 }
 
 interface ConversionWorkflowProps {
@@ -87,7 +88,11 @@ const getLocalizedErrorMessage = (
  * Now handles new schema with format detection and standardized data
  * Applies locale-aware formatting for display
  */
-const convertBankingDataToTransactions = (data: BankingData, locale: Locale): Transaction[] => {
+const convertBankingDataToTransactions = (
+  data: BankingData,
+  locale: Locale,
+  dictionary: Record<string, Record<string, unknown>>,
+): Transaction[] => {
   const transactions: Transaction[] = []
 
   // Add account info as initial transaction if available
@@ -98,19 +103,18 @@ const convertBankingDataToTransactions = (data: BankingData, locale: Locale): Tr
       description: `Account Balance - ${data.bankName || "Bank"}`,
       amount: parseFloat(data.balance.replace(/[^0-9.-]/g, "")) || 0,
       currency: data.currency || "USD",
-      type: "Credit",
+      type: (dictionary.viewer_page?.transaction_type_credit as string) || "Credit",
+      originalType: "credit",
     })
   }
 
   // Add actual transactions (now pre-standardized by LLM)
   if (data.transactions && data.transactions.length > 0) {
     const today = new Date().toISOString().split("T")[0] // YYYY-MM-DD format
-    let filteredCount = 0
 
-    data.transactions.forEach((transaction, index) => {
+    data.transactions.forEach((transaction) => {
       // Skip future dates (backup filter)
       if (transaction.date > today) {
-        filteredCount++
         return
       }
 
@@ -124,7 +128,11 @@ const convertBankingDataToTransactions = (data: BankingData, locale: Locale): Tr
         description: transaction.description,
         amount: parsedAmount, // Keep numeric for calculations
         currency: data.currency || "USD",
-        type: transaction.type === "debit" ? "Debit" : "Credit",
+        type:
+          transaction.type === "debit"
+            ? (dictionary.viewer_page?.transaction_type_debit as string) || "Debit"
+            : (dictionary.viewer_page?.transaction_type_credit as string) || "Credit",
+        originalType: transaction.type,
       })
     })
   }
@@ -193,7 +201,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
 
       if (result.success && result.data) {
         // Convert banking data to transaction format with locale formatting
-        const transactions = convertBankingDataToTransactions(result.data, lang)
+        const transactions = convertBankingDataToTransactions(result.data, lang, dictionary)
 
         if (transactions.length === 0) {
           // If no transactions found, show a friendly message

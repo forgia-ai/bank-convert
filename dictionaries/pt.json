@@ -147,6 +147,8 @@
     },
     "transaction_count_singular": "1 transação encontrada.",
     "transaction_count_plural": "{count} transações encontradas.",
+    "transaction_type_credit": "Crédito",
+    "transaction_type_debit": "Débito",
     "limit_error_title": "Limite de Páginas Atingido",
     "limit_error_badge": "{planName}: {currentUsage}/{limit} páginas usadas",
     "limit_error_description": "Este extrato excederia seu limite atual de {limit} páginas. Mude para o plano Crescimento para obter 500 páginas por mês e continuar processando extratos bancários ilimitados.",
