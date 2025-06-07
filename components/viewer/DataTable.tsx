@@ -138,9 +138,7 @@ const DataTable: React.FC<DataTableProps> = ({
           <TableBody>
             {data.map((transaction, index) => (
               <TableRow key={index} className="hover:bg-muted/30">
-                <TableCell className="font-medium w-[120px]">
-                  {new Date(transaction.date).toLocaleDateString()}
-                </TableCell>
+                <TableCell className="font-medium w-[120px]">{transaction.date}</TableCell>
                 <TableCell className="min-w-[200px]">{transaction.description}</TableCell>
                 <TableCell
                   className={`text-right font-medium w-[120px] ${getAmountColor(transaction.amount)}`}

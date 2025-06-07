@@ -51,7 +51,7 @@ const getMockUserLimits = (
   // Mock usage data - TODO: Fetch from API
   const mockUsage = {
     anonymous: { current: 0, limit: 1 }, // 1 document per month
-    free: { current: 46, limit: 50 }, // 50 pages total
+    free: { current: 14, limit: 50 }, // 50 pages total
     paid: { current: 127, limit: 500 }, // 500 pages per month
   }
 
@@ -152,7 +152,6 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
 
     // TODO: Integrate with Stripe and backend
     // await subscribeToStripeAPI(plan)
-    console.log(`Mock: Subscribed to ${plan} plan`)
   }
 
   // Mock function to process a document - TODO: Replace with actual processing
@@ -168,7 +167,6 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     // Increment usage
     incrementUsage(pageCount)
 
-    console.log(`Mock: Processed document with ${pageCount} pages`)
     return true
   }
 

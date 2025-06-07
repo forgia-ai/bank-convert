@@ -26,16 +26,14 @@ export default function InteractiveHeroSection({
   const fileUploadModuleRef = useRef<FileUploadModuleRef>(null) // Create a ref for FileUploadModule
 
   // Handler for file upload, defined within the Client Component
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleFileUpload = (file: File) => {
-    console.log("File selected in InteractiveHeroSection:", file.name)
-    // TODO: Implement actual file processing logic or state update here
-    // For example, you might want to set some state to show a preview
-    // or trigger an API call for processing.
+    // File selected - the actual processing is handled by FileUploadModule
+    // which will redirect to preview page
   }
 
   // Handler for preview data generation (for unauthenticated users)
   const handlePreviewGenerated = (data: import("./FileUploadModule").PreviewData) => {
-    console.log("Preview data generated:", data)
     // Store preview data in localStorage or context for the preview page
     if (typeof window !== "undefined") {
       localStorage.setItem("previewData", JSON.stringify(data))

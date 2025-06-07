@@ -83,7 +83,6 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
     ref,
   ) => {
     const router = useRouter() // Added for redirection
-    console.log("FileUploadModule rendered/updated. lang prop:", lang) // DEBUG LOG
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
@@ -274,8 +273,6 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
 
               // Record upload for anonymous users (for rate limiting)
               recordAnonymousUpload()
-
-              console.log("onDrop: lang before push:", lang) // DEBUG LOG
 
               // Handle different user types and redirection
               if (!disableRedirect && lang) {

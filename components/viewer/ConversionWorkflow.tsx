@@ -104,12 +104,23 @@ const convertBankingDataToTransactions = (data: BankingData, locale: Locale): Tr
 
   // Add actual transactions (now pre-standardized by LLM)
   if (data.transactions && data.transactions.length > 0) {
-    data.transactions.forEach((transaction) => {
+    const today = new Date().toISOString().split("T")[0] // YYYY-MM-DD format
+    let filteredCount = 0
+
+    data.transactions.forEach((transaction, index) => {
+      // Skip future dates (backup filter)
+      if (transaction.date > today) {
+        filteredCount++
+        return
+      }
+
       // Use the standardized amount for calculations but format for display
       const parsedAmount = parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0
 
+      const formattedDate = formatDateForLocale(transaction.date, locale)
+
       transactions.push({
-        date: formatDateForLocale(transaction.date, locale), // Convert from ISO to locale format
+        date: formattedDate,
         description: transaction.description,
         amount: parsedAmount, // Keep numeric for calculations
         currency: data.currency || "USD",
@@ -195,12 +206,6 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
 
         setTransactionData(transactions)
         setUploadState("completed")
-        console.log(
-          "Successfully processed PDF file:",
-          file.name,
-          "Transactions:",
-          transactions.length,
-        )
       } else {
         // Handle processing errors
         setUploadState("error")
@@ -224,7 +229,6 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   // Handle XLSX download
   const handleDownloadXLSX = () => {
     // TODO: Implement actual XLSX generation and download
-    console.log("Downloading XLSX with data:", transactionData)
 
     // For now, just create a simple CSV as a placeholder
     const csvContent = [
