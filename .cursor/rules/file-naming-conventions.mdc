@@ -1,0 +1,156 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+# File Naming Conventions
+
+This document outlines the file naming conventions used throughout the bank-convert project.
+
+## React Components (.tsx)
+
+### Custom Components
+
+Use **PascalCase** for all custom React component files:
+
+```
+✅ ConversionWorkflow.tsx
+✅ FileUploadArea.tsx
+✅ DataTable.tsx
+✅ TestimonialCard.tsx
+✅ InteractiveHeroSection.tsx
+
+❌ conversion-workflow.tsx
+❌ file-upload-area.tsx
+❌ data-table.tsx
+```
+
+### UI Components (shadcn/ui)
+
+Keep **kebab-case** for shadcn UI components:
+
+```
+✅ components/ui/button.tsx
+✅ components/ui/card.tsx
+✅ components/ui/dropdown-menu.tsx
+
+❌ components/ui/Button.tsx
+❌ components/ui/Card.tsx
+```
+
+**Rationale**: UI components are external dependencies and should maintain their original naming convention.
+
+## TypeScript Files (.ts)
+
+Use **kebab-case** for all TypeScript utility, library, and configuration files:
+
+```
+✅ get-dictionary.ts
+✅ file-validation.ts
+✅ user-limits-context.tsx
+✅ i18n-config.ts
+
+❌ getDictionary.ts
+❌ fileValidation.ts
+❌ userLimitsContext.tsx
+```
+
+## Import Path Consistency
+
+### Absolute Imports
+
+Always use absolute imports with the `@/` alias:
+
+```typescript
+✅ import ConversionWorkflow from "@/components/viewer/ConversionWorkflow"
+✅ import { getDictionary } from "@/lib/get-dictionary"
+✅ import { processPdfFile } from "@/actions/file-upload"
+
+❌ import ConversionWorkflow from "../../../components/viewer/ConversionWorkflow"
+❌ import { getDictionary } from "./lib/get-dictionary"
+```
+
+### Import Order
+
+1. Internal libraries first
+2. External libraries second
+
+```typescript
+✅
+import { validateFile } from "@/lib/file-validation"
+import { getDictionary } from "@/lib/get-dictionary"
+import { Button } from "@/components/ui/button"
+import React from "react"
+import { useRouter } from "next/navigation"
+
+❌
+import React from "react"
+import { validateFile } from "@/lib/file-validation"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+```
+
+## Special Cases
+
+### Context Files
+
+Use **kebab-case** with descriptive suffixes:
+
+```
+✅ user-limits-context.tsx
+✅ theme-provider-context.tsx
+✅ auth-context.tsx
+```
+
+### Hook Files
+
+Use **kebab-case** with `use-` prefix:
+
+```
+✅ use-file-upload.ts
+✅ use-local-storage.ts
+✅ use-debounce.ts
+```
+
+### Type Definition Files
+
+Use **kebab-case** with `.types.ts` suffix:
+
+```
+✅ api.types.ts
+✅ banking-data.types.ts
+✅ user.types.ts
+```
+
+## Configuration Files
+
+Keep existing conventions for configuration files:
+
+```
+✅ next.config.ts
+✅ tailwind.config.ts
+✅ vitest.config.ts
+✅ tsconfig.json
+✅ package.json
+```
+
+## Summary
+
+| File Type                 | Convention                 | Example                   |
+| ------------------------- | -------------------------- | ------------------------- |
+| React Components (Custom) | PascalCase                 | `ConversionWorkflow.tsx`  |
+| React Components (UI)     | kebab-case                 | `button.tsx`              |
+| TypeScript Files          | kebab-case                 | `file-validation.ts`      |
+| Test Files                | Match source + `.test.ts`  | `file-validation.test.ts` |
+| Context Files             | kebab-case + `-context`    | `user-limits-context.tsx` |
+| Hook Files                | kebab-case + `use-` prefix | `use-file-upload.ts`      |
+| Server Actions            | kebab-case                 | `file-upload.ts`          |
+| Pages/Layouts             | kebab-case (Next.js)       | `page.tsx`, `layout.tsx`  |
+
+## Enforcement
+
+- Use ESLint rules to enforce import path consistency
+- Use Prettier for consistent formatting
+- Run `yarn check` before committing to verify compliance
+- File naming should be checked during code review

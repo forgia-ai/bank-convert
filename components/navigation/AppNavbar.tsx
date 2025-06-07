@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import type { getDictionary } from "@/lib/getDictionary" // For type only
+import type { getDictionary } from "@/lib/get-dictionary" // For type only
 
 type NavStringsType = Awaited<ReturnType<typeof getDictionary>>["navbar"]
 
@@ -22,7 +22,7 @@ import {
 import { Layers3, CreditCard, Menu, X, Globe, KeyRound, UserPlus } from "lucide-react"
 import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
-import UsageTracker from "@/components/dashboard/usage-tracker"
+import UsageTracker from "@/components/dashboard/UsageTracker"
 
 // Helper to extract locale and pathname from the full path
 const getLocaleAndPathname = (fullPathname: string, locales: readonly Locale[]) => {

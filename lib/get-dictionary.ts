@@ -1,4 +1,4 @@
-// lib/getDictionary.ts
+// lib/get-dictionary.ts
 import "server-only"
 import type { Locale } from "../i18n-config"
 import { i18n } from "../i18n-config"

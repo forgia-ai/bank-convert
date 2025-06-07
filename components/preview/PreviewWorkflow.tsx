@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 import { CheckCircle, ArrowRight, Users, Star, Download } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import { type PreviewData } from "@/components/marketing/FileUploadModule"
-import DataTable from "@/components/viewer/data-table"
+import DataTable from "@/components/viewer/DataTable"
 import Link from "next/link"
 
 interface PreviewWorkflowProps {
@@ -146,7 +146,7 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
         data={convertToDataTableFormat(previewData)}
         columns={
           (dictionary.viewer_page
-            ?.table_columns as unknown as import("@/components/viewer/data-table").ColumnLabels) || {
+            ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels) || {
             date: "Date",
             description: "Description",
             amount: "Amount",

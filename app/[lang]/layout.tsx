@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
 import { UserLimitsProvider } from "@/contexts/user-limits-context"
 // AppNavbar and Footer will be imported by specific route group layouts
-// import { getDictionary } from "@/lib/getDictionary" // No longer needed here
+// import { getDictionary } from "@/lib/get-dictionary" // No longer needed here
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 // This function can be used to generate dynamic metadata based on the locale
 // For example, loading titles from your dictionary
-// import { getDictionary } from '@/lib/getDictionary'; // Assuming getDictionary is in lib
+// import { getDictionary } from '@/lib/get-dictionary'; // Assuming getDictionary is in lib
 // export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
 //   const dictionary = await getDictionary(params.lang);
 //   return {

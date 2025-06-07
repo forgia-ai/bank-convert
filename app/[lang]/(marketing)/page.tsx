@@ -1,15 +1,15 @@
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import InteractiveHeroSection from "@/components/marketing/interactive-hero-section"
-import FeatureCard from "@/components/marketing/feature-card"
-import TestimonialCard from "@/components/marketing/testimonial-card"
+import InteractiveHeroSection from "@/components/marketing/InteractiveHeroSection"
+import FeatureCard from "@/components/marketing/FeatureCard"
+import TestimonialCard from "@/components/marketing/TestimonialCard"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { getDictionary } from "@/lib/getDictionary"
+import { getDictionary } from "@/lib/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 export default async function MarketingHomePage({

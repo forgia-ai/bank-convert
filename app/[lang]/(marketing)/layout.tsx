@@ -1,7 +1,7 @@
-import TopAuthorityBar from "@/components/marketing/top-authority-bar"
+import TopAuthorityBar from "@/components/marketing/TopAuthorityBar"
 import AppNavbar from "@/components/navigation/AppNavbar"
 import Footer from "@/components/layout/Footer"
-import { getDictionary } from "@/lib/getDictionary"
+import { getDictionary } from "@/lib/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 export default async function MarketingLayout({

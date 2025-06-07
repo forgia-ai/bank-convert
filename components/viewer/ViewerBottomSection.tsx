@@ -2,7 +2,7 @@
 
 import React from "react"
 import { type Locale } from "@/i18n-config"
-import UpgradePrompt from "@/components/dashboard/upgrade-prompt"
+import UpgradePrompt from "@/components/dashboard/UpgradePrompt"
 
 interface ViewerBottomSectionProps {
   lang: Locale

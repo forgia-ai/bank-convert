@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
 import type { Locale } from "@/i18n-config"
-import RateLimitModal from "@/components/modals/rate-limit-modal"
+import RateLimitModal from "@/components/modals/RateLimitModal"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void

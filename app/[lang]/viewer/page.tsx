@@ -1,5 +1,5 @@
-import ConversionWorkflow from "@/components/viewer/conversion-workflow"
-import { getDictionary } from "@/lib/getDictionary"
+import ConversionWorkflow from "@/components/viewer/ConversionWorkflow"
+import { getDictionary } from "@/lib/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 interface ViewerPageProps {

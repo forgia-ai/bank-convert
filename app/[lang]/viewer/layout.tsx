@@ -1,7 +1,7 @@
 import AppNavbar from "@/components/navigation/AppNavbar"
 import Footer from "@/components/layout/Footer"
-import ViewerBottomSection from "@/components/viewer/viewer-bottom-section"
-import { getDictionary } from "@/lib/getDictionary"
+import ViewerBottomSection from "@/components/viewer/ViewerBottomSection"
+import { getDictionary } from "@/lib/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 export default async function ViewerLayout({

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
-import { getDictionary } from "@/lib/getDictionary"
+import { getDictionary } from "@/lib/get-dictionary"
 import { type Locale } from "@/i18n-config"
-import PreviewWorkflow from "@/components/preview/preview-workflow"
+import PreviewWorkflow from "@/components/preview/PreviewWorkflow"
 
 export default async function PreviewPage({
   params: paramsPromise,

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import PricingCard from "@/components/marketing/pricing-card" // New import
+import PricingCard from "@/components/marketing/PricingCard" // New import
 import {
   Accordion,
   AccordionContent,

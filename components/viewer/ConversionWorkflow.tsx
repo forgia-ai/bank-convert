@@ -4,7 +4,7 @@ import React, { useState, useRef } from "react"
 import FileUploadModule, {
   type FileUploadModuleRef,
 } from "@/components/marketing/FileUploadModule"
-import DataTable from "@/components/viewer/data-table"
+import DataTable from "@/components/viewer/DataTable"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { AlertCircle, Download, Zap, ArrowRight } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import { useUserLimits } from "@/contexts/user-limits-context"
+import { processPdfFile, type BankingData } from "@/lib/upload/actions"
 
 // Define the possible states for the conversion process
 type UploadState = "idle" | "uploading" | "processing" | "completed" | "error"
@@ -56,10 +57,43 @@ const truncateFilename = (filename: string, maxLength: number = 50): string => {
   return `${beginning}...${ending}${extension}`
 }
 
+/**
+ * Converts BankingData from Gemini API to Transaction array format expected by the table
+ */
+const convertBankingDataToTransactions = (data: BankingData): Transaction[] => {
+  const transactions: Transaction[] = []
+
+  // Add account info as initial transaction if available
+  if (data.balance) {
+    transactions.push({
+      date: new Date().toISOString().split("T")[0], // Today's date
+      description: `Account Balance - ${data.bankName || "Bank"}`,
+      amount: parseFloat(data.balance.replace(/[^0-9.-]/g, "")) || 0,
+      currency: data.currency || "USD",
+      type: "Credit",
+    })
+  }
+
+  // Add actual transactions
+  if (data.transactions && data.transactions.length > 0) {
+    data.transactions.forEach((transaction) => {
+      transactions.push({
+        date: transaction.date,
+        description: transaction.description,
+        amount: parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0,
+        currency: data.currency || "USD",
+        type: transaction.type === "debit" ? "Debit" : "Credit",
+      })
+    })
+  }
+
+  return transactions
+}
+
 export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkflowProps) {
   const [uploadState, setUploadState] = useState<UploadState>("idle")
-  const [extractedData, setExtractedData] = useState<Transaction[]>([])
   const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [transactionData, setTransactionData] = useState<Transaction[]>([])
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [isLimitError, setIsLimitError] = useState<boolean>(false)
   const fileUploadRef = useRef<FileUploadModuleRef>(null)
@@ -89,8 +123,8 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
       const success = await processDocument(mockPageCount)
 
       if (success) {
-        // Generate mock transaction data on successful processing
-        await simulateBackendProcessing(file)
+        // Process the PDF file using Gemini API
+        await processWithGeminiAPI(file)
       } else {
         throw new Error("Processing failed - limit reached")
       }
@@ -105,326 +139,62 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
     }
   }
 
-  // Simulate backend processing (replace with real API call)
-  const simulateBackendProcessing = async (file: File): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate random success/failure for demo
-        const success = Math.random() > 0.2 // 80% success rate
+  // Process PDF with Gemini API using server action
+  const processWithGeminiAPI = async (file: File): Promise<void> => {
+    try {
+      // Create FormData for server action
+      const formData = new FormData()
+      formData.append("file", file)
 
-        if (success) {
-          // Mock extracted transaction data - Much larger dataset to test scrolling
-          // In a real implementation, this would process the actual file
-          console.log("Processing file:", file.name, file.size)
-          const mockData: Transaction[] = [
-            {
-              date: "2024-01-01",
-              description: "Opening Balance",
-              amount: 5000.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-01-02",
-              description: "Grocery Store - Walmart",
-              amount: -156.78,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-03",
-              description: "Gas Station - Shell",
-              amount: -45.2,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-04",
-              description: "Coffee Shop - Starbucks",
-              amount: -8.95,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-05",
-              description: "Online Purchase - Amazon",
-              amount: -89.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-06",
-              description: "Salary Deposit",
-              amount: 3200.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-01-07",
-              description: "Rent Payment",
-              amount: -1500.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-08",
-              description: "Utilities - Electric Bill",
-              amount: -125.3,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-09",
-              description: "Phone Bill - Verizon",
-              amount: -85.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-10",
-              description: "Grocery Store - Target",
-              amount: -134.56,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-11",
-              description: "Restaurant - Olive Garden",
-              amount: -67.89,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-12",
-              description: "ATM Withdrawal",
-              amount: -100.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-13",
-              description: "Online Subscription - Netflix",
-              amount: -15.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-14",
-              description: "Gas Station - BP",
-              amount: -52.4,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-15",
-              description: "Coffee Shop Payment",
-              amount: -5.75,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-16",
-              description: "Bank Interest",
-              amount: 12.5,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-01-17",
-              description: "Online Shopping - eBay",
-              amount: -78.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-18",
-              description: "Grocery Store - Whole Foods",
-              amount: -189.45,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-19",
-              description: "Medical - Doctor Visit",
-              amount: -250.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-20",
-              description: "Transfer from Savings",
-              amount: 500.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-01-21",
-              description: "Car Insurance",
-              amount: -145.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-22",
-              description: "Pharmacy - CVS",
-              amount: -28.95,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-23",
-              description: "Restaurant - McDonald's",
-              amount: -12.45,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-24",
-              description: "Online Purchase - Best Buy",
-              amount: -299.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-25",
-              description: "Gas Station - Exxon",
-              amount: -48.75,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-26",
-              description: "Freelance Payment",
-              amount: 800.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-01-27",
-              description: "Grocery Store - Kroger",
-              amount: -167.23,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-28",
-              description: "Movie Theater",
-              amount: -25.5,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-29",
-              description: "Online Subscription - Spotify",
-              amount: -9.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-30",
-              description: "Restaurant - Chipotle",
-              amount: -14.75,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-01-31",
-              description: "ATM Fee",
-              amount: -3.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-01",
-              description: "Health Insurance",
-              amount: -320.0,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-02",
-              description: "Internet Bill - Comcast",
-              amount: -79.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-03",
-              description: "Cash Back Reward",
-              amount: 25.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-02-04",
-              description: "Clothing Store - H&M",
-              amount: -89.5,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-05",
-              description: "Gas Station - Shell",
-              amount: -51.3,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-06",
-              description: "Salary Deposit",
-              amount: 3200.0,
-              currency: "USD",
-              type: "Credit",
-            },
-            {
-              date: "2024-02-07",
-              description: "Grocery Store - Safeway",
-              amount: -145.67,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-08",
-              description: "Coffee Shop - Dunkin",
-              amount: -6.85,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-09",
-              description: "Home Improvement - Home Depot",
-              amount: -234.99,
-              currency: "USD",
-              type: "Debit",
-            },
-            {
-              date: "2024-02-10",
-              description: "Restaurant - Pizza Hut",
-              amount: -28.99,
-              currency: "USD",
-              type: "Debit",
-            },
-          ]
+      // Call server action to process PDF with Gemini
+      const result = await processPdfFile(formData)
 
-          setExtractedData(mockData)
-          setUploadState("completed")
-          resolve()
-        } else {
-          reject(new Error("Extraction failed"))
+      if (result.success && result.data) {
+        // Convert banking data to transaction format
+        const transactions = convertBankingDataToTransactions(result.data)
+
+        if (transactions.length === 0) {
+          // If no transactions found, show a friendly message
+          setUploadState("error")
+          setErrorMessage(
+            "No transaction data could be extracted from this PDF. Please ensure it's a valid bank statement.",
+          )
+          return
         }
-      }, 3000) // 3 second delay to simulate processing
-    })
+
+        setTransactionData(transactions)
+        setUploadState("completed")
+        console.log(
+          "Successfully processed PDF file:",
+          file.name,
+          "Transactions:",
+          transactions.length,
+        )
+      } else {
+        // Handle processing errors
+        setUploadState("error")
+        setErrorMessage(result.error || "Failed to process PDF file")
+      }
+    } catch (error) {
+      console.error("Error processing PDF with Gemini API:", error)
+      setUploadState("error")
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : (dictionary?.viewer_page?.backend_error_generic as string) || "Processing failed",
+      )
+    }
   }
 
   // Handle XLSX download
   const handleDownloadXLSX = () => {
     // TODO: Implement actual XLSX generation and download
-    console.log("Downloading XLSX with data:", extractedData)
+    console.log("Downloading XLSX with data:", transactionData)
 
     // For now, just create a simple CSV as a placeholder
     const csvContent = [
       ["Date", "Description", "Amount", "Currency", "Type"],
-      ...extractedData.map((tx) => [
+      ...transactionData.map((tx) => [
         tx.date,
         tx.description,
         tx.amount.toString(),
@@ -449,7 +219,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   // Handle clearing/resetting for new conversion
   const handleClearAndUploadNew = () => {
     setUploadState("idle")
-    setExtractedData([])
+    setTransactionData([])
     setCurrentFile(null)
     setErrorMessage("")
     setIsLimitError(false)
@@ -482,7 +252,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               ref={fileUploadRef}
               onFileUpload={handleFileUpload}
               lang={lang}
-              maxFileSize={10 * 1024 * 1024} // 10MB
+              maxFileSize={20 * 1024 * 1024} // 20MB to match PDF validation limit
               acceptedFileTypes={{ "application/pdf": [".pdf"] }}
               disableRedirect={true} // Prevent redirection since we're already on viewer page
               hideSelectFileButton={true} // Hide the select file button since drag-drop zone handles this
@@ -511,7 +281,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
           </div>
         )}
 
-        {uploadState === "completed" && extractedData.length > 0 && (
+        {uploadState === "completed" && transactionData.length > 0 && (
           <div className="space-y-6">
             {/* Action Buttons - Moved to top */}
             <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
@@ -546,10 +316,10 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
 
             {/* Data Table */}
             <DataTable
-              data={extractedData}
+              data={transactionData}
               columns={
                 dictionary.viewer_page
-                  ?.table_columns as unknown as import("@/components/viewer/data-table").ColumnLabels
+                  ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels
               }
               transactionCountStrings={{
                 singular:
