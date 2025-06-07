@@ -52,7 +52,7 @@
       "dropzoneDefaultTextClick": "Clique para carregar",
       "dropzoneDefaultTextDrag": " ou arraste e solte",
       "dropzoneHintPrefix": "PDF ou CSV (máx. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "Arquivo pronto para processar!",
       "buttonOrSelectFile": "Ou Selecionar Arquivo",
@@ -127,7 +127,7 @@
       "dropzoneDefaultTextClick": "Clique para carregar",
       "dropzoneDefaultTextDrag": " ou arraste e solte",
       "dropzoneHintPrefix": "Arquivo PDF (máx. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "Arquivo pronto para processar!",
       "buttonOrSelectFile": "Ou Selecionar Arquivo",
@@ -151,7 +151,10 @@
     "limit_error_badge": "{planName}: {currentUsage}/{limit} páginas usadas",
     "limit_error_description": "Este extrato excederia seu limite atual de {limit} páginas. Mude para o plano Crescimento para obter 500 páginas por mês e continuar processando extratos bancários ilimitados.",
     "limit_error_upgrade_button": "Atualize seu plano",
-    "processing_error_title": "Erro de Processamento"
+    "processing_error_title": "Erro de Processamento",
+    "error_pdf_processing_failed": "Erro inesperado do servidor ao processar o PDF.",
+    "error_data_extraction_failed": "Erro inesperado do servidor ao extrair dados bancários.",
+    "error_generic_processing": "Ocorreu um erro inesperado ao processar seu arquivo. Por favor, tente novamente."
   },
   "preview_page": {
     "no_data_title": "Nenhum Dado de Visualização Disponível",
@@ -228,5 +231,10 @@
     "primary_button": "Cadastrar Grátis",
     "secondary_button": "Ver Preços",
     "footer_text": "Cadastro gratuito leva 30 segundos. Não é necessário cartão de crédito."
+  },
+  "plans": {
+    "free": "Plano Gratuito",
+    "growth": "Plano Crescimento",
+    "premium": "Plano Premium"
   }
 }

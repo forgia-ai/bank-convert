@@ -144,6 +144,7 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
       {/* Data Table - Same as viewer but with custom footer message */}
       <DataTable
         data={convertToDataTableFormat(previewData)}
+        locale={lang}
         columns={
           (dictionary.viewer_page
             ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels) || {

@@ -52,7 +52,7 @@
       "dropzoneDefaultTextClick": "Haz clic para subir",
       "dropzoneDefaultTextDrag": " o arrastra y suelta",
       "dropzoneHintPrefix": "PDF o CSV (máx. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "¡Archivo listo para procesar!",
       "buttonOrSelectFile": "O Seleccionar Archivo",
@@ -127,7 +127,7 @@
       "dropzoneDefaultTextClick": "Haz clic para subir",
       "dropzoneDefaultTextDrag": " o arrastra y suelta",
       "dropzoneHintPrefix": "Archivo PDF (máx. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "¡Archivo listo para procesar!",
       "buttonOrSelectFile": "O Seleccionar Archivo",
@@ -151,7 +151,10 @@
     "limit_error_badge": "{planName}: {currentUsage}/{limit} páginas usadas",
     "limit_error_description": "Este extracto excedería tu límite actual de {limit} páginas. Actualiza al plan Crecimiento para obtener 500 páginas por mes y continuar procesando extractos bancarios ilimitados.",
     "limit_error_upgrade_button": "Cambiar a Crecimiento",
-    "processing_error_title": "Error de Procesamiento"
+    "processing_error_title": "Error de Procesamiento",
+    "error_pdf_processing_failed": "Error inesperado del servidor al procesar el PDF.",
+    "error_data_extraction_failed": "Error inesperado del servidor al extraer datos bancarios.",
+    "error_generic_processing": "Ocurrió un error inesperado al procesar tu archivo. Por favor, inténtalo de nuevo."
   },
   "preview_page": {
     "no_data_title": "No Hay Datos de Vista Previa Disponibles",
@@ -228,5 +231,10 @@
     "primary_button": "Registrarse Gratis",
     "secondary_button": "Ver Precios",
     "footer_text": "El registro gratuito toma 30 segundos. No se requiere tarjeta de crédito."
+  },
+  "plans": {
+    "free": "Plan Gratuito",
+    "growth": "Plan de Crecimiento",
+    "premium": "Plan Premium"
   }
 }

@@ -52,7 +52,7 @@
       "dropzoneDefaultTextClick": "Click to upload",
       "dropzoneDefaultTextDrag": " or drag and drop",
       "dropzoneHintPrefix": "PDF or CSV (max. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "File ready for processing!",
       "buttonOrSelectFile": "Or Select File",
@@ -127,7 +127,7 @@
       "dropzoneDefaultTextClick": "Click to upload",
       "dropzoneDefaultTextDrag": " or drag and drop",
       "dropzoneHintPrefix": "PDF file (max. ",
-      "dropzoneHintSuffix": "MB)",
+      "dropzoneHintSuffix": ")",
       "fileInfoUnit": " MB",
       "progressFileReady": "File ready for processing!",
       "buttonOrSelectFile": "Or Select File",
@@ -151,7 +151,10 @@
     "limit_error_badge": "{planName}: {currentUsage}/{limit} pages used",
     "limit_error_description": "This statement would exceed your current limit of {limit} pages. Upgrade to Growth plan to get 500 pages per month and continue processing unlimited bank statements.",
     "limit_error_upgrade_button": "Upgrade to Growth",
-    "processing_error_title": "Processing Error"
+    "processing_error_title": "Processing Error",
+    "error_pdf_processing_failed": "Unexpected server error while processing the PDF.",
+    "error_data_extraction_failed": "Unexpected server error while extracting banking data.",
+    "error_generic_processing": "An unexpected error occurred while processing your file. Please try again."
   },
   "preview_page": {
     "no_data_title": "No Preview Data Available",
@@ -228,5 +231,10 @@
     "primary_button": "Sign Up Free",
     "secondary_button": "See Pricing",
     "footer_text": "Free signup takes 30 seconds. No credit card required."
+  },
+  "plans": {
+    "free": "Free Plan",
+    "growth": "Growth Plan",
+    "premium": "Premium Plan"
   }
 }

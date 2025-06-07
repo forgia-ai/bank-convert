@@ -29,8 +29,9 @@ export default function UsageTracker({
   const usagePercentage = userLimits.usagePercentage
   const remainingPages = Math.max(limit - usage, 0)
 
-  // Get plan name based on user type
-  const planName = userType === "paid" ? "Growth" : userType === "free" ? "Free" : "Anonymous"
+  // Get plan name based on user type and subscription plan
+  const planKey = userLimits.planName // This is now the plan key (e.g., 'free', 'growth', 'premium')
+  const planName = (dictionary.plans as Record<string, string>)?.[planKey] || planKey
 
   // Determine badge variant based on user type
   const getBadgeVariant = () => {

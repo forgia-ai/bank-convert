@@ -7,6 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatAmountWithSign } from "@/lib/upload/locale-formatting"
+import type { Locale } from "@/i18n-config"
 
 interface Transaction {
   date: string
@@ -36,6 +38,7 @@ interface DataTableProps {
   columns?: ColumnLabels
   transactionCountStrings?: TransactionCountStrings
   customFooterMessage?: string // New prop for custom footer message
+  locale?: Locale // Locale for formatting amounts and dates
 }
 
 const defaultData: Transaction[] = [
@@ -88,13 +91,12 @@ const DataTable: React.FC<DataTableProps> = ({
   columns = defaultColumns,
   transactionCountStrings = defaultTransactionCountStrings,
   customFooterMessage,
+  locale = "en",
 }) => {
-  // Helper function to format amount with currency symbol
-  const formatAmount = (amount: number, currency?: string) => {
-    const formattedAmount = Math.abs(amount).toFixed(2)
-    const sign = amount >= 0 ? "+" : "-"
-    const currencySymbol = currency === "USD" ? "$" : currency || ""
-    return `${sign}${currencySymbol}${formattedAmount}`
+  // Helper function to format amount using locale-aware formatting
+  const formatAmount = (amount: number) => {
+    const standardizedAmount = amount.toFixed(2) // Convert to standardized format
+    return formatAmountWithSign(standardizedAmount, locale)
   }
 
   // Helper function to get amount color based on positive/negative
@@ -143,7 +145,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 <TableCell
                   className={`text-right font-medium w-[120px] ${getAmountColor(transaction.amount)}`}
                 >
-                  {formatAmount(transaction.amount, transaction.currency)}
+                  {formatAmount(transaction.amount)}
                 </TableCell>
                 <TableCell className="w-[100px]">{transaction.currency || "N/A"}</TableCell>
                 <TableCell className="w-[100px]">

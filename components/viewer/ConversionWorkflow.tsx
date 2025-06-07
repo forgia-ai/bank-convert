@@ -13,6 +13,7 @@ import { AlertCircle, Download, Zap, ArrowRight } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import { useUserLimits } from "@/contexts/user-limits-context"
 import { processPdfFile, type BankingData } from "@/lib/upload/actions"
+import { formatDateForLocale } from "@/lib/upload/locale-formatting"
 
 // Define the possible states for the conversion process
 type UploadState = "idle" | "uploading" | "processing" | "completed" | "error"
@@ -58,15 +59,42 @@ const truncateFilename = (filename: string, maxLength: number = 50): string => {
 }
 
 /**
- * Converts BankingData from Gemini API to Transaction array format expected by the table
+ * Translates error codes to localized error messages
  */
-const convertBankingDataToTransactions = (data: BankingData): Transaction[] => {
+const getLocalizedErrorMessage = (
+  errorCode: string,
+  dictionary: Record<string, Record<string, unknown>>,
+): string => {
+  const errorKeyMap: Record<string, string> = {
+    ERROR_PDF_PROCESSING_FAILED: "error_pdf_processing_failed",
+    ERROR_DATA_EXTRACTION_FAILED: "error_data_extraction_failed",
+  }
+
+  const dictionaryKey = errorKeyMap[errorCode]
+  if (dictionaryKey && dictionary.viewer_page?.[dictionaryKey]) {
+    return dictionary.viewer_page[dictionaryKey] as string
+  }
+
+  // Fallback to generic error message
+  return (
+    (dictionary.viewer_page?.error_generic_processing as string) ||
+    "An unexpected error occurred while processing your file. Please try again."
+  )
+}
+
+/**
+ * Converts BankingData from Gemini AI to Transaction array format expected by the table
+ * Now handles new schema with format detection and standardized data
+ * Applies locale-aware formatting for display
+ */
+const convertBankingDataToTransactions = (data: BankingData, locale: Locale): Transaction[] => {
   const transactions: Transaction[] = []
 
   // Add account info as initial transaction if available
   if (data.balance) {
+    const todayDate = new Date().toISOString().split("T")[0]
     transactions.push({
-      date: new Date().toISOString().split("T")[0], // Today's date
+      date: formatDateForLocale(todayDate, locale),
       description: `Account Balance - ${data.bankName || "Bank"}`,
       amount: parseFloat(data.balance.replace(/[^0-9.-]/g, "")) || 0,
       currency: data.currency || "USD",
@@ -74,13 +102,16 @@ const convertBankingDataToTransactions = (data: BankingData): Transaction[] => {
     })
   }
 
-  // Add actual transactions
+  // Add actual transactions (now pre-standardized by LLM)
   if (data.transactions && data.transactions.length > 0) {
     data.transactions.forEach((transaction) => {
+      // Use the standardized amount for calculations but format for display
+      const parsedAmount = parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0
+
       transactions.push({
-        date: transaction.date,
+        date: formatDateForLocale(transaction.date, locale), // Convert from ISO to locale format
         description: transaction.description,
-        amount: parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0,
+        amount: parsedAmount, // Keep numeric for calculations
         currency: data.currency || "USD",
         type: transaction.type === "debit" ? "Debit" : "Credit",
       })
@@ -150,8 +181,8 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
       const result = await processPdfFile(formData)
 
       if (result.success && result.data) {
-        // Convert banking data to transaction format
-        const transactions = convertBankingDataToTransactions(result.data)
+        // Convert banking data to transaction format with locale formatting
+        const transactions = convertBankingDataToTransactions(result.data, lang)
 
         if (transactions.length === 0) {
           // If no transactions found, show a friendly message
@@ -173,7 +204,11 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
       } else {
         // Handle processing errors
         setUploadState("error")
-        setErrorMessage(result.error || "Failed to process PDF file")
+        const errorMessage = result.error
+          ? getLocalizedErrorMessage(result.error, dictionary)
+          : (dictionary.viewer_page?.error_generic_processing as string) ||
+            "Failed to process PDF file"
+        setErrorMessage(errorMessage)
       }
     } catch (error) {
       console.error("Error processing PDF with Gemini API:", error)
@@ -252,8 +287,6 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               ref={fileUploadRef}
               onFileUpload={handleFileUpload}
               lang={lang}
-              maxFileSize={20 * 1024 * 1024} // 20MB to match PDF validation limit
-              acceptedFileTypes={{ "application/pdf": [".pdf"] }}
               disableRedirect={true} // Prevent redirection since we're already on viewer page
               hideSelectFileButton={true} // Hide the select file button since drag-drop zone handles this
               strings={
@@ -317,6 +350,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
             {/* Data Table */}
             <DataTable
               data={transactionData}
+              locale={lang}
               columns={
                 dictionary.viewer_page
                   ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels
@@ -349,7 +383,11 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
                       </div>
                       <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                         {(dictionary.viewer_page?.limit_error_badge as string)
-                          ?.replace("{planName}", userLimits.planName)
+                          ?.replace(
+                            "{planName}",
+                            (dictionary.plans as Record<string, string>)?.[userLimits.planName] ||
+                              userLimits.planName,
+                          )
                           ?.replace("{currentUsage}", userLimits.currentUsage.toString())
                           ?.replace("{limit}", userLimits.limit.toString())}
                       </Badge>

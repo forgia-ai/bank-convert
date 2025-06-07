@@ -1,42 +1,15 @@
 /**
  * Server actions for PDF file upload and processing
- * Handles file validation, upload, and data extraction using Gemini API
+ * Light wrapper around file validation and LLM processing
  */
 
 "use server"
 
-import { google } from "@ai-sdk/google"
-import { generateObject } from "ai"
-import { z } from "zod"
 import { validateFile } from "@/lib/upload/file-validation"
+import { extractBankingDataFromPDF, type BankingData } from "@/lib/ai/transactions-extractor"
+import { logger } from "@/lib/logger"
 
-// Schema for extracted banking data from PDF
-const BankingDataSchema = z.object({
-  accountNumber: z.string().optional(),
-  routingNumber: z.string().optional(),
-  accountHolderName: z.string().optional(),
-  bankName: z.string().optional(),
-  balance: z.string().optional(),
-  transactions: z
-    .array(
-      z.object({
-        date: z.string(),
-        description: z.string(),
-        amount: z.string(),
-        type: z.enum(["debit", "credit"]),
-      }),
-    )
-    .optional(),
-  statementPeriod: z
-    .object({
-      from: z.string(),
-      to: z.string(),
-    })
-    .optional(),
-  currency: z.string().optional(),
-})
-
-export type BankingData = z.infer<typeof BankingDataSchema>
+export type { BankingData }
 
 // Result type for file processing
 export type FileProcessingResult = {
@@ -48,7 +21,8 @@ export type FileProcessingResult = {
 }
 
 /**
- * Processes uploaded PDF file and extracts banking data using Gemini API
+ * Processes uploaded PDF file and extracts banking data
+ * Light wrapper around validation and LLM processing
  */
 export async function processPdfFile(formData: FormData): Promise<FileProcessingResult> {
   try {
@@ -56,91 +30,68 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
     const file = formData.get("file") as File
 
     if (!file) {
+      logger.warn({}, "PDF processing failed: No file provided")
       return {
         success: false,
         error: "No file provided",
       }
     }
 
+    logger.info({ fileName: file.name, fileSize: file.size }, "Starting PDF file processing")
+
     // Validate the PDF file
     const validation = validateFile(file)
     if (!validation.success) {
+      logger.warn({ fileName: file.name, error: validation.error }, "PDF validation failed")
       return {
         success: false,
         error: validation.error,
       }
     }
 
-    // Convert file to base64 for Gemini API
-    const bytes = await file.arrayBuffer()
-    const base64Data = Buffer.from(bytes).toString("base64")
+    logger.info({ fileName: file.name }, "PDF validation successful, starting LLM extraction")
 
-    // Process with Gemini API using Vercel AI SDK
-    const result = await generateObject({
-      model: google("gemini-2.0-flash-exp"),
-      schema: BankingDataSchema,
-      messages: [
+    // Extract banking data using LLM
+    const result = await extractBankingDataFromPDF(file)
+
+    if (result.success) {
+      logger.info(
         {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please analyze this banking PDF document and extract the following information:
-                - Account number
-                - Routing number
-                - Account holder name
-                - Bank name
-                - Current balance
-                - Transaction history (date, description, amount, type)
-                - Statement period
-                - Currency
-                
-                Please extract all available information accurately. If any field is not present in the document, omit it from the response.`,
-            },
-            {
-              type: "file",
-              data: base64Data,
-              mimeType: file.type,
-            },
-          ],
+          fileName: file.name,
+          transactionCount: result.data?.transactions?.length || 0,
+          hasBalance: !!result.data?.balance,
+          bankName: result.data?.bankName,
         },
-      ],
-    })
+        "PDF processing completed successfully",
+      )
 
-    return {
-      success: true,
-      data: result.object,
-      fileName: file.name,
-      fileSize: file.size,
+      return {
+        success: true,
+        data: result.data,
+        fileName: file.name,
+        fileSize: file.size,
+      }
+    } else {
+      logger.error({ fileName: file.name, error: result.error }, "LLM extraction failed")
+      return {
+        success: false,
+        error: result.error || "Failed to extract banking data",
+        fileName: file.name,
+        fileSize: file.size,
+      }
     }
   } catch (error) {
-    console.error("Error processing PDF file:", error)
-
-    // Handle specific AI SDK errors
-    if (error instanceof Error) {
-      if (error.message.includes("API key")) {
-        return {
-          success: false,
-          error: "AI service configuration error. Please check your API settings.",
-        }
-      }
-      if (error.message.includes("quota") || error.message.includes("limit")) {
-        return {
-          success: false,
-          error: "AI service quota exceeded. Please try again later.",
-        }
-      }
-      if (error.message.includes("timeout")) {
-        return {
-          success: false,
-          error: "Processing timeout. The PDF file might be too large or complex.",
-        }
-      }
-    }
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+      },
+      "PDF processing failed with unexpected error",
+    )
 
     return {
       success: false,
-      error: `Failed to process PDF file: ${error instanceof Error ? error.message : "Unknown error"}`,
+      error: "ERROR_PDF_PROCESSING_FAILED",
     }
   }
 }

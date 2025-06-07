@@ -17,7 +17,7 @@ export interface UserLimitsData {
   isCritical: boolean // 90%+
   resetDate?: string // For paid users (monthly reset)
   isMonthlyLimit: boolean // true for paid, false for free (lifetime)
-  planName: string // Display name for the plan
+  planName: string // Plan key for the plan (e.g., 'free', 'growth', 'premium')
   planPrice: string // Display price for the plan
 }
 
@@ -57,9 +57,9 @@ const getMockUserLimits = (
 
   // Plan details
   const planDetails = {
-    free: { name: "Plano Gratuito", price: "$0", limit: 50 },
-    growth: { name: "Plano Crescimento", price: "$8/mês", limit: 500 },
-    premium: { name: "Plano Premium", price: "$15/mês", limit: 999999 }, // Unlimited
+    free: { planKey: "free", price: "$0", limit: 50 },
+    growth: { planKey: "growth", price: "$8/mês", limit: 500 },
+    premium: { planKey: "premium", price: "$15/mês", limit: 999999 }, // Unlimited
   }
 
   const { current, limit: defaultLimit } = mockUsage[userType]
@@ -81,7 +81,7 @@ const getMockUserLimits = (
         ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
         : undefined,
     isMonthlyLimit: userType === "paid",
-    planName: planInfo.name,
+    planName: planInfo.planKey,
     planPrice: planInfo.price,
   }
 }

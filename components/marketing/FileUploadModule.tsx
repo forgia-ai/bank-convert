@@ -11,6 +11,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
 import type { Locale } from "@/i18n-config"
 import RateLimitModal from "@/components/modals/RateLimitModal"
+import {
+  validateFile,
+  SUPPORTED_FILE_TYPES,
+  formatFileSize,
+  getFileSizeLimit,
+} from "@/lib/upload/file-validation"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -52,8 +58,6 @@ export interface PreviewData {
 interface FileUploadModuleProps {
   onFileUpload: (file: File) => void
   lang: Locale // Added lang prop
-  maxFileSize?: number
-  acceptedFileTypes?: Record<string, string[]>
   hideSelectFileButton?: boolean
   disableRedirect?: boolean // Add prop to disable automatic redirection
   strings: FileUploadModuleStrings
@@ -68,8 +72,6 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
     {
       onFileUpload,
       lang, // Added lang prop
-      maxFileSize = 5 * 1024 * 1024,
-      acceptedFileTypes = { "application/pdf": [".pdf"], "text/csv": [".csv"] },
       hideSelectFileButton = false,
       disableRedirect = false, // Default to false for backwards compatibility
       strings,
@@ -207,6 +209,15 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       }
     }
 
+    // Custom file validation using our robust validation system
+    const handleFileValidation = useCallback((file: File): string | null => {
+      const validation = validateFile(file)
+      if (!validation.success) {
+        return validation.error || "File validation failed"
+      }
+      return null
+    }, [])
+
     const onDrop = useCallback(
       (acceptedFiles: File[], fileRejections: FileRejection[]) => {
         setError(null)
@@ -219,13 +230,14 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           return
         }
 
+        // Handle file rejections from react-dropzone
         if (fileRejections.length > 0) {
           const firstRejection = fileRejections[0]
           if (firstRejection.errors && firstRejection.errors.length > 0) {
             const firstError = firstRejection.errors[0]
             if (firstError.code === "file-too-large") {
               setError(
-                `${strings.errorFileTooLargePrefix}${maxFileSize / (1024 * 1024)}${strings.errorFileTooLargeSuffix}`,
+                `${strings.errorFileTooLargePrefix}${formatFileSize(getFileSizeLimit(SUPPORTED_FILE_TYPES.PDF))}${strings.errorFileTooLargeSuffix}`,
               )
             } else if (firstError.code === "file-invalid-type") {
               setError(strings.errorInvalidFileType)
@@ -240,6 +252,14 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
 
         if (acceptedFiles.length > 0) {
           const selectedFile = acceptedFiles[0]
+
+          // Use our robust validation system for additional validation
+          const validationError = handleFileValidation(selectedFile)
+          if (validationError) {
+            setError(validationError)
+            return
+          }
+
           setFile(selectedFile)
           setProgress(0)
           let currentProgress = 0
@@ -274,6 +294,13 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
                 console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
                 // Optionally, handle this error case, e.g., redirect to a generic error page or homepage
                 // router.push("/error");
+              } else {
+                // When redirect is disabled, reset the component state immediately
+                // so the parent component can take over the UI
+                setTimeout(() => {
+                  setFile(null)
+                  setProgress(null)
+                }, 100) // Small delay to allow the parent to process the file
               }
             }
           }, 200)
@@ -281,7 +308,6 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       },
       [
         onFileUpload,
-        maxFileSize,
         strings.errorFileTooLargePrefix,
         strings.errorFileTooLargeSuffix,
         strings.errorInvalidFileType,
@@ -293,13 +319,14 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         onPreviewGenerated, // Added for preview data callback
         checkAnonymousRateLimit, // Added for rate limiting
         recordAnonymousUpload, // Added for rate limiting
+        handleFileValidation, // Added our validation function
       ],
     )
 
     const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
       onDrop,
-      accept: acceptedFileTypes,
-      maxSize: maxFileSize,
+      accept: { [SUPPORTED_FILE_TYPES.PDF]: [".pdf"] },
+      maxSize: getFileSizeLimit(SUPPORTED_FILE_TYPES.PDF),
       multiple: false,
       noClick: false, // Allow clicking on the dropzone to open file dialog
     })
@@ -362,7 +389,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {strings.dropzoneHintPrefix}
-                    {maxFileSize / (1024 * 1024)}
+                    {formatFileSize(getFileSizeLimit(SUPPORTED_FILE_TYPES.PDF))}
                     {strings.dropzoneHintSuffix}
                   </p>
                 </>
@@ -407,7 +434,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               )}
             </div>
             <Progress value={progress} className="w-full h-2" />
-            {progress === 100 && (
+            {progress === 100 && !disableRedirect && (
               <p className="text-xs text-green-600 mt-1">{strings.progressFileReady}</p>
             )}
           </div>
@@ -419,7 +446,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           </Button>
         )}
 
-        {file && progress === 100 && (
+        {file && progress === 100 && !disableRedirect && (
           <>
             <div className="mt-6 p-4 border rounded-md bg-muted/20">
               <p className="text-sm text-muted-foreground">{strings.placeholderFileProcessed}</p>
