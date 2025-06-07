@@ -247,7 +247,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hidden md:flex items-center gap-1.5 px-2"
+                  className="hidden md:flex items-center gap-1.5 px-2 cursor-pointer"
                   aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
                 >
                   <Globe className="h-4 w-4" />
@@ -287,7 +287,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                 <Button
                   variant="outline"
                   size="sm"
-                  className="hidden md:flex items-center gap-1.5 w-30"
+                  className="hidden md:flex items-center gap-1.5 w-30 cursor-pointer"
                   aria-label={`Change language, current language ${nativeLanguageNames[currentLocale] || currentLocale.toUpperCase()}`}
                 >
                   <Globe className="h-4 w-4" />
