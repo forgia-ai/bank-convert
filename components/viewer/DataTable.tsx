@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { formatAmountWithSign } from "@/lib/upload/locale-formatting"
+import { formatAmountWithSign, formatDateForLocale } from "@/lib/upload/locale-formatting"
 import type { Locale } from "@/i18n-config"
 
 interface Transaction {
@@ -111,6 +111,12 @@ const DataTable: React.FC<DataTableProps> = ({
     return formatAmountWithSign(standardizedAmount, locale)
   }
 
+  // Helper function to format date using locale-aware formatting
+  const formatDate = (dateString: string) => {
+    // The date is expected to be in ISO format (YYYY-MM-DD)
+    return formatDateForLocale(dateString, locale)
+  }
+
   // Helper function to get amount color based on positive/negative
   const getAmountColor = (amount: number) => {
     return amount >= 0 ? "text-green-600" : "text-red-600"
@@ -150,7 +156,9 @@ const DataTable: React.FC<DataTableProps> = ({
           <TableBody>
             {data.map((transaction, index) => (
               <TableRow key={index} className="hover:bg-muted/30">
-                <TableCell className="font-medium w-[120px]">{transaction.date}</TableCell>
+                <TableCell className="font-medium w-[120px]">
+                  {formatDate(transaction.date)}
+                </TableCell>
                 <TableCell className="min-w-[200px]">{transaction.description}</TableCell>
                 <TableCell
                   className={`text-right font-medium w-[120px] ${getAmountColor(transaction.amount)}`}
