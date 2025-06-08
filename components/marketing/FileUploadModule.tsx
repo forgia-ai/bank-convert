@@ -192,7 +192,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
                 description: transaction.description,
                 amount: parsedAmount, // LLM should return standardized amounts like "1234.56"
                 currency: bankingData.currency || "USD",
-                type: transaction.type === "credit" ? "Credit" : "Debit",
+                type: transaction.type, // Keep original lowercase value for consistent processing
               }
             })
 

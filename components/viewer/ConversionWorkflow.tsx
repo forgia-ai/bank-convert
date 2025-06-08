@@ -14,6 +14,7 @@ import { type Locale } from "@/i18n-config"
 import { useUserLimits } from "@/contexts/user-limits-context"
 import { type BankingData } from "@/lib/upload/actions"
 import { formatDateForLocale } from "@/lib/upload/locale-formatting"
+import { exportTransactionsToXLSX, generateXLSXFilename } from "@/lib/export/xlsx-export"
 
 // Define the possible states for the conversion process
 type UploadState = "idle" | "uploading" | "processing" | "completed" | "error"
@@ -190,32 +191,42 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   }
 
   // Handle XLSX download
-  const handleDownloadXLSX = () => {
-    // TODO: Implement actual XLSX generation and download
+  const handleDownloadXLSX = async () => {
+    if (transactionData.length === 0) {
+      return
+    }
 
-    // For now, just create a simple CSV as a placeholder
-    const csvContent = [
-      ["Date", "Description", "Amount", "Currency", "Type"],
-      ...transactionData.map((tx) => [
-        tx.date,
-        tx.description,
-        tx.amount.toString(),
-        tx.currency || "",
-        tx.type || "",
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n")
+    try {
+      // Convert transaction data to export format
+      const transactionsForExport = transactionData.map((tx) => ({
+        date: tx.date,
+        description: tx.description,
+        amount: tx.amount,
+        currency: tx.currency || "USD",
+        type: tx.type || "",
+      }))
 
-    const blob = new Blob([csvContent], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${currentFile?.name || "bank-statement"}-extracted.csv`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+      // Generate filename based on original file
+      const baseFilename = currentFile?.name?.replace(/\.[^/.]+$/, "") || "bank-statement"
+      const filename = generateXLSXFilename(baseFilename, true)
+
+      // Export to XLSX
+      await exportTransactionsToXLSX(transactionsForExport, {
+        filename,
+        sheetName: "Bank Transactions",
+        includeHeader: true,
+        columnHeaders: dictionary.viewer_page?.table_columns as {
+          date: string
+          description: string
+          amount: string
+          currency: string
+          type: string
+        },
+      })
+    } catch (error) {
+      console.error("Error generating XLSX file:", error)
+      // Could show a toast notification here if needed
+    }
   }
 
   // Handle clearing/resetting for new conversion

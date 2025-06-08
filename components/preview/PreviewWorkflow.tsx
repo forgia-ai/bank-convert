@@ -1,14 +1,14 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-// import { Badge } from "@/components/ui/badge" // Not used in this component
-import { CheckCircle, ArrowRight, Users, Star, Download } from "lucide-react"
-import { type Locale } from "@/i18n-config"
+import { exportTransactionsToXLSX, generateXLSXFilename } from "@/lib/export/xlsx-export"
 import { type PreviewData } from "@/components/marketing/FileUploadModule"
 import DataTable from "@/components/viewer/DataTable"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { CheckCircle, ArrowRight, Users, Star, Download } from "lucide-react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
+import { type Locale } from "@/i18n-config"
 
 interface PreviewWorkflowProps {
   lang: Locale
@@ -38,13 +38,21 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
 
   // Convert preview data to DataTable format
   const convertToDataTableFormat = (previewData: PreviewData) => {
-    return previewData.previewTransactions.map((transaction) => ({
-      date: transaction.date,
-      description: transaction.description,
-      amount: transaction.amount,
-      currency: transaction.currency,
-      type: transaction.type === "credit" ? "Credit" : "Debit", // Capitalize to match DataTable format
-    }))
+    return previewData.previewTransactions.map((transaction) => {
+      const convertedType =
+        transaction.type === "debit"
+          ? (dictionary.viewer_page?.transaction_type_debit as string) || "Debit"
+          : (dictionary.viewer_page?.transaction_type_credit as string) || "Credit"
+
+      return {
+        date: transaction.date,
+        description: transaction.description,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        type: convertedType,
+        originalType: transaction.type as "credit" | "debit", // Add originalType for proper styling
+      }
+    })
   }
 
   // Helper function to truncate filename
@@ -57,35 +65,40 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
   }
 
   // Download handler for preview - downloads limited data
-  const handleDownloadXLSX = () => {
+  const handleDownloadXLSX = async () => {
     if (!previewData) return
 
-    // Create CSV content from preview data
-    const headers = ["Date", "Description", "Amount", "Currency", "Type"]
-    const csvContent = [
-      headers.join(","),
-      ...previewData.previewTransactions.map((transaction) =>
-        [
-          transaction.date,
-          `"${transaction.description}"`, // Quote description to handle commas
-          transaction.amount,
-          transaction.currency,
-          transaction.type,
-        ].join(","),
-      ),
-    ].join("\n")
+    try {
+      // Convert preview transaction data to export format
+      const transactionsForExport = previewData.previewTransactions.map((transaction) => ({
+        date: transaction.date,
+        description: transaction.description,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        type: transaction.type,
+      }))
 
-    // Create and download the file
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-    const url = URL.createObjectURL(blob)
-    link.setAttribute("href", url)
-    link.setAttribute("download", `${previewData.filename.replace(".pdf", "")}_preview.csv`)
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+      // Generate filename based on original file
+      const baseFilename = previewData.filename.replace(/\.[^/.]+$/, "") || "bank-statement"
+      const filename = generateXLSXFilename(`${baseFilename}_preview`, true)
+
+      // Export to XLSX
+      await exportTransactionsToXLSX(transactionsForExport, {
+        filename,
+        sheetName: "Preview Transactions",
+        includeHeader: true,
+        columnHeaders: dictionary.viewer_page?.table_columns as {
+          date: string
+          description: string
+          amount: string
+          currency: string
+          type: string
+        },
+      })
+    } catch (error) {
+      console.error("Error generating preview XLSX file:", error)
+      // Could show a toast notification here if needed
+    }
   }
 
   if (isLoading) {
@@ -136,7 +149,7 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
             className="flex items-center justify-center space-x-2 cursor-pointer"
           >
             <Download className="h-4 w-4" />
-            <span>{dictionary.preview_page?.download_preview_csv || "Download Preview CSV"}</span>
+            <span>{dictionary.preview_page?.download_preview_csv || "Download Preview XLSX"}</span>
           </Button>
         </div>
       </div>
