@@ -2,15 +2,6 @@
 // including a drag-and-drop zone and a file input button.
 "use client"
 
-import React, { useCallback, useState, useImperativeHandle, forwardRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useDropzone, FileRejection } from "react-dropzone"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
-import type { Locale } from "@/i18n-config"
-import RateLimitModal from "@/components/modals/RateLimitModal"
 import {
   validateFile,
   SUPPORTED_FILE_TYPES,
@@ -18,6 +9,22 @@ import {
   getFileSizeLimit,
 } from "@/lib/upload/file-validation"
 import { processPdfFile, type BankingData } from "@/lib/upload/actions"
+import RateLimitModal from "@/components/modals/RateLimitModal"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { UploadCloud, File as FileIcon, XCircle } from "lucide-react"
+import React, {
+  useCallback,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+  useRef,
+} from "react"
+import { useRouter } from "next/navigation"
+import { useDropzone, FileRejection } from "react-dropzone"
+import type { Locale } from "@/i18n-config"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -40,7 +47,6 @@ export interface FileUploadModuleStrings {
   buttonUploadAnother: string // Used when file is processed
   buttonDownloadSample: string // Used when file is processed
   alertTitleUploadError: string
-  // New strings for improved progress feedback
   progressUploading: string // "Uploading document..."
   progressExtracting: string // "Extracting transaction data..."
 }
@@ -61,11 +67,10 @@ export interface PreviewData {
 
 interface FileUploadModuleProps {
   onFileUpload: (file: File) => void
-  lang: Locale // Added lang prop
+  lang: Locale
   hideSelectFileButton?: boolean
   disableRedirect?: boolean // Add prop to disable automatic redirection
   strings: FileUploadModuleStrings
-  // New props for unauthenticated flow
   isAuthenticated?: boolean
   userType?: "anonymous" | "free" | "paid"
   onPreviewGenerated?: (data: PreviewData) => void
@@ -79,27 +84,46 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
   (
     {
       onFileUpload,
-      lang, // Added lang prop
+      lang,
       hideSelectFileButton = false,
       disableRedirect = false, // Default to false for backwards compatibility
       strings,
-      // New props for unauthenticated flow
+
       isAuthenticated = true, // Default to authenticated for backwards compatibility
-      userType = "free", // eslint-disable-line @typescript-eslint/no-unused-vars
       onPreviewGenerated,
-      // Enhanced progress props
       useTwoPhaseProgress = false,
       onProcessingComplete,
     },
     ref,
   ) => {
-    const router = useRouter() // Added for redirection
+    const router = useRouter()
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
     const [processingPhase, setProcessingPhase] = useState<"uploading" | "extracting">("uploading")
     const [showRateLimitModal, setShowRateLimitModal] = useState(false)
     const [isRateLimited, setIsRateLimited] = useState(false)
+
+    // Ref to store interval ID for cleanup
+    const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+    // Cleanup interval on component unmount
+    useEffect(() => {
+      return () => {
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current)
+          progressIntervalRef.current = null
+        }
+      }
+    }, [])
+
+    // Cleanup interval when file changes
+    useEffect(() => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+        progressIntervalRef.current = null
+      }
+    }, [file])
 
     // Mock rate limiting for anonymous users
     const checkAnonymousRateLimit = useCallback((): boolean => {
@@ -144,7 +168,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         if (result.success && result.data) {
           const bankingData = result.data
 
-          // Calculate total pages (estimate based on transaction count)
+          // Calculate total transaction count (only actual transactions, not balance)
           const totalTransactions = bankingData.transactions?.length || 0
           const estimatedPages = Math.max(1, Math.ceil(totalTransactions / 15)) // ~15 transactions per page
 
@@ -208,7 +232,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           setProgress(10)
 
           // Start gradual progress simulation during extraction
-          const progressInterval = setInterval(() => {
+          progressIntervalRef.current = setInterval(() => {
             setProgress((current) => {
               if (current !== null && current < 90) {
                 // Gradually increase from 10% to 90% over time
@@ -225,7 +249,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             const result = await processPdfFile(formData)
 
             // Clear the interval and complete progress
-            clearInterval(progressInterval)
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current)
+              progressIntervalRef.current = null
+            }
             setProgress(100)
 
             if (result.success && result.data) {
@@ -241,7 +268,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             }
           } catch (error) {
             // Clear the interval on error
-            clearInterval(progressInterval)
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current)
+              progressIntervalRef.current = null
+            }
             throw error // Re-throw to be caught by outer catch block
           }
         } catch (error) {
@@ -280,7 +310,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           setProgress(10)
 
           // Start gradual progress simulation during extraction
-          const progressInterval = setInterval(() => {
+          progressIntervalRef.current = setInterval(() => {
             setProgress((current) => {
               if (current !== null && current < 90) {
                 // Gradually increase from 10% to 90% over time
@@ -295,7 +325,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             const previewData = await processFileForPreview(selectedFile)
 
             // Clear the interval and complete progress
-            clearInterval(progressInterval)
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current)
+              progressIntervalRef.current = null
+            }
             setProgress(100)
 
             if (previewData) {
@@ -320,7 +353,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             }
           } catch (error) {
             // Clear the interval on error
-            clearInterval(progressInterval)
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current)
+              progressIntervalRef.current = null
+            }
             throw error // Re-throw to be caught by outer catch block
           }
         } catch (error) {

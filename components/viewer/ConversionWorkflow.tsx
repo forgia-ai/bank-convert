@@ -63,28 +63,17 @@ const truncateFilename = (filename: string, maxLength: number = 50): string => {
  * Converts BankingData from Gemini AI to Transaction array format expected by the table
  * Now handles new schema with format detection and standardized data
  * Applies locale-aware formatting for display
+ * Note: Account balance is not displayed nor counted as a transaction
  */
 const convertBankingDataToTransactions = (
   data: BankingData,
   locale: Locale,
   dictionary: Record<string, Record<string, unknown>>,
-): Transaction[] => {
+): { transactions: Transaction[]; totalCount: number } => {
   const transactions: Transaction[] = []
 
-  // Add account info as initial transaction if available
-  if (data.balance) {
-    const todayDate = new Date().toISOString().split("T")[0]
-    transactions.push({
-      date: formatDateForLocale(todayDate, locale),
-      description: `Account Balance - ${data.bankName || "Bank"}`,
-      amount: parseFloat(data.balance) || 0, // LLM should return standardized amounts
-      currency: data.currency || "USD",
-      type: (dictionary.viewer_page?.transaction_type_credit as string) || "Credit",
-      originalType: "credit",
-    })
-  }
-
   // Add actual transactions (now pre-standardized by LLM)
+  // Note: Account balance is not counted as a transaction
   if (data.transactions && data.transactions.length > 0) {
     const today = new Date().toISOString().split("T")[0] // YYYY-MM-DD format
 
@@ -113,19 +102,40 @@ const convertBankingDataToTransactions = (
     })
   }
 
-  return transactions
+  // Total count is just the number of actual transactions (no balance)
+  const totalCount = transactions.length
+
+  return { transactions, totalCount }
 }
 
 export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkflowProps) {
   const [uploadState, setUploadState] = useState<UploadState>("idle")
   const [currentFile, setCurrentFile] = useState<File | null>(null)
   const [transactionData, setTransactionData] = useState<Transaction[]>([])
+  const [totalTransactionCount, setTotalTransactionCount] = useState<number>(0)
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [isLimitError, setIsLimitError] = useState<boolean>(false)
   const fileUploadRef = useRef<FileUploadModuleRef>(null)
 
   // Get user limits context for mock processing
   const { processDocument, canProcessPages, userLimits } = useUserLimits()
+
+  // Helper function to format transaction count message
+  const formatTransactionCountMessage = (count: number) => {
+    const transactionCountStrings = {
+      singular:
+        (dictionary.viewer_page?.transaction_count_singular as string) || "1 transaction found.",
+      plural:
+        (dictionary.viewer_page?.transaction_count_plural as string) ||
+        "{count} transactions found.",
+    }
+
+    if (count === 1) {
+      return transactionCountStrings.singular
+    } else {
+      return transactionCountStrings.plural.replace("{count}", count.toString())
+    }
+  }
 
   // Handle file upload from FileUploadModule (simplified - just set file and validate limits)
   const handleFileUpload = (file: File) => {
@@ -150,7 +160,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   // Handle processing completion from FileUploadModule
   const handleProcessingComplete = (data: BankingData) => {
     // Convert banking data to transaction format with locale formatting
-    const transactions = convertBankingDataToTransactions(data, lang, dictionary)
+    const { transactions, totalCount } = convertBankingDataToTransactions(data, lang, dictionary)
 
     if (transactions.length === 0) {
       // If no transactions found, show a friendly message
@@ -163,6 +173,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
 
     // Switch to results view immediately - no delays!
     setTransactionData(transactions)
+    setTotalTransactionCount(totalCount)
     setUploadState("completed")
 
     // Handle usage tracking in the background (async, non-blocking)
@@ -211,6 +222,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   const handleClearAndUploadNew = () => {
     setUploadState("idle")
     setTransactionData([])
+    setTotalTransactionCount(0)
     setCurrentFile(null)
     setErrorMessage("")
     setIsLimitError(false)
@@ -304,6 +316,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
                   (dictionary.viewer_page?.transaction_count_plural as string) ||
                   "{count} transactions found.",
               }}
+              customFooterMessage={formatTransactionCountMessage(totalTransactionCount)}
             />
           </div>
         )}
