@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { AlertCircle, Download, Zap, ArrowRight } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import { useUserLimits } from "@/contexts/user-limits-context"
-import { processPdfFile, type BankingData } from "@/lib/upload/actions"
+import { type BankingData } from "@/lib/upload/actions"
 import { formatDateForLocale } from "@/lib/upload/locale-formatting"
 
 // Define the possible states for the conversion process
@@ -60,30 +60,6 @@ const truncateFilename = (filename: string, maxLength: number = 50): string => {
 }
 
 /**
- * Translates error codes to localized error messages
- */
-const getLocalizedErrorMessage = (
-  errorCode: string,
-  dictionary: Record<string, Record<string, unknown>>,
-): string => {
-  const errorKeyMap: Record<string, string> = {
-    ERROR_PDF_PROCESSING_FAILED: "error_pdf_processing_failed",
-    ERROR_DATA_EXTRACTION_FAILED: "error_data_extraction_failed",
-  }
-
-  const dictionaryKey = errorKeyMap[errorCode]
-  if (dictionaryKey && dictionary.viewer_page?.[dictionaryKey]) {
-    return dictionary.viewer_page[dictionaryKey] as string
-  }
-
-  // Fallback to generic error message
-  return (
-    (dictionary.viewer_page?.error_generic_processing as string) ||
-    "An unexpected error occurred while processing your file. Please try again."
-  )
-}
-
-/**
  * Converts BankingData from Gemini AI to Transaction array format expected by the table
  * Now handles new schema with format detection and standardized data
  * Applies locale-aware formatting for display
@@ -101,7 +77,7 @@ const convertBankingDataToTransactions = (
     transactions.push({
       date: formatDateForLocale(todayDate, locale),
       description: `Account Balance - ${data.bankName || "Bank"}`,
-      amount: parseFloat(data.balance.replace(/[^0-9.-]/g, "")) || 0,
+      amount: parseFloat(data.balance) || 0, // LLM should return standardized amounts
       currency: data.currency || "USD",
       type: (dictionary.viewer_page?.transaction_type_credit as string) || "Credit",
       originalType: "credit",
@@ -119,7 +95,7 @@ const convertBankingDataToTransactions = (
       }
 
       // Use the standardized amount for calculations but format for display
-      const parsedAmount = parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0
+      const parsedAmount = parseFloat(transaction.amount) || 0 // LLM should return standardized amounts
 
       const formattedDate = formatDateForLocale(transaction.date, locale)
 
@@ -151,10 +127,9 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
   // Get user limits context for mock processing
   const { processDocument, canProcessPages, userLimits } = useUserLimits()
 
-  // Handle file upload from FileUploadModule
-  const handleFileUpload = async (file: File) => {
+  // Handle file upload from FileUploadModule (simplified - just set file and validate limits)
+  const handleFileUpload = (file: File) => {
     setCurrentFile(file)
-    setUploadState("processing")
     setErrorMessage("")
 
     // Mock: Simulate 10 pages per document
@@ -168,70 +143,39 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
       return
     }
 
-    try {
-      // Use mock processing from context
-      const success = await processDocument(mockPageCount)
-
-      if (success) {
-        // Process the PDF file using Gemini API
-        await processWithGeminiAPI(file)
-      } else {
-        throw new Error("Processing failed - limit reached")
-      }
-    } catch (error) {
-      setUploadState("error")
-      setIsLimitError(false) // Regular processing error, not limit error
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : (dictionary?.viewer_page?.backend_error_generic as string) || "Processing failed",
-      )
-    }
+    // Let FileUploadModule handle the progress and processing
+    // We'll get notified via onProcessingComplete when it's done
   }
 
-  // Process PDF with Gemini API using server action
-  const processWithGeminiAPI = async (file: File): Promise<void> => {
-    try {
-      // Create FormData for server action
-      const formData = new FormData()
-      formData.append("file", file)
+  // Handle processing completion from FileUploadModule
+  const handleProcessingComplete = (data: BankingData) => {
+    // Convert banking data to transaction format with locale formatting
+    const transactions = convertBankingDataToTransactions(data, lang, dictionary)
 
-      // Call server action to process PDF with Gemini
-      const result = await processPdfFile(formData)
-
-      if (result.success && result.data) {
-        // Convert banking data to transaction format with locale formatting
-        const transactions = convertBankingDataToTransactions(result.data, lang, dictionary)
-
-        if (transactions.length === 0) {
-          // If no transactions found, show a friendly message
-          setUploadState("error")
-          setErrorMessage(
-            "No transaction data could be extracted from this PDF. Please ensure it's a valid bank statement.",
-          )
-          return
-        }
-
-        setTransactionData(transactions)
-        setUploadState("completed")
-      } else {
-        // Handle processing errors
-        setUploadState("error")
-        const errorMessage = result.error
-          ? getLocalizedErrorMessage(result.error, dictionary)
-          : (dictionary.viewer_page?.error_generic_processing as string) ||
-            "Failed to process PDF file"
-        setErrorMessage(errorMessage)
-      }
-    } catch (error) {
-      console.error("Error processing PDF with Gemini API:", error)
+    if (transactions.length === 0) {
+      // If no transactions found, show a friendly message
       setUploadState("error")
       setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : (dictionary?.viewer_page?.backend_error_generic as string) || "Processing failed",
+        "No transaction data could be extracted from this PDF. Please ensure it's a valid bank statement.",
       )
+      return
     }
+
+    // Switch to results view immediately - no delays!
+    setTransactionData(transactions)
+    setUploadState("completed")
+
+    // Handle usage tracking in the background (async, non-blocking)
+    const trackUsage = async () => {
+      try {
+        const mockPageCount = 10
+        await processDocument(mockPageCount)
+      } catch (error) {
+        console.warn("Usage tracking failed:", error)
+        // Don't show error to user since the main processing succeeded
+      }
+    }
+    trackUsage()
   }
 
   // Handle XLSX download
@@ -290,7 +234,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Conversion Section - Conditional rendering based on state */}
       <div className="space-y-6">
-        {(uploadState === "idle" || uploadState === "uploading") && (
+        {uploadState === "idle" && (
           <div className="space-y-6">
             <h2 className="text-xl font-medium text-center">
               {dictionary.viewer_page?.upload_headline as string}
@@ -301,28 +245,13 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               lang={lang}
               disableRedirect={true} // Prevent redirection since we're already on viewer page
               hideSelectFileButton={true} // Hide the select file button since drag-drop zone handles this
+              useTwoPhaseProgress={true} // Use enhanced two-phase progress like marketing page
+              onProcessingComplete={handleProcessingComplete} // Handle completion
               strings={
                 dictionary.viewer_page
                   ?.file_upload_module_strings as unknown as import("@/components/marketing/FileUploadModule").FileUploadModuleStrings
               }
             />
-          </div>
-        )}
-
-        {uploadState === "processing" && (
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              <span className="text-lg">
-                {dictionary.viewer_page?.processing_message as string}
-              </span>
-            </div>
-            {currentFile && (
-              <p className="text-sm text-muted-foreground">
-                {dictionary.viewer_page?.results_for_prefix as string}
-                {truncateFilename(currentFile.name)}
-              </p>
-            )}
           </div>
         )}
 

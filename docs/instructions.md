@@ -338,11 +338,9 @@ This plan outlines the development phases, starting with frontend UI and mock da
 1.  **[ ] API Route Structure:**
     - [ ] Set up API routes for file upload, data extraction, and XLSX download.
 2.  **[ ] File Handling:**
-    - [ ] Implement server-side logic for receiving and temporarily processing uploaded files (PDF, CSV).
-    - [ ] Implement initial file validation (type, size).
-3.  **[ ] Mock Extraction Service:**
-    - [ ] Create a backend service that simulates LLM data extraction, returning structured JSON transaction data based on uploaded file type (for testing UI flow without actual LLM calls).
-4.  **[ ] XLSX Generation & Download:**
+    - [x] Implement server-side logic for receiving and temporarily processing uploaded files (PDF).
+    - [x] Implement initial file validation (type, size).
+3.  **[ ] XLSX Generation & Download:**
     - [ ] Implement logic to convert structured JSON transaction data into an XLSX file (e.g., using `exceljs` or `xlsx` library).
     - [ ] Create the API endpoint to trigger XLSX file download.
 

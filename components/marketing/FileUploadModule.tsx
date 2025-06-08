@@ -17,7 +17,7 @@ import {
   formatFileSize,
   getFileSizeLimit,
 } from "@/lib/upload/file-validation"
-import { processPdfFile } from "@/lib/upload/actions"
+import { processPdfFile, type BankingData } from "@/lib/upload/actions"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -69,6 +69,10 @@ interface FileUploadModuleProps {
   isAuthenticated?: boolean
   userType?: "anonymous" | "free" | "paid"
   onPreviewGenerated?: (data: PreviewData) => void
+  // Force enhanced two-phase progress regardless of authentication status
+  useTwoPhaseProgress?: boolean
+  // Callback for when processing completes (for authenticated users with two-phase progress)
+  onProcessingComplete?: (data: BankingData) => void
 }
 
 const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
@@ -83,6 +87,9 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       isAuthenticated = true, // Default to authenticated for backwards compatibility
       userType = "free", // eslint-disable-line @typescript-eslint/no-unused-vars
       onPreviewGenerated,
+      // Enhanced progress props
+      useTwoPhaseProgress = false,
+      onProcessingComplete,
     },
     ref,
   ) => {
@@ -144,13 +151,26 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           // Convert transactions to preview format (limit to first 10)
           const previewTransactions = (bankingData.transactions || [])
             .slice(0, 10) // Limit to first 10 transactions for preview
-            .map((transaction) => ({
-              date: transaction.date,
-              description: transaction.description,
-              amount: parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0,
-              currency: bankingData.currency || "USD",
-              type: transaction.type === "credit" ? "Credit" : "Debit",
-            }))
+            .map((transaction) => {
+              const parsedAmount = parseFloat(transaction.amount) || 0
+
+              // Debug: Log if LLM returns non-standardized amounts (should not happen)
+              if (isNaN(parsedAmount) || transaction.amount !== parsedAmount.toString()) {
+                console.warn("LLM returned non-standardized amount:", {
+                  original: transaction.amount,
+                  parsed: parsedAmount,
+                  description: transaction.description,
+                })
+              }
+
+              return {
+                date: transaction.date,
+                description: transaction.description,
+                amount: parsedAmount, // LLM should return standardized amounts like "1234.56"
+                currency: bankingData.currency || "USD",
+                type: transaction.type === "credit" ? "Credit" : "Debit",
+              }
+            })
 
           return {
             totalTransactions,
@@ -167,12 +187,83 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       }
     }, [])
 
+    // Handle processing for authenticated users with two-phase progress
+    const handleAuthenticatedTwoPhaseProcessing = useCallback(
+      async (selectedFile: File) => {
+        try {
+          onFileUpload(selectedFile)
+
+          // Phase 1: Upload simulation (fast)
+          setProcessingPhase("uploading")
+          setProgress(0)
+
+          // Simulate upload progress (quick - 1 second)
+          for (let i = 0; i <= 10; i += 5) {
+            setProgress(i)
+            await new Promise((resolve) => setTimeout(resolve, 100)) // 100ms per step
+          }
+
+          // Phase 2: Extraction (longer)
+          setProcessingPhase("extracting")
+          setProgress(10)
+
+          // Start gradual progress simulation during extraction
+          const progressInterval = setInterval(() => {
+            setProgress((current) => {
+              if (current !== null && current < 90) {
+                // Gradually increase from 10% to 90% over time
+                return Math.min(current + 2, 90)
+              }
+              return current
+            })
+          }, 500) // Increase by 2% every 500ms (2x faster)
+
+          try {
+            // Perform actual extraction
+            const formData = new FormData()
+            formData.append("file", selectedFile)
+            const result = await processPdfFile(formData)
+
+            // Clear the interval and complete progress
+            clearInterval(progressInterval)
+            setProgress(100)
+
+            if (result.success && result.data) {
+              // Notify parent component of successful processing
+              if (onProcessingComplete) {
+                onProcessingComplete(result.data)
+              }
+
+              // Don't reset component state - let parent control the transition
+              // This prevents the flicker back to upload state
+            } else {
+              throw new Error(result.error || "Failed to process file")
+            }
+          } catch (error) {
+            // Clear the interval on error
+            clearInterval(progressInterval)
+            throw error // Re-throw to be caught by outer catch block
+          }
+        } catch (error) {
+          console.error("Error in authenticated two-phase processing:", error)
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Failed to process the file. Please try again.",
+          )
+          setProgress(null)
+          setProcessingPhase("uploading")
+          setFile(null)
+        }
+      },
+      [onFileUpload, onProcessingComplete],
+    )
+
     // Handle processing for unauthenticated users
     const handleUnauthenticatedProcessing = useCallback(
       async (selectedFile: File) => {
         try {
           onFileUpload(selectedFile)
-          recordAnonymousUpload()
 
           // Phase 1: Upload simulation (fast)
           setProcessingPhase("uploading")
@@ -212,6 +303,9 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               if (onPreviewGenerated) {
                 onPreviewGenerated(previewData)
               }
+
+              // Record upload only after successful processing
+              recordAnonymousUpload()
 
               // Small delay to show completion, then redirect
               await new Promise((resolve) => setTimeout(resolve, 500))
@@ -306,10 +400,13 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           setFile(selectedFile)
           setProgress(0)
 
-          // Handle different user types
+          // Handle different user types and processing modes
           if (!isAuthenticated && !disableRedirect) {
-            // For unauthenticated users, perform actual extraction (async)
+            // For unauthenticated users, perform actual extraction with preview (async)
             handleUnauthenticatedProcessing(selectedFile)
+          } else if (useTwoPhaseProgress) {
+            // For authenticated users with enhanced two-phase progress
+            handleAuthenticatedTwoPhaseProcessing(selectedFile)
           } else {
             // For authenticated users or when redirect is disabled, use the original progress simulation
             let currentProgress = 0
@@ -354,10 +451,12 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         lang, // Added lang to dependencies
         disableRedirect, // Added disableRedirect to dependencies
         isAuthenticated, // Added for unauthenticated flow
+        useTwoPhaseProgress, // Added for enhanced progress mode
         checkAnonymousRateLimit, // Added for rate limiting
         recordAnonymousUpload, // Added for rate limiting
         handleFileValidation, // Added our validation function
         handleUnauthenticatedProcessing, // Added new processing function
+        handleAuthenticatedTwoPhaseProcessing, // Added authenticated two-phase processing
       ],
     )
 
