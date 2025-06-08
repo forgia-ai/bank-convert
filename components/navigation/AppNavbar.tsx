@@ -71,6 +71,11 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
     return { code: loc, name: nativeLanguageNames[loc] || loc.toUpperCase() } // Fallback to uppercase code if native name missing
   })
 
+  // Configure Clerk redirect URLs to preserve language selection
+  const afterSignInUrl = `/${currentLocale}/viewer`
+  const afterSignUpUrl = `/${currentLocale}/viewer`
+  const afterSignOutUrl = `/${currentLocale}`
+
   const handleLanguageChange = (targetLang: Locale) => {
     // Always construct the path with the target locale prefix
     let newPath = `/${targetLang}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`
@@ -268,15 +273,23 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <UserButton />
+            <UserButton afterSignOutUrl={afterSignOutUrl} />
           </SignedIn>
           <SignedOut>
-            <SignInButton mode="modal">
+            <SignInButton
+              mode="modal"
+              fallbackRedirectUrl={afterSignInUrl}
+              forceRedirectUrl={afterSignInUrl}
+            >
               <Button variant="outline" size="sm" asChild className="hidden md:inline-flex">
                 <span className="cursor-pointer">{navStrings.login}</span>
               </Button>
             </SignInButton>
-            <SignUpButton mode="modal">
+            <SignUpButton
+              mode="modal"
+              fallbackRedirectUrl={afterSignUpUrl}
+              forceRedirectUrl={afterSignUpUrl}
+            >
               <Button size="sm" asChild>
                 <span className="cursor-pointer">{navStrings.signup}</span>
               </Button>
@@ -359,7 +372,11 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                 </Link>
               ))}
               {/* Mobile Login Button */}
-              <SignInButton mode="modal">
+              <SignInButton
+                mode="modal"
+                fallbackRedirectUrl={afterSignInUrl}
+                forceRedirectUrl={afterSignInUrl}
+              >
                 <button
                   onClick={handleLinkClick}
                   className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -369,7 +386,11 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                 </button>
               </SignInButton>
               {/* Mobile Sign Up Button */}
-              <SignUpButton mode="modal">
+              <SignUpButton
+                mode="modal"
+                fallbackRedirectUrl={afterSignUpUrl}
+                forceRedirectUrl={afterSignUpUrl}
+              >
                 <button
                   onClick={handleLinkClick}
                   className="flex items-center gap-3 w-full px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"

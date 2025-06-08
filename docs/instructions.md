@@ -335,14 +335,14 @@ This plan outlines the development phases, starting with frontend UI and mock da
 
 **Phase 2: Backend Development & Core Logic (Next.js API Routes)**
 
-1.  **[ ] API Route Structure:**
-    - [ ] Set up API routes for file upload, data extraction, and XLSX download.
-2.  **[ ] File Handling:**
+1.  **[x] API Route Structure:**
+    - [x] Set up API routes for file upload, data extraction, and XLSX download.
+2.  **[x] File Handling:**
     - [x] Implement server-side logic for receiving and temporarily processing uploaded files (PDF).
     - [x] Implement initial file validation (type, size).
-3.  **[ ] XLSX Generation & Download:**
-    - [ ] Implement logic to convert structured JSON transaction data into an XLSX file (e.g., using `exceljs` or `xlsx` library).
-    - [ ] Create the API endpoint to trigger XLSX file download.
+3.  **[x] XLSX Generation & Download:**
+    - [x] Implement logic to convert structured JSON transaction data into an XLSX file (e.g., using `exceljs` or `xlsx` library).
+    - [x] Create the API endpoint to trigger XLSX file download.
 
 **Phase 3: Third-Party Integrations & Backend Finalization**
 
@@ -351,11 +351,11 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [ ] Implement full user profile data management via Clerk (e.g., linking user metadata if needed).
     - [ ] Ensure seamless user session management across frontend and backend.
 2.  **[ ] LLM Integration (Gemini/OpenAI via Vercel AI SDK):**
-    - [ ] Set up and configure the Vercel AI SDK.
-    - [ ] Implement API calls to chosen LLM provider(s) (Gemini, OpenAI) for actual transaction data extraction.
+    - [x] Set up and configure the Vercel AI SDK.
+    - [x] Implement API calls to chosen LLM provider(s) (Gemini, OpenAI) for actual transaction data extraction.
     - [ ] Develop and refine prompts for optimal extraction accuracy.
     - [ ] Handle LLM API responses, including potential errors and rate limits.
-    - [ ] Replace the mock extraction service with live LLM calls.
+    - [x] Replace the mock extraction service with live LLM calls.
 3.  **[ ] PDF Preprocessing (if necessary):**
     - [ ] If LLMs struggle with certain PDF types, integrate a PDF parsing/OCR library (e.g., `pdf-parse` for text-based PDFs, or explore cloud OCR if image-based PDFs are common).
 4.  **[ ] Stripe Integration (Payments & Subscriptions):**
@@ -364,8 +364,8 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [ ] Implement Stripe webhooks to handle subscription events (e.g., `checkout.session.completed`, `customer.subscription.updated`, `invoice.payment_succeeded`).
     - [ ] Link subscription status (from Stripe, associated with Clerk user ID) to feature access/limits (e.g., page consumption).
     - [ ] (Optional) Evaluate and integrate Clerk Billing if it simplifies subscription management with Stripe.
-5.  **[ ] Language Support (Content Finalization):**
-    - [ ] Add actual translations for all supported languages to the i18n resource files.
+5.  **[x] Language Support (Content Finalization):**
+    - [x] Add actual translations for all supported languages to the i18n resource files.
 
 **Phase 4: Testing, Refinement & Deployment**
 

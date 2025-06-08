@@ -1,7 +1,7 @@
 "use client" // For the toggle functionality later
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import PricingCard from "@/components/marketing/PricingCard" // New import
@@ -13,18 +13,31 @@ import {
 } from "@/components/ui/accordion" // New import
 import { useUserLimits, type SubscriptionPlan } from "@/contexts/user-limits-context"
 import { useAuth } from "@clerk/nextjs"
+import { i18n, type Locale } from "@/i18n-config"
 
 export default function PricingPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const { isSignedIn } = useAuth()
   const { subscribeToPlan } = useUserLimits()
   const [isAnnual, setIsAnnual] = useState(false)
 
+  // Extract current language from pathname
+  const getCurrentLocale = (): Locale => {
+    const segments = pathname.split("/").filter(Boolean)
+    if (segments.length > 0 && ([...i18n.locales] as string[]).includes(segments[0])) {
+      return segments[0] as Locale
+    }
+    return i18n.defaultLocale
+  }
+
+  const currentLang = getCurrentLocale()
+
   // Mock subscription handler
   const handlePlanSelection = async (planName: string) => {
     if (!isSignedIn) {
-      // Redirect to sign up if not authenticated
-      router.push("/sign-up")
+      // Redirect to sign up if not authenticated - preserve language
+      router.push(`/${currentLang}/sign-up`)
       return
     }
 
@@ -39,8 +52,8 @@ export default function PricingPage() {
     if (plan) {
       try {
         await subscribeToPlan(plan)
-        // Redirect to viewer after successful subscription
-        router.push("/viewer")
+        // Redirect to viewer after successful subscription - preserve language
+        router.push(`/${currentLang}/viewer`)
       } catch (error) {
         console.error("Failed to subscribe to plan:", error)
       }

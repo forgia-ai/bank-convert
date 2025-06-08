@@ -40,9 +40,22 @@ export default async function RootLayout({
   params: Promise<{ lang: Locale }>
 }>) {
   const { lang } = await paramsPromise
-  // const dictionary = await getDictionary(lang) // Dictionary will be fetched by route group layouts
+
+  // Configure language-aware redirect URLs for Clerk
+  const signInUrl = `/${lang}/sign-in`
+  const signUpUrl = `/${lang}/sign-up`
+  const afterSignInUrl = `/${lang}/viewer`
+  const afterSignUpUrl = `/${lang}/viewer`
+  const afterSignOutUrl = `/${lang}`
+
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInUrl={signInUrl}
+      signUpUrl={signUpUrl}
+      afterSignInUrl={afterSignInUrl}
+      afterSignUpUrl={afterSignUpUrl}
+      afterSignOutUrl={afterSignOutUrl}
+    >
       {/* Set the lang attribute dynamically */}
       <html lang={lang} suppressHydrationWarning={true}>
         <body
