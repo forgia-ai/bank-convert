@@ -17,6 +17,7 @@ import {
   formatFileSize,
   getFileSizeLimit,
 } from "@/lib/upload/file-validation"
+import { processPdfFile } from "@/lib/upload/actions"
 
 export interface FileUploadModuleRef {
   openFileDialog: () => void
@@ -39,6 +40,9 @@ export interface FileUploadModuleStrings {
   buttonUploadAnother: string // Used when file is processed
   buttonDownloadSample: string // Used when file is processed
   alertTitleUploadError: string
+  // New strings for improved progress feedback
+  progressUploading: string // "Uploading document..."
+  progressExtracting: string // "Extracting transaction data..."
 }
 
 // Preview data interface for unauthenticated users
@@ -86,6 +90,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
     const [file, setFile] = useState<File | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [progress, setProgress] = useState<number | null>(null)
+    const [processingPhase, setProcessingPhase] = useState<"uploading" | "extracting">("uploading")
     const [showRateLimitModal, setShowRateLimitModal] = useState(false)
     const [isRateLimited, setIsRateLimited] = useState(false)
 
@@ -120,93 +125,131 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       }
     }, [isAuthenticated, checkAnonymousRateLimit])
 
-    // Mock function to generate preview data for unauthenticated users
-    const generateMockPreviewData = (file: File): PreviewData => {
-      // Generate mock transaction data
-      const mockTransactions = [
-        {
-          date: "2024-01-15",
-          description: "Grocery Store Purchase",
-          amount: -85.42,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-14",
-          description: "Salary Deposit",
-          amount: 3500.0,
-          currency: "USD",
-          type: "credit",
-        },
-        {
-          date: "2024-01-13",
-          description: "Gas Station",
-          amount: -45.2,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-12",
-          description: "Online Transfer",
-          amount: -200.0,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-11",
-          description: "Restaurant",
-          amount: -67.89,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-10",
-          description: "ATM Withdrawal",
-          amount: -100.0,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-09",
-          description: "Utility Bill Payment",
-          amount: -125.5,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-08",
-          description: "Coffee Shop",
-          amount: -12.75,
-          currency: "USD",
-          type: "debit",
-        },
-        {
-          date: "2024-01-07",
-          description: "Freelance Payment",
-          amount: 850.0,
-          currency: "USD",
-          type: "credit",
-        },
-        {
-          date: "2024-01-06",
-          description: "Subscription Service",
-          amount: -15.99,
-          currency: "USD",
-          type: "debit",
-        },
-      ]
+    // Function to perform actual extraction for unauthenticated users (limited preview)
+    const processFileForPreview = useCallback(async (file: File): Promise<PreviewData | null> => {
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
 
-      // Simulate different document sizes based on file size
-      const totalTransactions = Math.floor(Math.random() * 40) + 30 // 30-70 transactions
-      const totalPages = Math.ceil(totalTransactions / 15) // ~15 transactions per page
+        // Use the existing processPdfFile function
+        const result = await processPdfFile(formData)
 
-      return {
-        totalTransactions,
-        totalPages,
-        previewTransactions: mockTransactions.slice(0, 10), // Show first 10
-        filename: file.name,
+        if (result.success && result.data) {
+          const bankingData = result.data
+
+          // Calculate total pages (estimate based on transaction count)
+          const totalTransactions = bankingData.transactions?.length || 0
+          const estimatedPages = Math.max(1, Math.ceil(totalTransactions / 15)) // ~15 transactions per page
+
+          // Convert transactions to preview format (limit to first 10)
+          const previewTransactions = (bankingData.transactions || [])
+            .slice(0, 10) // Limit to first 10 transactions for preview
+            .map((transaction) => ({
+              date: transaction.date,
+              description: transaction.description,
+              amount: parseFloat(transaction.amount.replace(/[^0-9.-]/g, "")) || 0,
+              currency: bankingData.currency || "USD",
+              type: transaction.type === "credit" ? "Credit" : "Debit",
+            }))
+
+          return {
+            totalTransactions,
+            totalPages: estimatedPages,
+            previewTransactions,
+            filename: file.name,
+          }
+        } else {
+          throw new Error(result.error || "Failed to process file")
+        }
+      } catch (error) {
+        console.error("Error processing file for preview:", error)
+        throw error
       }
-    }
+    }, [])
+
+    // Handle processing for unauthenticated users
+    const handleUnauthenticatedProcessing = useCallback(
+      async (selectedFile: File) => {
+        try {
+          onFileUpload(selectedFile)
+          recordAnonymousUpload()
+
+          // Phase 1: Upload simulation (fast)
+          setProcessingPhase("uploading")
+          setProgress(0)
+
+          // Simulate upload progress (quick - 1 second)
+          for (let i = 0; i <= 10; i += 5) {
+            setProgress(i)
+            await new Promise((resolve) => setTimeout(resolve, 100)) // 100ms per step
+          }
+
+          // Phase 2: Extraction (longer)
+          setProcessingPhase("extracting")
+          setProgress(10)
+
+          // Start gradual progress simulation during extraction
+          const progressInterval = setInterval(() => {
+            setProgress((current) => {
+              if (current !== null && current < 90) {
+                // Gradually increase from 10% to 90% over time
+                return Math.min(current + 2, 90)
+              }
+              return current
+            })
+          }, 500) // Increase by 2% every 500ms (2x faster)
+
+          try {
+            // Perform actual extraction
+            const previewData = await processFileForPreview(selectedFile)
+
+            // Clear the interval and complete progress
+            clearInterval(progressInterval)
+            setProgress(100)
+
+            if (previewData) {
+              // Store preview data and redirect directly to preview page
+              if (onPreviewGenerated) {
+                onPreviewGenerated(previewData)
+              }
+
+              // Small delay to show completion, then redirect
+              await new Promise((resolve) => setTimeout(resolve, 500))
+
+              if (lang) {
+                router.push(`/${lang}/preview`)
+              } else {
+                console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
+              }
+            } else {
+              throw new Error("No preview data generated")
+            }
+          } catch (error) {
+            // Clear the interval on error
+            clearInterval(progressInterval)
+            throw error // Re-throw to be caught by outer catch block
+          }
+        } catch (error) {
+          console.error("Error in unauthenticated processing:", error)
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Failed to process the file. Please try again or sign up for full access.",
+          )
+          setProgress(null)
+          setProcessingPhase("uploading")
+          setFile(null)
+        }
+      },
+      [
+        onFileUpload,
+        recordAnonymousUpload,
+        processFileForPreview,
+        onPreviewGenerated,
+        lang,
+        router,
+      ],
+    )
 
     // Custom file validation using our robust validation system
     const handleFileValidation = useCallback((file: File): string | null => {
@@ -222,6 +265,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         setError(null)
         setFile(null)
         setProgress(null)
+        setProcessingPhase("uploading")
 
         // Check rate limiting for anonymous users
         if (!isAuthenticated && checkAnonymousRateLimit()) {
@@ -261,46 +305,43 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
 
           setFile(selectedFile)
           setProgress(0)
-          let currentProgress = 0
-          const interval = setInterval(() => {
-            currentProgress += 10
-            if (currentProgress <= 100) {
-              setProgress(currentProgress)
-            } else {
-              clearInterval(interval)
-              setProgress(100)
-              onFileUpload(selectedFile)
 
-              // Record upload for anonymous users (for rate limiting)
-              recordAnonymousUpload()
-
-              // Handle different user types and redirection
-              if (!disableRedirect && lang) {
-                if (!isAuthenticated) {
-                  // For unauthenticated users, generate preview data and redirect to preview page
-                  const previewData = generateMockPreviewData(selectedFile)
-                  if (onPreviewGenerated) {
-                    onPreviewGenerated(previewData)
-                  }
-                  router.push(`/${lang}/preview`)
-                } else {
-                  // For authenticated users, redirect to viewer as before
-                  router.push(`/${lang}/viewer`)
-                }
-              } else if (!disableRedirect) {
-                console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
-                // Optionally, handle this error case, e.g., redirect to a generic error page or homepage
-                // router.push("/error");
+          // Handle different user types
+          if (!isAuthenticated && !disableRedirect) {
+            // For unauthenticated users, perform actual extraction (async)
+            handleUnauthenticatedProcessing(selectedFile)
+          } else {
+            // For authenticated users or when redirect is disabled, use the original progress simulation
+            let currentProgress = 0
+            const interval = setInterval(() => {
+              currentProgress += 10
+              if (currentProgress <= 100) {
+                setProgress(currentProgress)
               } else {
-                // When redirect is disabled, reset the component state immediately
-                // so the parent component can take over the UI
-                setTimeout(() => {
-                  setFile(null)
-                  setProgress(null)
-                }, 100) // Small delay to allow the parent to process the file
+                clearInterval(interval)
+                setProgress(100)
+                onFileUpload(selectedFile)
+
+                // Record upload for anonymous users (for rate limiting)
+                recordAnonymousUpload()
+
+                // Handle redirection for authenticated users
+                if (!disableRedirect && lang && isAuthenticated) {
+                  router.push(`/${lang}/viewer`)
+                } else if (!disableRedirect && !lang) {
+                  console.error("FileUploadModule: lang is undefined, cannot redirect correctly!")
+                } else if (disableRedirect) {
+                  // When redirect is disabled, reset the component state immediately
+                  // so the parent component can take over the UI
+                  setTimeout(() => {
+                    setFile(null)
+                    setProgress(null)
+                    setProcessingPhase("uploading")
+                  }, 100) // Small delay to allow the parent to process the file
+                }
               }
-            }
-          }, 200)
+            }, 200)
+          }
         }
       },
       [
@@ -313,10 +354,10 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
         lang, // Added lang to dependencies
         disableRedirect, // Added disableRedirect to dependencies
         isAuthenticated, // Added for unauthenticated flow
-        onPreviewGenerated, // Added for preview data callback
         checkAnonymousRateLimit, // Added for rate limiting
         recordAnonymousUpload, // Added for rate limiting
         handleFileValidation, // Added our validation function
+        handleUnauthenticatedProcessing, // Added new processing function
       ],
     )
 
@@ -337,6 +378,7 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
       setFile(null)
       setError(null)
       setProgress(null)
+      setProcessingPhase("uploading")
     }
 
     return (
@@ -431,6 +473,16 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               )}
             </div>
             <Progress value={progress} className="w-full h-2" />
+
+            {/* Show phase-specific text */}
+            {progress < 100 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {processingPhase === "uploading"
+                  ? strings.progressUploading
+                  : strings.progressExtracting}
+              </p>
+            )}
+
             {progress === 100 && !disableRedirect && (
               <p className="text-xs text-green-600 mt-1">{strings.progressFileReady}</p>
             )}
@@ -441,20 +493,6 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
           <Button onClick={open} variant="outline" className="mt-6">
             {strings.buttonOrSelectFile}
           </Button>
-        )}
-
-        {file && progress === 100 && !disableRedirect && (
-          <>
-            <div className="mt-6 p-4 border rounded-md bg-muted/20">
-              <p className="text-sm text-muted-foreground">{strings.placeholderFileProcessed}</p>
-            </div>
-            <div className="mt-4 flex gap-2 justify-center">
-              <Button onClick={handleRemoveFile} variant="outline">
-                {strings.buttonUploadAnother}
-              </Button>
-              <Button variant="default">{strings.buttonDownloadSample}</Button>
-            </div>
-          </>
         )}
 
         {/* Rate Limit Modal for Anonymous Users */}

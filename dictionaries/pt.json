@@ -59,7 +59,9 @@
       "placeholderFileProcessed": "Arquivo processado (simulado). Exiba dados de amostra e opções de download aqui.",
       "buttonUploadAnother": "Carregar Outro Arquivo",
       "buttonDownloadSample": "Baixar XLSX de Amostra",
-      "alertTitleUploadError": "Erro de Upload"
+      "alertTitleUploadError": "Erro de Upload",
+      "progressUploading": "Carregando documento...",
+      "progressExtracting": "Extraindo dados de transações..."
     },
     "top_authority_bar": {
       "trust_message": "Confiado por mais de 10.000 usuários satisfeitos em todo o mundo!"
