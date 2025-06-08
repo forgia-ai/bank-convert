@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import type { getDictionary } from "@/lib/get-dictionary" // For type only
+import type { getDictionary } from "@/lib/utils/get-dictionary" // For type only
 
 type NavStringsType = Awaited<ReturnType<typeof getDictionary>>["navbar"]
 

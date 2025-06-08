@@ -6,7 +6,7 @@
 import { generateObject } from "ai"
 import { z } from "zod"
 import { getGoogleProvider, DEFAULT_GEMINI_MODEL } from "@/lib/ai/gemini-config"
-import { logger } from "@/lib/logger"
+import { logger } from "@/lib/utils/logger"
 
 // System prompt for banking data extraction with format detection
 const BANKING_DATA_EXTRACTION_PROMPT = `# Role and Objective

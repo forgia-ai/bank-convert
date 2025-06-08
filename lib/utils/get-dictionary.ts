@@ -1,13 +1,13 @@
 // lib/get-dictionary.ts
 import "server-only"
-import type { Locale } from "../i18n-config"
-import { i18n } from "../i18n-config"
+import type { Locale } from "@/i18n-config"
+import { i18n } from "@/i18n-config"
 
 // We enumerate all dictionaries here for better linting and typescript support
 const dictionaries = {
-  en: () => import("../dictionaries/en.json").then((module) => module.default),
-  es: () => import("../dictionaries/es.json").then((module) => module.default),
-  pt: () => import("../dictionaries/pt.json").then((module) => module.default),
+  en: () => import("@/dictionaries/en.json").then((module) => module.default),
+  es: () => import("@/dictionaries/es.json").then((module) => module.default),
+  pt: () => import("@/dictionaries/pt.json").then((module) => module.default),
   // Add other locales from i18n.locales here
 } as const
 

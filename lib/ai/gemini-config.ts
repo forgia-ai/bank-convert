@@ -1,5 +1,5 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { logger } from "@/lib/logger"
+import { logger } from "@/lib/utils/logger"
 
 let googleProviderInstance: ReturnType<typeof createGoogleGenerativeAI> | null = null
 

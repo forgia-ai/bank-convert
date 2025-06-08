@@ -7,7 +7,7 @@
 
 import { validateFile } from "@/lib/upload/file-validation"
 import { extractBankingDataFromPDF, type BankingData } from "@/lib/ai/transactions-extractor"
-import { logger } from "@/lib/logger"
+import { logger } from "@/lib/utils/logger"
 
 export type { BankingData }
 
