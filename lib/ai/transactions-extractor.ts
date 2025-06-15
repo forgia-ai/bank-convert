@@ -348,6 +348,7 @@ export async function extractBankingDataFromPDF(file: File): Promise<LLMProcessi
 
     // Debug log: Structured extracted banking data
     // Log the complete LLM response for debugging
+    // TODO: Remove full data logging in production
     logger.info(
       {
         fileName: file.name,

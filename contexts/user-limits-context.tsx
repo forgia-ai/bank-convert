@@ -1,10 +1,12 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { checkUserUsageLimit, recordUserPageUsage, getCurrentUserUsage } from "@/lib/usage/actions"
+import { type PlanType } from "@/lib/usage/tracking"
 
 // Types
 export type UserType = "anonymous" | "free" | "paid"
-export type SubscriptionPlan = "free" | "growth" | "premium"
+export type SubscriptionPlan = "free" | "paid1" | "paid2"
 
 export interface UserLimitsData {
   userType: UserType
@@ -17,7 +19,7 @@ export interface UserLimitsData {
   isCritical: boolean // 90%+
   resetDate?: string // For paid users (monthly reset)
   isMonthlyLimit: boolean // true for paid, false for free (lifetime)
-  planName: string // Plan key for the plan (e.g., 'free', 'growth', 'premium')
+  planName: string // Plan key for the plan (e.g., 'free', 'paid1', 'paid2')
   planPrice: string // Display price for the plan
 }
 
@@ -39,52 +41,21 @@ export interface UserLimitsContextType {
   getUpgradePromptVariant: () => "subtle" | "prominent" | "urgent"
 }
 
-// Mock data - TODO: Replace with real API calls
-const getMockUserLimits = (
-  mockUserType: UserType = "free",
-  mockPlan: SubscriptionPlan = "free",
-): UserLimitsData => {
-  // TODO: Get from authentication context or API
-  const userType = mockUserType
-  const subscriptionPlan = mockPlan
-
-  // Mock usage data - TODO: Fetch from API
-  const mockUsage = {
-    anonymous: { current: 0, limit: 1 }, // 1 document per month
-    free: { current: 14, limit: 50 }, // 50 pages total
-    paid: { current: 127, limit: 500 }, // 500 pages per month
-  }
-
-  // Plan details
-  const planDetails = {
-    free: { planKey: "free", price: "$0", limit: 50 },
-    growth: { planKey: "growth", price: "$8/mês", limit: 500 },
-    premium: { planKey: "premium", price: "$15/mês", limit: 999999 }, // Unlimited
-  }
-
-  const { current, limit: defaultLimit } = mockUsage[userType]
-  const planInfo = planDetails[subscriptionPlan]
-  const limit = subscriptionPlan === "free" ? planInfo.limit : planInfo.limit
-  const usagePercentage = (current / limit) * 100
-
-  return {
-    userType,
-    subscriptionPlan,
-    currentUsage: current,
-    limit,
-    usagePercentage,
-    isAtLimit: current >= limit,
-    isNearLimit: usagePercentage >= 75,
-    isCritical: usagePercentage >= 90,
-    resetDate:
-      userType === "paid"
-        ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
-        : undefined,
-    isMonthlyLimit: userType === "paid",
-    planName: planInfo.planKey,
-    planPrice: planInfo.price,
-  }
-}
+// Initial/default state
+const getDefaultUserLimits = (): UserLimitsData => ({
+  userType: "free",
+  subscriptionPlan: "free",
+  currentUsage: 0,
+  limit: 50,
+  usagePercentage: 0,
+  isAtLimit: false,
+  isNearLimit: false,
+  isCritical: false,
+  resetDate: undefined,
+  isMonthlyLimit: false,
+  planName: "free",
+  planPrice: "$0",
+})
 
 // Context
 const UserLimitsContext = createContext<UserLimitsContextType | undefined>(undefined)
@@ -95,9 +66,33 @@ interface UserLimitsProviderProps {
 }
 
 export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
-  const [userLimits, setUserLimits] = useState<UserLimitsData>(getMockUserLimits())
+  const [userLimits, setUserLimits] = useState<UserLimitsData>(getDefaultUserLimits())
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Mock function to increment usage - TODO: Replace with API call
+  // Function to convert plan type to user type
+  const planTypeToUserType = (planType: SubscriptionPlan): UserType => {
+    switch (planType) {
+      case "free":
+        return "free"
+      case "paid1":
+      case "paid2":
+        return "paid"
+      default:
+        return "free"
+    }
+  }
+
+  // Function to get plan details
+  const getPlanDetails = (plan: SubscriptionPlan) => {
+    const planDetails = {
+      free: { planKey: "free", price: "$0", limit: 50 },
+      paid1: { planKey: "paid1", price: "$8/mês", limit: 500 },
+      paid2: { planKey: "paid2", price: "$15/mês", limit: 1000 },
+    }
+    return planDetails[plan]
+  }
+
+  // Function to increment usage locally (optimistic update)
   const incrementUsage = (pages: number) => {
     setUserLimits((prev) => {
       const newUsage = Math.min(prev.currentUsage + pages, prev.limit)
@@ -112,19 +107,47 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
         isCritical: newPercentage >= 90,
       }
     })
-
-    // TODO: Send usage update to backend
-    // await updateUsageAPI(pages)
   }
 
-  // Mock function to refresh limits - TODO: Replace with API call
+  // Function to refresh limits from server
   const refreshLimits = async () => {
-    // TODO: Fetch fresh data from API
-    // const freshData = await fetchUserLimitsAPI()
-    // setUserLimits(freshData)
+    try {
+      setIsLoading(true)
 
-    // For now, just refresh with mock data
-    setUserLimits(getMockUserLimits(userLimits.userType, userLimits.subscriptionPlan))
+      // Get current plan type from state (or default to free)
+      const currentPlanType = userLimits.subscriptionPlan as PlanType
+
+      const result = await getCurrentUserUsage(currentPlanType)
+
+      if (result.success && result.data) {
+        const usageData = result.data
+        const planDetails = getPlanDetails(usageData.planType as SubscriptionPlan)
+        const userType = planTypeToUserType(usageData.planType as SubscriptionPlan)
+
+        setUserLimits({
+          userType,
+          subscriptionPlan: usageData.planType as SubscriptionPlan,
+          currentUsage: usageData.currentPeriodUsage,
+          limit: usageData.planLimit,
+          usagePercentage: usageData.usagePercentage,
+          isAtLimit: usageData.currentPeriodUsage >= usageData.planLimit,
+          isNearLimit: usageData.usagePercentage >= 75,
+          isCritical: usageData.usagePercentage >= 90,
+          resetDate:
+            userType === "paid"
+              ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+              : undefined,
+          isMonthlyLimit: userType === "paid",
+          planName: planDetails.planKey,
+          planPrice: planDetails.price,
+        })
+      }
+    } catch (error) {
+      console.error("Failed to refresh user limits:", error)
+      // Keep existing state on error
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Mock function to subscribe to a plan - TODO: Replace with Stripe integration
@@ -132,42 +155,70 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Determine new user type based on plan
-    const newUserType: UserType = plan === "free" ? "free" : "paid"
+    // Update local state optimistically
+    const planDetails = getPlanDetails(plan)
+    const userType = planTypeToUserType(plan)
 
-    // Reset usage for new plan (simulate fresh start)
-    const newUsage = plan === "free" ? 0 : 0 // Fresh start for all plans
-
-    setUserLimits(getMockUserLimits(newUserType, plan))
-
-    // Update usage to current value if needed
     setUserLimits((prev) => ({
       ...prev,
-      currentUsage: newUsage,
-      usagePercentage: (newUsage / prev.limit) * 100,
-      isAtLimit: newUsage >= prev.limit,
-      isNearLimit: (newUsage / prev.limit) * 100 >= 75,
-      isCritical: (newUsage / prev.limit) * 100 >= 90,
+      userType,
+      subscriptionPlan: plan,
+      limit: planDetails.limit,
+      planName: planDetails.planKey,
+      planPrice: planDetails.price,
+      isMonthlyLimit: userType === "paid",
+      resetDate:
+        userType === "paid"
+          ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+          : undefined,
+      // Recalculate percentages with new limit
+      usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
+      isAtLimit: prev.currentUsage >= planDetails.limit,
+      isNearLimit: (prev.currentUsage / planDetails.limit) * 100 >= 75,
+      isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
     }))
 
-    // TODO: Integrate with Stripe and backend
-    // await subscribeToStripeAPI(plan)
+    // Refresh from server to get authoritative data
+    await refreshLimits()
   }
 
-  // Mock function to process a document - TODO: Replace with actual processing
+  // Function to process a document with usage tracking
   const processDocument = async (pageCount: number): Promise<boolean> => {
-    // Check if user can process this many pages
-    if (!canProcessPages(pageCount)) {
+    try {
+      // Check if user can process this many pages
+      if (!canProcessPages(pageCount)) {
+        return false
+      }
+
+      // Check usage limit via server action
+      const currentPlanType = userLimits.subscriptionPlan as PlanType
+      const limitCheck = await checkUserUsageLimit(pageCount, currentPlanType)
+
+      if (!limitCheck.success || !limitCheck.data?.canProcess) {
+        return false
+      }
+
+      // Record the usage via server action
+      const recordResult = await recordUserPageUsage(
+        pageCount,
+        undefined,
+        undefined,
+        currentPlanType,
+      )
+
+      if (!recordResult.success) {
+        console.error("Failed to record usage:", recordResult.error)
+        return false
+      }
+
+      // Update local state optimistically
+      incrementUsage(pageCount)
+
+      return true
+    } catch (error) {
+      console.error("Failed to process document:", error)
       return false
     }
-
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Increment usage
-    incrementUsage(pageCount)
-
-    return true
   }
 
   // Helper to check if user can process pages
@@ -189,7 +240,6 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
 
   // Initialize data on mount
   useEffect(() => {
-    // TODO: Fetch initial user limits from API
     refreshLimits()
   }, [])
 

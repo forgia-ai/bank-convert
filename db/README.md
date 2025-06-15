@@ -1,28 +1,23 @@
-# Database Setup Guide
+# Database Setup
 
-This guide explains how to set up Supabase for the Bank Convert application.
-
-## Prerequisites
-
-1. Create a Supabase account at [supabase.com](https://supabase.com)
-2. Create a new project in Supabase
+This directory contains the database migrations and setup for the Bank Statement Converter application using Supabase.
 
 ## Environment Variables
 
-Add these environment variables to your `.env.local` file:
+Add these to your `.env.local` file:
 
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```bash
+# Supabase Configuration (Server-only)
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### Where to find these values:
+## Getting Your Supabase Credentials
 
-1. **NEXT_PUBLIC_SUPABASE_URL**: Go to your Supabase project → Settings → API → Project URL
-2. **NEXT_PUBLIC_SUPABASE_ANON_KEY**: Go to your Supabase project → Settings → API → Project API keys → `anon` `public`
-3. **SUPABASE_SERVICE_ROLE_KEY**: Go to your Supabase project → Settings → API → Project API keys → `service_role` `secret`
+1. **SUPABASE_URL**: Go to your Supabase project → Settings → API → Project URL
+2. **SUPABASE_ANON_KEY**: Go to your Supabase project → Settings → API → Project API keys → `anon` `public`
+
+**Important**: These are server-only environment variables (no `NEXT_PUBLIC_` prefix) to ensure database access is restricted to server-side code only. All database operations are performed via server actions to maintain security.
 
 ## Database Migration Setup
 

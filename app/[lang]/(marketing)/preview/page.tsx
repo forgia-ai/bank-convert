@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
-import { getDictionary } from "@/lib/get-dictionary"
+import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 import PreviewWorkflow from "@/components/preview/PreviewWorkflow"
 

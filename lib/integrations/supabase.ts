@@ -7,7 +7,7 @@ export interface Database {
       user_usage: {
         Row: {
           id: string
-          clerk_user_id: string
+          user_id: string
           billing_period_start: string
           billing_period_end: string
           pages_consumed: number
@@ -17,7 +17,7 @@ export interface Database {
         }
         Insert: {
           id?: string
-          clerk_user_id: string
+          user_id: string
           billing_period_start: string
           billing_period_end: string
           pages_consumed?: number
@@ -27,7 +27,7 @@ export interface Database {
         }
         Update: {
           id?: string
-          clerk_user_id?: string
+          user_id?: string
           billing_period_start?: string
           billing_period_end?: string
           pages_consumed?: number
@@ -39,7 +39,7 @@ export interface Database {
       usage_logs: {
         Row: {
           id: string
-          clerk_user_id: string
+          user_id: string
           pages_processed: number
           file_name: string | null
           file_size: number | null
@@ -47,7 +47,7 @@ export interface Database {
         }
         Insert: {
           id?: string
-          clerk_user_id: string
+          user_id: string
           pages_processed: number
           file_name?: string | null
           file_size?: number | null
@@ -55,7 +55,7 @@ export interface Database {
         }
         Update: {
           id?: string
-          clerk_user_id?: string
+          user_id?: string
           pages_processed?: number
           file_name?: string | null
           file_size?: number | null
@@ -66,40 +66,20 @@ export interface Database {
   }
 }
 
-// Environment variable validation
-function getSupabaseConfig() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Server-side Supabase client (server-only environment variables)
+export function createServerSupabaseClient() {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
 
   if (!supabaseUrl) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable")
+    throw new Error("Missing SUPABASE_URL environment variable")
   }
 
   if (!supabaseAnonKey) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable")
+    throw new Error("Missing SUPABASE_ANON_KEY environment variable")
   }
 
-  return { supabaseUrl, supabaseAnonKey }
-}
-
-// Client-side Supabase client (uses anon key)
-const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig()
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
-
-// Server-side Supabase client (uses service role key for admin operations)
-export function createServerSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl) {
-    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable")
-  }
-
-  if (!supabaseServiceKey) {
-    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY environment variable")
-  }
-
-  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { getDictionary } from "@/lib/get-dictionary"
+import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 export default async function MarketingHomePage({

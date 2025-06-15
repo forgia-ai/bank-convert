@@ -33,7 +33,7 @@ export default function UpgradePrompt({
   // Mock quick upgrade handler (subscribes to Growth plan)
   const handleQuickUpgrade = async () => {
     try {
-      await subscribeToPlan("growth")
+      await subscribeToPlan("paid1")
       router.push(`/${lang}/viewer`)
     } catch (error) {
       console.error("Failed to upgrade:", error)

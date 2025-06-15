@@ -4,8 +4,8 @@ import { logger } from "@/lib/utils/logger"
 // Plan limits (pages per month)
 export const PLAN_LIMITS = {
   free: 50,
-  growth: 500,
-  premium: 1000,
+  paid1: 500,
+  paid2: 1000,
 } as const
 
 export type PlanType = keyof typeof PLAN_LIMITS
@@ -118,12 +118,11 @@ export async function getOrCreateUsageRecord(
   const { data: existingRecord, error: selectError } = await supabase
     .from("user_usage")
     .select("*")
-    .eq("clerk_user_id", userId)
+    .eq("user_id", userId)
     .eq("billing_period_start", periodStart)
-    .single()
+    .maybeSingle()
 
-  if (selectError && selectError.code !== "PGRST116") {
-    // PGRST116 is "not found" error, which is expected for new records
+  if (selectError) {
     logger.error({ error: selectError, userId }, "Error fetching usage record")
     throw new Error("Failed to fetch usage record")
   }
@@ -137,18 +136,23 @@ export async function getOrCreateUsageRecord(
   const { data: newRecord, error: insertError } = await supabase
     .from("user_usage")
     .insert({
-      clerk_user_id: userId,
+      user_id: userId,
       billing_period_start: periodStart,
       billing_period_end: periodEnd,
       pages_consumed: 0,
       plan_type: planType,
     })
     .select()
-    .single()
+    .maybeSingle()
 
   if (insertError) {
     logger.error({ error: insertError, userId }, "Error creating usage record")
     throw new Error("Failed to create usage record")
+  }
+
+  if (!newRecord) {
+    logger.error({ userId }, "No record returned after insert")
+    throw new Error("Failed to create usage record: no data returned")
   }
 
   logger.info({ userId, usage: newRecord }, "Created new usage record")
@@ -223,7 +227,7 @@ export async function trackPageUsage(
 
   // Log the usage for audit trail
   const { error: logError } = await supabase.from("usage_logs").insert({
-    clerk_user_id: userId,
+    user_id: userId,
     pages_processed: pagesProcessed,
     file_name: fileName,
     file_size: fileSize,
@@ -285,7 +289,7 @@ export async function getUserUsageHistory(
   const { data, error } = await supabase
     .from("usage_logs")
     .select("*")
-    .eq("clerk_user_id", userId)
+    .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(limit)
 

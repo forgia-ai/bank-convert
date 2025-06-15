@@ -356,15 +356,13 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [ ] Develop and refine prompts for optimal extraction accuracy.
     - [ ] Handle LLM API responses, including potential errors and rate limits.
     - [x] Replace the mock extraction service with live LLM calls.
-3.  **[ ] PDF Preprocessing (if necessary):**
-    - [ ] If LLMs struggle with certain PDF types, integrate a PDF parsing/OCR library (e.g., `pdf-parse` for text-based PDFs, or explore cloud OCR if image-based PDFs are common).
-4.  **[ ] Stripe Integration (Payments & Subscriptions):**
+3.  **[ ] Stripe Integration (Payments & Subscriptions):**
     - [ ] Set up Stripe account, products (subscription plans), and prices.
     - [ ] Integrate Stripe Checkout or Payment Elements for users to subscribe to plans.
     - [ ] Implement Stripe webhooks to handle subscription events (e.g., `checkout.session.completed`, `customer.subscription.updated`, `invoice.payment_succeeded`).
     - [ ] Link subscription status (from Stripe, associated with Clerk user ID) to feature access/limits (e.g., page consumption).
     - [ ] (Optional) Evaluate and integrate Clerk Billing if it simplifies subscription management with Stripe.
-5.  **[x] Language Support (Content Finalization):**
+4.  **[x] Language Support (Content Finalization):**
     - [x] Add actual translations for all supported languages to the i18n resource files.
 
 **Phase 4: Testing, Refinement & Deployment**

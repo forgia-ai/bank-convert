@@ -77,7 +77,10 @@ interface FileUploadModuleProps {
   // Force enhanced two-phase progress regardless of authentication status
   useTwoPhaseProgress?: boolean
   // Callback for when processing completes (for authenticated users with two-phase progress)
-  onProcessingComplete?: (data: BankingData) => void
+  onProcessingComplete?: (
+    data: BankingData,
+    metadata?: { fileName?: string; fileSize?: number; pageCount?: number },
+  ) => void
 }
 
 const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
@@ -258,7 +261,11 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
             if (result.success && result.data) {
               // Notify parent component of successful processing
               if (onProcessingComplete) {
-                onProcessingComplete(result.data)
+                onProcessingComplete(result.data, {
+                  fileName: result.fileName,
+                  fileSize: result.fileSize,
+                  pageCount: result.pageCount,
+                })
               }
 
               // Don't reset component state - let parent control the transition

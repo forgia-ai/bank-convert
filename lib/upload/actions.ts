@@ -7,6 +7,7 @@
 
 import { validateFile } from "@/lib/upload/file-validation"
 import { extractBankingDataFromPDF, type BankingData } from "@/lib/ai/transactions-extractor"
+import { getPdfMetadata } from "@/lib/upload/pdf-utils"
 import { logger } from "@/lib/utils/logger"
 
 export type { BankingData }
@@ -18,6 +19,7 @@ export type FileProcessingResult = {
   error?: string
   fileName?: string
   fileSize?: number
+  pageCount?: number
 }
 
 /**
@@ -49,7 +51,55 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
       }
     }
 
-    logger.info({ fileName: file.name }, "PDF validation successful, starting LLM extraction")
+    logger.info(
+      { fileName: file.name },
+      "PDF validation successful, extracting metadata and LLM processing",
+    )
+
+    // Extract PDF metadata (including page count) for usage tracking
+    let pageCount = 0
+    try {
+      logger.info(
+        { fileName: file.name, fileSize: file.size, fileType: file.type },
+        "Starting PDF metadata extraction",
+      )
+
+      const fileBuffer = Buffer.from(await file.arrayBuffer())
+      logger.info(
+        {
+          fileName: file.name,
+          bufferLength: fileBuffer.length,
+          isBuffer: Buffer.isBuffer(fileBuffer),
+          bufferStart: fileBuffer.slice(0, 10).toString("hex"),
+        },
+        "Created buffer from file",
+      )
+
+      const pdfMetadata = await getPdfMetadata(fileBuffer)
+      pageCount = pdfMetadata.pageCount
+      logger.info({ fileName: file.name, pageCount }, "Successfully extracted PDF page count")
+    } catch (metadataError) {
+      logger.error(
+        {
+          error: metadataError,
+          fileName: file.name,
+          errorMessage: metadataError instanceof Error ? metadataError.message : "Unknown error",
+          errorStack: metadataError instanceof Error ? metadataError.stack : undefined,
+        },
+        "Failed to extract PDF metadata - this may be a pdf-parse library issue",
+      )
+
+      // Set a fallback page count based on file size (rough estimate: ~100KB per page)
+      pageCount = Math.max(1, Math.ceil(file.size / (100 * 1024)))
+      logger.warn(
+        {
+          fileName: file.name,
+          fileSize: file.size,
+          fallbackPageCount: pageCount,
+        },
+        "Using fallback page count estimation",
+      )
+    }
 
     // Extract banking data using LLM
     const result = await extractBankingDataFromPDF(file)
@@ -58,6 +108,7 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
       logger.info(
         {
           fileName: file.name,
+          pageCount,
           transactionCount: result.data?.transactions?.length || 0,
           hasBalance: !!result.data?.balance,
           bankName: result.data?.bankName,
@@ -70,6 +121,7 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
         data: result.data,
         fileName: file.name,
         fileSize: file.size,
+        pageCount,
       }
     } else {
       logger.error({ fileName: file.name, error: result.error }, "LLM extraction failed")
@@ -78,6 +130,7 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
         error: result.error || "Failed to extract banking data",
         fileName: file.name,
         fileSize: file.size,
+        pageCount,
       }
     }
   } catch (error) {

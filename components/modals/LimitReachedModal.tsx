@@ -42,7 +42,7 @@ export default function LimitReachedModal({
   // Mock quick upgrade handler
   const handleQuickUpgrade = async () => {
     try {
-      await subscribeToPlan("growth")
+      await subscribeToPlan("paid1")
       onClose()
       router.push(`/${lang}/viewer`)
     } catch (error) {

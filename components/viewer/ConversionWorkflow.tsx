@@ -15,6 +15,9 @@ import { useUserLimits } from "@/contexts/user-limits-context"
 import { type BankingData } from "@/lib/upload/actions"
 import { formatDateForLocale } from "@/lib/upload/locale-formatting"
 import { exportTransactionsToXLSX, generateXLSXFilename } from "@/lib/export/xlsx-export"
+import { recordUserPageUsage } from "@/lib/usage/actions"
+import { type PlanType } from "@/lib/usage/tracking"
+import { logger } from "@/lib/utils/logger"
 
 // Define the possible states for the conversion process
 type UploadState = "idle" | "uploading" | "processing" | "completed" | "error"
@@ -32,6 +35,14 @@ interface Transaction {
 interface ConversionWorkflowProps {
   lang: Locale
   dictionary: Record<string, Record<string, unknown>>
+}
+
+// Processing result with metadata from server
+interface ProcessingResult {
+  data: BankingData
+  fileName?: string
+  fileSize?: number
+  pageCount?: number
 }
 
 // Utility function to truncate filename in the middle
@@ -112,14 +123,15 @@ const convertBankingDataToTransactions = (
 export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkflowProps) {
   const [uploadState, setUploadState] = useState<UploadState>("idle")
   const [currentFile, setCurrentFile] = useState<File | null>(null)
+  const [, setProcessingResult] = useState<ProcessingResult | null>(null)
   const [transactionData, setTransactionData] = useState<Transaction[]>([])
   const [totalTransactionCount, setTotalTransactionCount] = useState<number>(0)
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [isLimitError, setIsLimitError] = useState<boolean>(false)
   const fileUploadRef = useRef<FileUploadModuleRef>(null)
 
-  // Get user limits context for mock processing
-  const { processDocument, canProcessPages, userLimits } = useUserLimits()
+  // Get user limits context for processing
+  const { canProcessPages, userLimits, refreshLimits } = useUserLimits()
 
   // Helper function to format transaction count message
   const formatTransactionCountMessage = (count: number) => {
@@ -138,52 +150,103 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
     }
   }
 
-  // Handle file upload from FileUploadModule (simplified - just set file and validate limits)
+  // Handle file upload from FileUploadModule
   const handleFileUpload = (file: File) => {
     setCurrentFile(file)
     setErrorMessage("")
+    setProcessingResult(null)
 
-    // Mock: Simulate 10 pages per document
-    const mockPageCount = 10
+    // Note: We can't check page limits here because we need server-side processing
+    // to get the actual page count. The FileUploadModule will handle the processing
+    // and we'll validate limits when we receive the result.
+  }
 
-    // Check if user can process this document
-    if (!canProcessPages(mockPageCount)) {
+  // Handle processing completion from FileUploadModule
+  const handleProcessingComplete = (
+    data: BankingData,
+    metadata?: { fileName?: string; fileSize?: number; pageCount?: number },
+  ) => {
+    // Store the complete processing result
+    const result: ProcessingResult = {
+      data,
+      fileName: metadata?.fileName || currentFile?.name,
+      fileSize: metadata?.fileSize || currentFile?.size,
+      pageCount: metadata?.pageCount || 1, // Fallback to 1 page if not provided
+    }
+
+    setProcessingResult(result)
+
+    // Check if the page count would exceed user's limits
+    if (result.pageCount && !canProcessPages(result.pageCount)) {
       setUploadState("error")
       setIsLimitError(true)
       setErrorMessage("You've reached your page limit. Please upgrade to process more documents.")
       return
     }
 
-    // Let FileUploadModule handle the progress and processing
-    // We'll get notified via onProcessingComplete when it's done
-  }
-
-  // Handle processing completion from FileUploadModule
-  const handleProcessingComplete = (data: BankingData) => {
     // Convert banking data to transaction format with locale formatting
     const { transactions, totalCount } = convertBankingDataToTransactions(data, lang, dictionary)
 
-    if (transactions.length === 0) {
-      // If no transactions found, show a friendly message
-      setUploadState("error")
-      setErrorMessage(
-        "No transaction data could be extracted from this PDF. Please ensure it's a valid bank statement.",
-      )
-      return
-    }
-
-    // Switch to results view immediately - no delays!
+    // ✅ SUCCESSFUL EXTRACTION: LLM processed the PDF successfully
+    // Even if 0 transactions are found, this is still a successful extraction that should be charged
+    // Set the state first, then handle usage tracking
     setTransactionData(transactions)
     setTotalTransactionCount(totalCount)
-    setUploadState("completed")
 
-    // Handle usage tracking in the background (async, non-blocking)
+    if (transactions.length === 0) {
+      // Show success state but with a message about no transactions
+      setUploadState("completed")
+      // We'll show a special message in the UI for this case
+    } else {
+      // Normal success with transactions found
+      setUploadState("completed")
+    }
+
+    // Handle usage tracking in the background for ALL successful extractions (async, non-blocking)
     const trackUsage = async () => {
       try {
-        const mockPageCount = 10
-        await processDocument(mockPageCount)
+        if (result.pageCount && result.pageCount > 0) {
+          logger.info(
+            {
+              fileName: result.fileName,
+              fileSize: result.fileSize,
+              pageCount: result.pageCount,
+              transactionCount: totalCount,
+            },
+            "Recording actual page usage for successful extraction",
+          )
+
+          const trackingResult = await recordUserPageUsage(
+            result.pageCount,
+            result.fileName,
+            result.fileSize,
+            userLimits.subscriptionPlan as PlanType,
+          )
+
+          if (!trackingResult.success) {
+            logger.warn({ error: trackingResult.error }, "Failed to record page usage")
+          } else {
+            logger.info(
+              { pageCount: result.pageCount, transactionCount: totalCount },
+              "Successfully recorded actual page usage",
+            )
+
+            // ✅ REFRESH USER LIMITS: Update the navbar after successful usage tracking
+            try {
+              await refreshLimits()
+              logger.info({}, "Successfully refreshed user limits after usage tracking")
+            } catch (refreshError) {
+              logger.warn(
+                { error: refreshError },
+                "Failed to refresh user limits after usage tracking",
+              )
+            }
+          }
+        } else {
+          logger.warn({ result }, "Missing page count for usage tracking")
+        }
       } catch (error) {
-        console.warn("Usage tracking failed:", error)
+        logger.warn({ error }, "Usage tracking failed")
         // Don't show error to user since the main processing succeeded
       }
     }
@@ -278,7 +341,7 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
           </div>
         )}
 
-        {uploadState === "completed" && transactionData.length > 0 && (
+        {uploadState === "completed" && (
           <div className="space-y-6">
             {/* Action Buttons - Moved to top */}
             <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
@@ -296,7 +359,9 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
                 <Button
                   onClick={handleDownloadXLSX}
+                  disabled={transactionData.length === 0}
                   className="flex items-center justify-center space-x-2 cursor-pointer w-full sm:w-auto"
+                  title={transactionData.length === 0 ? "No transactions to export" : undefined}
                 >
                   <Download className="h-4 w-4" />
                   <span>{dictionary.viewer_page?.download_xlsx_button as string}</span>
@@ -311,24 +376,54 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               </div>
             </div>
 
-            {/* Data Table */}
-            <DataTable
-              data={transactionData}
-              locale={lang}
-              columns={
-                dictionary.viewer_page
-                  ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels
-              }
-              transactionCountStrings={{
-                singular:
-                  (dictionary.viewer_page?.transaction_count_singular as string) ||
-                  "1 transaction found.",
-                plural:
-                  (dictionary.viewer_page?.transaction_count_plural as string) ||
-                  "{count} transactions found.",
-              }}
-              customFooterMessage={formatTransactionCountMessage(totalTransactionCount)}
-            />
+            {/* Conditional Content Based on Transaction Count */}
+            {transactionData.length > 0 ? (
+              /* Data Table for successful extractions with transactions */
+              <DataTable
+                data={transactionData}
+                locale={lang}
+                columns={
+                  dictionary.viewer_page
+                    ?.table_columns as unknown as import("@/components/viewer/DataTable").ColumnLabels
+                }
+                transactionCountStrings={{
+                  singular:
+                    (dictionary.viewer_page?.transaction_count_singular as string) ||
+                    "1 transaction found.",
+                  plural:
+                    (dictionary.viewer_page?.transaction_count_plural as string) ||
+                    "{count} transactions found.",
+                }}
+                customFooterMessage={formatTransactionCountMessage(totalTransactionCount)}
+              />
+            ) : (
+              /* Message for successful extractions with 0 transactions */
+              <Card className="border-blue-200 bg-blue-50 border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-lg text-blue-800">
+                      Extraction Completed Successfully
+                    </CardTitle>
+                  </div>
+                  <CardDescription className="text-blue-700">
+                    We successfully processed your PDF, but no transaction data was found. This
+                    could happen if:
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>The document doesn&apos;t contain transaction records</li>
+                      <li>The document is a statement summary or account overview</li>
+                      <li>The transactions are in an unusual format</li>
+                    </ul>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-sm text-blue-600">
+                    💡 <strong>Note:</strong> This processing counts toward your page usage as the
+                    document was successfully analyzed.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
 

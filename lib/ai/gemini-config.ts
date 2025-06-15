@@ -1,5 +1,4 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { logger } from "@/lib/utils/logger"
 
 let googleProviderInstance: ReturnType<typeof createGoogleGenerativeAI> | null = null
 
@@ -13,10 +12,8 @@ export function getGoogleProvider() {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
     // Ensure required environment variables are set
-    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "") {
-      logger.warn(
-        "[google-generative-config] GEMINI_API_KEY environment variable is not set or empty. Gemini AI integration may not work properly.",
-      )
+    if (!GEMINI_API_KEY?.trim()) {
+      throw new Error("GEMINI_API_KEY must be set to use Gemini AI")
     }
 
     // Create the Google Generative AI provider instance

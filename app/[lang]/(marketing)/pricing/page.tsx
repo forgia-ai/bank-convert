@@ -44,8 +44,8 @@ export default function PricingPage() {
     // Map plan names to subscription plans
     const planMap: Record<string, SubscriptionPlan> = {
       Free: "free",
-      Growth: "growth",
-      Premium: "premium",
+      Growth: "paid1",
+      Premium: "paid2",
     }
 
     const plan = planMap[planName]

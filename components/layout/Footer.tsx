@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { getDictionary } from "@/lib/get-dictionary"
+import type { getDictionary } from "@/lib/utils/get-dictionary"
 
 type FooterStringsType = Awaited<ReturnType<typeof getDictionary>>["footer"]
 

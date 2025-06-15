@@ -20,8 +20,21 @@ vi.mock("@/lib/integrations/supabase", () => ({
             error: null,
           }),
         ),
+        maybeSingle: vi.fn(() =>
+          Promise.resolve({
+            data: {
+              id: "test-id",
+              pages_consumed: 10,
+              billing_period_start: "2024-01-01",
+              billing_period_end: "2024-01-31",
+              plan_type: "free",
+            },
+            error: null,
+          }),
+        ),
         select: vi.fn(() => ({
           single: vi.fn(() => Promise.resolve({ data: { id: "new-id" }, error: null })),
+          maybeSingle: vi.fn(() => Promise.resolve({ data: { id: "new-id" }, error: null })),
         })),
         insert: vi.fn(() => Promise.resolve({ error: null })),
       }
@@ -33,10 +46,20 @@ vi.mock("@/lib/integrations/supabase", () => ({
         select: vi.fn(() => createChainableMock()),
         insert: vi.fn((data) => {
           // Handle both user_usage inserts (with .select().single()) and usage_logs inserts (direct)
-          if (data?.clerk_user_id) {
+          if (data?.user_id) {
             return {
               select: vi.fn(() => ({
                 single: vi.fn(() =>
+                  Promise.resolve({
+                    data: {
+                      id: "new-id",
+                      ...data,
+                      pages_consumed: 0,
+                    },
+                    error: null,
+                  }),
+                ),
+                maybeSingle: vi.fn(() =>
                   Promise.resolve({
                     data: {
                       id: "new-id",
