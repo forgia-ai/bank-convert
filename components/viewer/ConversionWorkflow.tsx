@@ -400,12 +400,6 @@ export default function ConversionWorkflow({ lang, dictionary }: ConversionWorkf
               /* Message for successful extractions with 0 transactions */
               <Card className="border-blue-200 bg-blue-50 border-2">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-lg text-blue-800">
-                      Extraction Completed Successfully
-                    </CardTitle>
-                  </div>
                   <CardDescription className="text-blue-700">
                     We successfully processed your PDF, but no transaction data was found. This
                     could happen if:
