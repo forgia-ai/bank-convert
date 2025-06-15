@@ -56,23 +56,29 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
       "PDF validation successful, extracting metadata and LLM processing",
     )
 
+    // Create buffer once for both metadata extraction and LLM processing
+    logger.info(
+      { fileName: file.name, fileSize: file.size, fileType: file.type },
+      "Creating file buffer for metadata extraction and LLM processing",
+    )
+
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+    logger.info(
+      {
+        fileName: file.name,
+        bufferLength: fileBuffer.length,
+        isBuffer: Buffer.isBuffer(fileBuffer),
+        bufferStart: fileBuffer.slice(0, 10).toString("hex"),
+      },
+      "Created buffer from file",
+    )
+
     // Extract PDF metadata (including page count) for usage tracking
     let pageCount = 0
     try {
       logger.info(
-        { fileName: file.name, fileSize: file.size, fileType: file.type },
-        "Starting PDF metadata extraction",
-      )
-
-      const fileBuffer = Buffer.from(await file.arrayBuffer())
-      logger.info(
-        {
-          fileName: file.name,
-          bufferLength: fileBuffer.length,
-          isBuffer: Buffer.isBuffer(fileBuffer),
-          bufferStart: fileBuffer.slice(0, 10).toString("hex"),
-        },
-        "Created buffer from file",
+        { fileName: file.name },
+        "Starting PDF metadata extraction using pre-created buffer",
       )
 
       const pdfMetadata = await getPdfMetadata(fileBuffer)
@@ -101,8 +107,8 @@ export async function processPdfFile(formData: FormData): Promise<FileProcessing
       )
     }
 
-    // Extract banking data using LLM
-    const result = await extractBankingDataFromPDF(file)
+    // Extract banking data using LLM with pre-parsed buffer to avoid redundant file reading
+    const result = await extractBankingDataFromPDF(file, fileBuffer, pageCount)
 
     if (result.success) {
       logger.info(

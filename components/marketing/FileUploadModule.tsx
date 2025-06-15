@@ -262,9 +262,9 @@ const FileUploadModule = forwardRef<FileUploadModuleRef, FileUploadModuleProps>(
               // Notify parent component of successful processing
               if (onProcessingComplete) {
                 onProcessingComplete(result.data, {
-                  fileName: result.fileName,
-                  fileSize: result.fileSize,
-                  pageCount: result.pageCount,
+                  fileName: result.fileName || selectedFile.name,
+                  fileSize: result.fileSize || selectedFile.size,
+                  pageCount: result.pageCount || 1,
                 })
               }
 

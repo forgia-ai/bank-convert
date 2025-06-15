@@ -29,7 +29,7 @@ export interface UserLimitsContextType {
 
   // Actions
   incrementUsage: (pages: number) => void
-  refreshLimits: () => Promise<void>
+  refreshLimits: (planType?: SubscriptionPlan) => Promise<void>
 
   // Mock subscription actions
   subscribeToPlan: (plan: SubscriptionPlan) => Promise<void>
@@ -95,8 +95,13 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   // Function to increment usage locally (optimistic update)
   const incrementUsage = (pages: number) => {
     setUserLimits((prev) => {
-      const newUsage = Math.min(prev.currentUsage + pages, prev.limit)
+      const newUsage = prev.currentUsage + pages
       const newPercentage = (newUsage / prev.limit) * 100
+
+      // Log when usage exceeds limit to track over-usage
+      if (newUsage > prev.limit && prev.currentUsage <= prev.limit) {
+        console.warn(`Usage exceeded limit: ${newUsage} pages used, limit is ${prev.limit}`)
+      }
 
       return {
         ...prev,
@@ -110,12 +115,12 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   }
 
   // Function to refresh limits from server
-  const refreshLimits = async () => {
+  const refreshLimits = async (planType?: SubscriptionPlan) => {
     try {
       setIsLoading(true)
 
-      // Get current plan type from state (or default to free)
-      const currentPlanType = userLimits.subscriptionPlan as PlanType
+      // Use provided plan type or fall back to current state
+      const currentPlanType = (planType || userLimits.subscriptionPlan) as PlanType
 
       const result = await getCurrentUserUsage(currentPlanType)
 
@@ -178,8 +183,8 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
       isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
     }))
 
-    // Refresh from server to get authoritative data
-    await refreshLimits()
+    // Refresh from server to get authoritative data with the new plan
+    await refreshLimits(plan)
   }
 
   // Function to process a document with usage tracking

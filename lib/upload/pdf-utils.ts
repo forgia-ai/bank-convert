@@ -2,39 +2,6 @@ import pdf from "pdf-parse"
 import { logger } from "@/lib/utils/logger"
 
 /**
- * Parse PDF date string into a Date object
- * PDF dates are typically in format: D:YYYYMMDDHHmmSSOHH'mm or D:YYYYMMDDHHMMSS
- * @param pdfDateString - The raw PDF date string
- * @returns Date object or undefined if parsing fails
- */
-export function parsePdfDate(pdfDateString: string | undefined): Date | undefined {
-  if (!pdfDateString) return undefined
-
-  try {
-    // Remove the "D:" prefix if present
-    const dateStr = pdfDateString.replace(/^D:/, "")
-
-    // Extract date components (YYYYMMDDHHMMSS format)
-    const year = parseInt(dateStr.substring(0, 4), 10)
-    const month = parseInt(dateStr.substring(4, 6), 10) - 1 // Month is 0-indexed
-    const day = parseInt(dateStr.substring(6, 8), 10)
-    const hour = parseInt(dateStr.substring(8, 10), 10) || 0
-    const minute = parseInt(dateStr.substring(10, 12), 10) || 0
-    const second = parseInt(dateStr.substring(12, 14), 10) || 0
-
-    // Validate extracted values
-    if (isNaN(year) || isNaN(month) || isNaN(day)) {
-      return undefined
-    }
-
-    return new Date(year, month, day, hour, minute, second)
-  } catch (error) {
-    logger.warn({ pdfDateString, error }, "Failed to parse PDF date string")
-    return undefined
-  }
-}
-
-/**
  * Count the number of pages in a PDF file
  * @param fileBuffer - The PDF file as a Buffer
  * @returns Promise<number> - The number of pages in the PDF
@@ -52,34 +19,6 @@ export async function countPdfPages(fileBuffer: Buffer): Promise<number> {
   } catch (error) {
     logger.error({ error, fileSize: fileBuffer.length }, "Error counting PDF pages")
     throw new Error("Failed to count PDF pages", { cause: error as Error })
-  }
-}
-
-/**
- * Extract text from PDF file (utility function for later use)
- * @param fileBuffer - The PDF file as a Buffer
- * @returns Promise<string> - The extracted text content
- */
-export async function extractPdfText(fileBuffer: Buffer): Promise<string> {
-  try {
-    logger.info({ fileSize: fileBuffer.length }, "Extracting PDF text")
-
-    const data = await pdf(fileBuffer)
-    const text = data.text
-
-    logger.info(
-      {
-        textLength: text.length,
-        pageCount: data.numpages,
-        fileSize: fileBuffer.length,
-      },
-      "Successfully extracted PDF text",
-    )
-
-    return text
-  } catch (error) {
-    logger.error({ error, fileSize: fileBuffer.length }, "Error extracting PDF text")
-    throw new Error("Failed to extract PDF text", { cause: error as Error })
   }
 }
 

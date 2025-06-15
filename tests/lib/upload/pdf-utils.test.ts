@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { countPdfPages, extractPdfText, getPdfMetadata } from "@/lib/upload/pdf-utils"
+import { countPdfPages, getPdfMetadata } from "@/lib/upload/pdf-utils"
 import pdf from "pdf-parse"
 
 // Mock pdf-parse
@@ -50,26 +50,6 @@ describe("PDF Utils", () => {
       mockPdf.mockRejectedValue(new Error("PDF parsing failed"))
 
       await expect(countPdfPages(mockBuffer)).rejects.toThrow("Failed to count PDF pages")
-    })
-  })
-
-  describe("extractPdfText", () => {
-    it("should return extracted text", async () => {
-      mockPdf.mockResolvedValue(
-        createMockResult({
-          numpages: 2,
-          text: "extracted text content",
-        }),
-      )
-
-      const result = await extractPdfText(mockBuffer)
-      expect(result).toBe("extracted text content")
-    })
-
-    it("should throw error when text extraction fails", async () => {
-      mockPdf.mockRejectedValue(new Error("Text extraction failed"))
-
-      await expect(extractPdfText(mockBuffer)).rejects.toThrow("Failed to extract PDF text")
     })
   })
 

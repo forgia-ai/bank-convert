@@ -268,16 +268,41 @@ function validateDateConsistency(data: BankingData): {
 
 /**
  * Extracts banking data from PDF file using Gemini AI
+ * @param file - The PDF file to process
+ * @param fileBuffer - Optional pre-parsed file buffer to avoid redundant file reading
+ * @param pageCount - Optional pre-computed page count for logging purposes
  */
-export async function extractBankingDataFromPDF(file: File): Promise<LLMProcessingResult> {
+export async function extractBankingDataFromPDF(
+  file: File,
+  fileBuffer?: Buffer,
+  pageCount?: number,
+): Promise<LLMProcessingResult> {
   try {
     logger.info(
-      { fileName: file.name, fileSize: file.size, mimeType: file.type },
+      {
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+        pageCount,
+        hasPreParsedBuffer: !!fileBuffer,
+      },
       "Starting LLM extraction for PDF",
     )
 
-    // Convert file to base64 for Gemini API
-    const bytes = await file.arrayBuffer()
+    // Use provided buffer or read file if not provided
+    let bytes: ArrayBuffer
+    if (fileBuffer) {
+      logger.info(
+        { fileName: file.name, bufferLength: fileBuffer.length },
+        "Using pre-parsed file buffer, skipping redundant file read",
+      )
+      bytes = new ArrayBuffer(fileBuffer.length)
+      new Uint8Array(bytes).set(fileBuffer)
+    } else {
+      logger.info({ fileName: file.name }, "No pre-parsed buffer provided, reading file")
+      bytes = await file.arrayBuffer()
+    }
+
     const base64Data = Buffer.from(bytes).toString("base64")
     const base64Size = base64Data.length
 
