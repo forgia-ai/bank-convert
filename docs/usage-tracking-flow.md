@@ -217,6 +217,48 @@ const usageData: UsageData = await getUserUsage(userId, planType, subscriptionSt
 }
 ```
 
+### 5. `updateUserPlan()`
+
+**Purpose**: Updates user's subscription plan in the database
+
+```typescript
+await updateUserPlan(
+  userId: string,
+  newPlanType: PlanType,
+  subscriptionStartDate?: Date
+)
+```
+
+**Process**:
+
+1. Validates user ID and plan type parameters
+2. Calculates current billing period
+3. Updates `plan_type` field for current usage record
+4. Ensures future usage records will use the new plan type
+
+**Validation**:
+
+- Rejects empty user IDs
+- Validates plan type against allowed values ('free', 'paid1', 'paid2')
+- Provides detailed error messages for invalid inputs
+
+### 6. `getUserPlan()`
+
+**Purpose**: Retrieves user's current plan from database
+
+```typescript
+const currentPlan: PlanType = await getUserPlan(
+  userId: string,
+  subscriptionStartDate?: Date
+)
+```
+
+**Process**:
+
+1. Gets or creates usage record for current billing period
+2. Returns the `plan_type` from the database record
+3. Provides authoritative plan data source
+
 ## File Processing Integration
 
 ### PDF Page Counting
@@ -402,9 +444,22 @@ sequenceDiagram
 
 ### Plan Changes
 
-- **Mid-period upgrades**: New limits apply immediately
+**Implementation**: Plan changes are now fully implemented with database persistence:
+
+- **Plan Updates**: `updateUserSubscriptionPlan()` server action updates `plan_type` in database
+- **Current Plan Retrieval**: `getUserCurrentPlan()` server action gets authoritative plan from database
+- **Context Integration**: `UserLimitsProvider.subscribeToPlan()` calls server actions and refreshes state
+- **Mid-period upgrades**: New limits apply immediately with database update
 - **Mid-period downgrades**: Existing usage grandfathered until next period
-- **Subscription cancellation**: Revert to free plan limits
+- **Subscription cancellation**: Revert to free plan limits via `updateUserPlan("free")`
+
+**Usage Flow**:
+
+1. User clicks pricing page button
+2. Context calls `updateUserSubscriptionPlan()` server action
+3. Server action updates database via `updateUserPlan()`
+4. Context refreshes state with new plan limits
+5. All future usage checks use new plan type from database
 
 ## Security Considerations
 
@@ -541,3 +596,72 @@ This architecture ensures:
 ### Plan Configuration
 
 Plans and limits are defined in `
+
+/\*\*
+
+- Server action to get user usage history
+- Called from settings/analytics pages
+  \*/
+  export async function getUserUsageHistoryData(limit: number = 10): Promise<{
+  success: boolean
+  data?: Array<{
+  id: string
+  pages_processed: number
+  file_name: string | null
+  file_size: number | null
+  created_at: string
+  }>
+  error?: string
+  }> {
+  try {
+  const { userId } = await auth()
+
+      if (!userId) {
+        return {
+          success: false,
+          error: "User not authenticated",
+        }
+      }
+
+      const history = await getUserUsageHistory(userId, limit)
+
+      return {
+        success: true,
+        data: history,
+      }
+
+  } catch (error) {
+  logger.error({ error, limit }, "Error getting user usage history")
+  return {
+  success: false,
+  error: "Failed to get usage history",
+  }
+  }
+  }
+
+/\*\*
+
+- Server action to update user's subscription plan (mock implementation)
+- Called when user clicks pricing page buttons
+  \*/
+  export async function updateUserSubscriptionPlan(newPlanType: PlanType): Promise<{
+  success: boolean
+  error?: string
+  }> {
+  // Handles authentication, validation, and calls updateUserPlan()
+  // Provides secure API for plan updates from client components
+  }
+
+/\*\*
+
+- Server action to get user's current plan from database
+- Called from context to get authoritative plan data
+  \*/
+  export async function getUserCurrentPlan(): Promise<{
+  success: boolean
+  data?: PlanType
+  error?: string
+  }> {
+  // Handles authentication and calls getUserPlan()
+  // Returns current plan type from database
+  }

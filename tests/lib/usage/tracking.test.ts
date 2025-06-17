@@ -1,4 +1,4 @@
-import { trackPageUsage, checkUsageLimit } from "@/lib/usage/tracking"
+import { trackPageUsage, checkUsageLimit, getUserUsageHistory } from "@/lib/usage/tracking"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
 // Mock the dependencies
@@ -42,43 +42,60 @@ vi.mock("@/lib/integrations/supabase", () => ({
     }
 
     return {
-      from: vi.fn(() => ({
-        select: vi.fn(() => createChainableMock()),
-        insert: vi.fn((data) => {
-          // Handle both user_usage inserts (with .select().single()) and usage_logs inserts (direct)
-          if (data?.user_id) {
-            return {
-              select: vi.fn(() => ({
-                single: vi.fn(() =>
-                  Promise.resolve({
-                    data: {
-                      id: "new-id",
-                      ...data,
-                      pages_consumed: 0,
-                    },
-                    error: null,
-                  }),
-                ),
-                maybeSingle: vi.fn(() =>
-                  Promise.resolve({
-                    data: {
-                      id: "new-id",
-                      ...data,
-                      pages_consumed: 0,
-                    },
-                    error: null,
-                  }),
-                ),
+      from: vi.fn((tableName) => {
+        // Handle different tables with different mock behaviors
+        if (tableName === "usage_logs") {
+          return {
+            select: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                order: vi.fn(() => ({
+                  limit: vi.fn(() => Promise.resolve({ data: [], error: null })),
+                })),
               })),
-            }
+            })),
+            insert: vi.fn(() => Promise.resolve({ error: null })),
           }
-          // For usage_logs direct insert
-          return Promise.resolve({ error: null })
-        }),
-        update: vi.fn(() => ({
-          eq: vi.fn(() => Promise.resolve({ error: null })),
-        })),
-      })),
+        }
+
+        // Default behavior for user_usage table
+        return {
+          select: vi.fn(() => createChainableMock()),
+          insert: vi.fn((data) => {
+            // Handle both user_usage inserts (with .select().single()) and usage_logs inserts (direct)
+            if (data?.user_id) {
+              return {
+                select: vi.fn(() => ({
+                  single: vi.fn(() =>
+                    Promise.resolve({
+                      data: {
+                        id: "new-id",
+                        ...data,
+                        pages_consumed: 0,
+                      },
+                      error: null,
+                    }),
+                  ),
+                  maybeSingle: vi.fn(() =>
+                    Promise.resolve({
+                      data: {
+                        id: "new-id",
+                        ...data,
+                        pages_consumed: 0,
+                      },
+                      error: null,
+                    }),
+                  ),
+                })),
+              }
+            }
+            // For usage_logs direct insert
+            return Promise.resolve({ error: null })
+          }),
+          update: vi.fn(() => ({
+            eq: vi.fn(() => Promise.resolve({ error: null })),
+          })),
+        }
+      }),
       rpc: vi.fn(() => Promise.resolve({ error: null })),
     }
   }),
@@ -194,6 +211,18 @@ describe("Usage Tracking Validation", () => {
       expect(typeof result.currentUsage).toBe("number")
       expect(typeof result.limit).toBe("number")
       expect(typeof result.wouldExceed).toBe("boolean")
+    })
+  })
+
+  describe("getUserUsageHistory", () => {
+    it("should return empty array for non-existent user", async () => {
+      const result = await getUserUsageHistory("non-existent-user")
+      expect(result).toEqual([])
+    })
+
+    it("should handle limit parameter", async () => {
+      const result = await getUserUsageHistory("test-user", 5)
+      expect(result).toEqual([])
     })
   })
 })

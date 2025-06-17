@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { checkUserUsageLimit, recordUserPageUsage, getCurrentUserUsage } from "@/lib/usage/actions"
+import { updateUserSubscriptionPlan, getUserCurrentPlan } from "@/lib/subscriptions/actions"
 import { type PlanType } from "@/lib/usage/tracking"
 
 // Types
@@ -119,8 +120,20 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     try {
       setIsLoading(true)
 
-      // Use provided plan type or fall back to current state
-      const currentPlanType = (planType || userLimits.subscriptionPlan) as PlanType
+      // Get current plan from database if not provided
+      let currentPlanType: PlanType
+      if (planType) {
+        currentPlanType = planType as PlanType
+      } else {
+        // Get the user's current plan from database
+        const planResult = await getUserCurrentPlan()
+        if (planResult.success && planResult.data) {
+          currentPlanType = planResult.data
+        } else {
+          // Fallback to free if we can't get the plan
+          currentPlanType = "free"
+        }
+      }
 
       const result = await getCurrentUserUsage(currentPlanType)
 
@@ -157,34 +170,43 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
 
   // Mock function to subscribe to a plan - TODO: Replace with Stripe integration
   const subscribeToPlan = async (plan: SubscriptionPlan) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Call server action to update plan in database
+      const result = await updateUserSubscriptionPlan(plan as PlanType)
 
-    // Update local state optimistically
-    const planDetails = getPlanDetails(plan)
-    const userType = planTypeToUserType(plan)
+      if (!result.success) {
+        console.error("Failed to update plan:", result.error)
+        return
+      }
 
-    setUserLimits((prev) => ({
-      ...prev,
-      userType,
-      subscriptionPlan: plan,
-      limit: planDetails.limit,
-      planName: planDetails.planKey,
-      planPrice: planDetails.price,
-      isMonthlyLimit: userType === "paid",
-      resetDate:
-        userType === "paid"
-          ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
-          : undefined,
-      // Recalculate percentages with new limit
-      usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
-      isAtLimit: prev.currentUsage >= planDetails.limit,
-      isNearLimit: (prev.currentUsage / planDetails.limit) * 100 >= 75,
-      isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
-    }))
+      // Update local state optimistically
+      const planDetails = getPlanDetails(plan)
+      const userType = planTypeToUserType(plan)
 
-    // Refresh from server to get authoritative data with the new plan
-    await refreshLimits(plan)
+      setUserLimits((prev) => ({
+        ...prev,
+        userType,
+        subscriptionPlan: plan,
+        limit: planDetails.limit,
+        planName: planDetails.planKey,
+        planPrice: planDetails.price,
+        isMonthlyLimit: userType === "paid",
+        resetDate:
+          userType === "paid"
+            ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+            : undefined,
+        // Recalculate percentages with new limit
+        usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
+        isAtLimit: prev.currentUsage >= planDetails.limit,
+        isNearLimit: (prev.currentUsage / planDetails.limit) * 100 >= 75,
+        isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
+      }))
+
+      // Refresh from server to get authoritative data with the new plan
+      await refreshLimits(plan)
+    } catch (error) {
+      console.error("Error subscribing to plan:", error)
+    }
   }
 
   // Function to process a document with usage tracking
