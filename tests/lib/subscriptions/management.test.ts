@@ -11,6 +11,16 @@ vi.mock("@/lib/integrations/supabase", () => ({
           eq: () => ({ error: null }),
         }),
       }),
+      upsert: () => ({ error: null }),
+      select: () => ({
+        eq: () => ({
+          order: () => ({
+            limit: () => ({
+              maybeSingle: () => ({ data: null, error: null }),
+            }),
+          }),
+        }),
+      }),
     }),
   }),
 }))

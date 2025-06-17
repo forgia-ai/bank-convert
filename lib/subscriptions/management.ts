@@ -9,7 +9,7 @@ import {
 
 /**
  * Update user's plan type in database
- * Updates the plan_type for current and future billing periods
+ * Uses upsert to update existing records or create new ones for current billing period
  */
 export async function updateUserPlan(
   userId: string,
@@ -29,24 +29,35 @@ export async function updateUserPlan(
   const supabase = createServerSupabaseClient()
 
   // Calculate current billing period to identify which records to update
-  const { periodStart } = calculateBillingPeriod(subscriptionStartDate || new Date())
+  const { periodStart, periodEnd } = calculateBillingPeriod(subscriptionStartDate || new Date())
 
-  // Update the current billing period record if it exists
-  const { error: updateError } = await supabase
-    .from("user_usage")
-    .update({ plan_type: newPlanType })
-    .eq("user_id", userId)
-    .eq("billing_period_start", periodStart)
+  // Use upsert to ensure the plan change is persisted even if no record exists
+  const { error: upsertError } = await supabase.from("user_usage").upsert(
+    {
+      user_id: userId,
+      billing_period_start: periodStart,
+      billing_period_end: periodEnd,
+      plan_type: newPlanType,
+      pages_consumed: 0, // Default for new records, ignored for existing ones
+    },
+    {
+      onConflict: "user_id,billing_period_start",
+      ignoreDuplicates: false, // Update existing records
+    },
+  )
 
-  if (updateError) {
-    logger.error({ error: updateError, userId }, "Error updating current period plan")
+  if (upsertError) {
+    logger.error({ error: upsertError, userId }, "Error upserting user plan")
     throw new Error("Failed to update user plan")
   }
 
   // Also ensure any future getOrCreateUsageRecord calls will use the new plan
   // This is handled by passing the correct planType to those functions
 
-  logger.info({ userId, newPlanType, periodStart }, "Successfully updated user plan")
+  logger.info(
+    { userId, newPlanType, periodStart },
+    "Successfully updated/created user plan record",
+  )
 }
 
 /**
@@ -59,8 +70,30 @@ export async function getUserPlan(
 ): Promise<PlanType> {
   logger.info({ userId }, "Getting user plan from database")
 
-  // Get the current usage record which contains the plan type
-  const usageRecord = await getOrCreateUsageRecord(userId, "free", subscriptionStartDate)
+  const supabase = createServerSupabaseClient()
+
+  // First, try to determine the user's actual plan type from existing records
+  // Query the most recent usage record to get the current plan
+  const { data: latestRecord, error: queryError } = await supabase
+    .from("user_usage")
+    .select("plan_type")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (queryError) {
+    logger.error({ error: queryError, userId }, "Error querying existing usage records")
+    throw new Error("Failed to retrieve user plan")
+  }
+
+  // Determine the correct plan type to use
+  const currentPlanType = (latestRecord?.plan_type as PlanType) || "free"
+
+  logger.info({ userId, currentPlanType }, "Determined current plan type for user")
+
+  // Get the current usage record, using the correct plan type
+  const usageRecord = await getOrCreateUsageRecord(userId, currentPlanType, subscriptionStartDate)
 
   const planType = usageRecord.plan_type as PlanType
 
