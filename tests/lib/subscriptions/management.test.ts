@@ -1,28 +1,41 @@
-import { updateUserPlan, getUserPlan } from "@/lib/subscriptions/management"
+import {
+  updateUserPlan,
+  getUserPlan,
+  getActiveSubscription,
+  upsertSubscription,
+  createTestSubscription,
+} from "@/lib/subscriptions/management"
 import { getOrCreateUsageRecord } from "@/lib/usage/tracking"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
 // Mock external dependencies
+let mockSupabaseClient: any
+
+beforeEach(() => {
+  // Create a fresh mock for each test
+  const createChainableMock = () => {
+    const mock = {
+      data: null,
+      error: null,
+      eq: vi.fn(() => createChainableMock()),
+      select: vi.fn(() => createChainableMock()),
+      update: vi.fn(() => createChainableMock()),
+      insert: vi.fn(() => createChainableMock()),
+      upsert: vi.fn(() => createChainableMock()),
+      single: vi.fn(() => ({ data: null, error: null })),
+      maybeSingle: vi.fn(() => ({ data: null, error: null })),
+      order: vi.fn(() => createChainableMock()),
+    }
+    return mock
+  }
+
+  mockSupabaseClient = {
+    from: vi.fn(() => createChainableMock()),
+  }
+})
+
 vi.mock("@/lib/integrations/supabase", () => ({
-  createServerSupabaseClient: () => ({
-    from: () => ({
-      update: () => ({
-        eq: () => ({
-          eq: () => ({ error: null }),
-        }),
-      }),
-      upsert: () => ({ error: null }),
-      select: () => ({
-        eq: () => ({
-          order: () => ({
-            limit: () => ({
-              maybeSingle: () => ({ data: null, error: null }),
-            }),
-          }),
-        }),
-      }),
-    }),
-  }),
+  createServerSupabaseClient: () => mockSupabaseClient,
 }))
 
 vi.mock("@/lib/utils/logger", () => ({
@@ -70,22 +83,15 @@ describe("Subscription Management", () => {
     })
   })
 
-  describe("getUserPlan", () => {
-    it("should return plan type for existing user", async () => {
-      // Mock the getOrCreateUsageRecord to return paid1 plan
-      vi.mocked(getOrCreateUsageRecord).mockResolvedValueOnce({
-        id: "mock-id",
-        pages_consumed: 0,
-        billing_period_start: "2024-01-01",
-        billing_period_end: "2024-01-31",
-        plan_type: "paid1",
-      })
-
-      const planType = await getUserPlan("test-user")
-      expect(planType).toBe("paid1")
+  describe("getActiveSubscription", () => {
+    it("should return null when no active subscription exists", async () => {
+      const subscription = await getActiveSubscription("test-user")
+      expect(subscription).toBeNull()
     })
+  })
 
-    it("should return free plan for new user", async () => {
+  describe("getUserPlan", () => {
+    it("should return free plan when no active subscription", async () => {
       // Mock returns free plan by default
       vi.mocked(getOrCreateUsageRecord).mockResolvedValueOnce({
         id: "mock-id",
@@ -95,15 +101,8 @@ describe("Subscription Management", () => {
         plan_type: "free",
       })
 
-      const planType = await getUserPlan("new-user")
+      const planType = await getUserPlan("test-user")
       expect(planType).toBe("free")
-    })
-
-    it("should handle subscription start date", async () => {
-      const startDate = new Date("2024-01-15")
-      const planType = await getUserPlan("user-with-start-date", startDate)
-      expect(typeof planType).toBe("string")
-      expect(["free", "paid1", "paid2"]).toContain(planType)
     })
   })
 })

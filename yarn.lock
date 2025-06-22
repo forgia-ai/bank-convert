@@ -1906,6 +1906,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stripe/stripe-js@npm:^7.3.1":
+  version: 7.3.1
+  resolution: "@stripe/stripe-js@npm:7.3.1"
+  checksum: 10c0/5ff21220074cae1f07c3f17372280f7f4884b8dcc2ace06f7d4e581314b376c72fc1888135408324de277c3bef471d26660f82f46945e313a9892363d8d15727
+  languageName: node
+  linkType: hard
+
 "@supabase/auth-js@npm:2.70.0":
   version: 2.70.0
   resolution: "@supabase/auth-js@npm:2.70.0"
@@ -3012,6 +3019,7 @@ __metadata:
     "@radix-ui/react-slot": "npm:^1.2.2"
     "@radix-ui/react-switch": "npm:^1.2.4"
     "@radix-ui/react-tabs": "npm:^1.1.11"
+    "@stripe/stripe-js": "npm:^7.3.1"
     "@supabase/supabase-js": "npm:^2.50.0"
     "@tailwindcss/postcss": "npm:^4"
     "@types/exceljs": "npm:^1.3.2"
@@ -3025,6 +3033,7 @@ __metadata:
     ai: "npm:^4.3.16"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
+    dotenv: "npm:^16.5.0"
     eslint: "npm:^9"
     eslint-config-next: "npm:15.3.2"
     exceljs: "npm:^4.4.0"
@@ -3040,6 +3049,7 @@ __metadata:
     react-dom: "npm:^19.0.0"
     react-dropzone: "npm:^14.3.8"
     sonner: "npm:^2.0.3"
+    stripe: "npm:^18.2.1"
     tailwind-merge: "npm:^3.2.0"
     tailwindcss: "npm:^4"
     tw-animate-css: "npm:^1.2.9"
@@ -3659,6 +3669,13 @@ __metadata:
     no-case: "npm:^3.0.4"
     tslib: "npm:^2.0.3"
   checksum: 10c0/5b859ea65097a7ea870e2c91b5768b72ddf7fa947223fd29e167bcdff58fe731d941c48e47a38ec8aa8e43044c8fbd15cd8fa21689a526bc34b6548197cd5b05
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.5.0":
+  version: 16.5.0
+  resolution: "dotenv@npm:16.5.0"
+  checksum: 10c0/5bc94c919fbd955bf0ba44d33922a1e93d1078e64a1db5c30faeded1d996e7a83c55332cb8ea4fae5a9ca4d0be44cbceb95c5811e70f9f095298df09d1997dd9
   languageName: node
   linkType: hard
 
@@ -6639,7 +6656,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:^6.14.0":
+"qs@npm:^6.11.0, qs@npm:^6.14.0":
   version: 6.14.0
   resolution: "qs@npm:6.14.0"
   dependencies:
@@ -7683,6 +7700,20 @@ __metadata:
   version: 3.1.1
   resolution: "strip-json-comments@npm:3.1.1"
   checksum: 10c0/9681a6257b925a7fa0f285851c0e613cc934a50661fa7bb41ca9cbbff89686bb4a0ee366e6ecedc4daafd01e83eee0720111ab294366fe7c185e935475ebcecd
+  languageName: node
+  linkType: hard
+
+"stripe@npm:^18.2.1":
+  version: 18.2.1
+  resolution: "stripe@npm:18.2.1"
+  dependencies:
+    qs: "npm:^6.11.0"
+  peerDependencies:
+    "@types/node": ">=12.x.x"
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+  checksum: 10c0/7edef67ca27bd4e84ac24eae4e10fa1d712392c08eec62aa6748c78241ebccc2a057651716a619fcaac1b70c5f08ba5fc5adf255d67462d5a441e3a96c0dc6c5
   languageName: node
   linkType: hard
 

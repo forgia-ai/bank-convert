@@ -11,9 +11,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion" // New import
-import { useUserLimits, type SubscriptionPlan } from "@/contexts/user-limits-context"
+import { useUserLimits } from "@/contexts/user-limits-context"
 import { useAuth } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
+import { createCheckoutSession } from "@/lib/stripe/client"
+import { toast } from "sonner"
 
 export default function PricingPage() {
   const router = useRouter()
@@ -33,7 +35,7 @@ export default function PricingPage() {
 
   const currentLang = getCurrentLocale()
 
-  // Mock subscription handler
+  // Real Stripe subscription handler
   const handlePlanSelection = async (planName: string) => {
     if (!isSignedIn) {
       // Redirect to sign up if not authenticated - preserve language
@@ -41,21 +43,36 @@ export default function PricingPage() {
       return
     }
 
-    // Map plan names to subscription plans
-    const planMap: Record<string, SubscriptionPlan> = {
-      Free: "free",
+    // Handle free plan differently
+    if (planName === "Free") {
+      try {
+        await subscribeToPlan("free")
+        // Redirect to viewer after successful subscription - preserve language
+        router.push(`/${currentLang}/viewer`)
+      } catch (error) {
+        console.error("Failed to subscribe to free plan:", error)
+        toast.error("Failed to activate free plan")
+      }
+      return
+    }
+
+    // Map plan names to Stripe plan types
+    const planMap: Record<string, "paid1" | "paid2"> = {
       Growth: "paid1",
       Premium: "paid2",
     }
 
-    const plan = planMap[planName]
-    if (plan) {
+    const planType = planMap[planName]
+    if (planType) {
       try {
-        await subscribeToPlan(plan)
-        // Redirect to viewer after successful subscription - preserve language
-        router.push(`/${currentLang}/viewer`)
+        // Determine billing cycle based on toggle
+        const billingCycle = isAnnual ? "yearly" : "monthly"
+
+        // Create Stripe checkout session and redirect
+        await createCheckoutSession(planType, billingCycle)
       } catch (error) {
-        console.error("Failed to subscribe to plan:", error)
+        console.error("Failed to create checkout session:", error)
+        toast.error("Failed to start checkout process")
       }
     }
   }
@@ -85,7 +102,7 @@ export default function PricingPage() {
       annualPrice: 14, // per month, billed annually ($168/year)
       description: "Best for power users and small businesses.",
       features: [
-        "Unlimited pages/month",
+        "1000 pages/month",
         "Dedicated chat support",
         "Advanced analytics",
         "Early access to new features",

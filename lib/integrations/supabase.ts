@@ -62,6 +62,68 @@ export interface Database {
           created_at?: string
         }
       }
+      user_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_customer_id: string
+          stripe_subscription_id: string | null
+          plan_type: "free" | "paid1" | "paid2"
+          status:
+            | "active"
+            | "canceled"
+            | "incomplete"
+            | "incomplete_expired"
+            | "past_due"
+            | "trialing"
+            | "unpaid"
+          current_period_start: string | null
+          current_period_end: string | null
+          canceled_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_customer_id: string
+          stripe_subscription_id?: string | null
+          plan_type: "free" | "paid1" | "paid2"
+          status:
+            | "active"
+            | "canceled"
+            | "incomplete"
+            | "incomplete_expired"
+            | "past_due"
+            | "trialing"
+            | "unpaid"
+          current_period_start?: string | null
+          current_period_end?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string | null
+          plan_type?: "free" | "paid1" | "paid2"
+          status?:
+            | "active"
+            | "canceled"
+            | "incomplete"
+            | "incomplete_expired"
+            | "past_due"
+            | "trialing"
+            | "unpaid"
+          current_period_start?: string | null
+          current_period_end?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }

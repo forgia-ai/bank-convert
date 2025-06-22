@@ -87,8 +87,8 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   const getPlanDetails = (plan: SubscriptionPlan) => {
     const planDetails = {
       free: { planKey: "free", price: "$0", limit: 50 },
-      paid1: { planKey: "paid1", price: "$8/mês", limit: 500 },
-      paid2: { planKey: "paid2", price: "$15/mês", limit: 1000 },
+      paid1: { planKey: "paid1", price: "$8/month", limit: 500 },
+      paid2: { planKey: "paid2", price: "$14/month", limit: 1000 },
     }
     return planDetails[plan]
   }
@@ -168,44 +168,48 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     }
   }
 
-  // Mock function to subscribe to a plan - TODO: Replace with Stripe integration
+  // Subscribe to a plan - handles both free plan updates and Stripe redirects
   const subscribeToPlan = async (plan: SubscriptionPlan) => {
     try {
-      // Call server action to update plan in database
-      const result = await updateUserSubscriptionPlan(plan as PlanType)
+      // For free plan, update directly in database
+      if (plan === "free") {
+        const result = await updateUserSubscriptionPlan(plan as PlanType)
 
-      if (!result.success) {
-        console.error("Failed to update plan:", result.error)
-        return
+        if (!result.success) {
+          console.error("Failed to update plan:", result.error)
+          throw new Error(result.error || "Failed to update plan")
+        }
+
+        // Update local state optimistically
+        const planDetails = getPlanDetails(plan)
+        const userType = planTypeToUserType(plan)
+
+        setUserLimits((prev) => ({
+          ...prev,
+          userType,
+          subscriptionPlan: plan,
+          limit: planDetails.limit,
+          planName: planDetails.planKey,
+          planPrice: planDetails.price,
+          isMonthlyLimit: userType === "paid",
+          resetDate: undefined,
+          // Recalculate percentages with new limit
+          usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
+          isAtLimit: prev.currentUsage >= planDetails.limit,
+          isNearLimit: (prev.currentUsage / planDetails.limit) * 100 >= 75,
+          isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
+        }))
+
+        // Refresh from server to get authoritative data with the new plan
+        await refreshLimits(plan)
+      } else {
+        // For paid plans, this should redirect to Stripe Checkout
+        // The actual subscription will be handled by webhook
+        throw new Error("Paid plan subscriptions should use Stripe Checkout")
       }
-
-      // Update local state optimistically
-      const planDetails = getPlanDetails(plan)
-      const userType = planTypeToUserType(plan)
-
-      setUserLimits((prev) => ({
-        ...prev,
-        userType,
-        subscriptionPlan: plan,
-        limit: planDetails.limit,
-        planName: planDetails.planKey,
-        planPrice: planDetails.price,
-        isMonthlyLimit: userType === "paid",
-        resetDate:
-          userType === "paid"
-            ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
-            : undefined,
-        // Recalculate percentages with new limit
-        usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
-        isAtLimit: prev.currentUsage >= planDetails.limit,
-        isNearLimit: (prev.currentUsage / planDetails.limit) * 100 >= 75,
-        isCritical: (prev.currentUsage / planDetails.limit) * 100 >= 90,
-      }))
-
-      // Refresh from server to get authoritative data with the new plan
-      await refreshLimits(plan)
     } catch (error) {
       console.error("Error subscribing to plan:", error)
+      throw error
     }
   }
 

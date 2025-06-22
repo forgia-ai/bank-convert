@@ -27,6 +27,7 @@
     "@radix-ui/react-slot": "^1.2.2",
     "@radix-ui/react-switch": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.11",
+    "@stripe/stripe-js": "^7.3.1",
     "@supabase/supabase-js": "^2.50.0",
     "@types/pdf-parse": "^1.1.5",
     "@types/react-dropzone": "^5.1.0",
@@ -44,6 +45,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "sonner": "^2.0.3",
+    "stripe": "^18.2.1",
     "tailwind-merge": "^3.2.0",
     "zod": "^3.25.56"
   },
@@ -56,6 +58,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/ui": "^3.2.2",
+    "dotenv": "^16.5.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "pino-pretty": "^13.0.0",
