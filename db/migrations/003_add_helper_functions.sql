@@ -8,7 +8,9 @@ CREATE OR REPLACE FUNCTION increment_user_usage(
   usage_id UUID,
   increment_by INTEGER
 )
-RETURNS void AS $$
+RETURNS void
+SET search_path = public
+AS $$
 BEGIN
   -- Validate inputs
   IF increment_by <= 0 THEN
