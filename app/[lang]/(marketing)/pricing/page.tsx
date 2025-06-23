@@ -69,7 +69,7 @@ export default function PricingPage() {
         const billingCycle = isAnnual ? "yearly" : "monthly"
 
         // Create Stripe checkout session and redirect
-        await createCheckoutSession(planType, billingCycle)
+        await createCheckoutSession(planType, billingCycle, currentLang)
       } catch (error) {
         console.error("Failed to create checkout session:", error)
         toast.error("Failed to start checkout process")

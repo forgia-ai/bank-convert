@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
+import { auth, clerkClient } from "@clerk/nextjs/server"
 import { createStripeClient, getPlanConfig } from "@/lib/integrations/stripe"
 import { createServerSupabaseClient } from "@/lib/integrations/supabase"
 import { logger } from "@/lib/utils/logger"
 import { z } from "zod"
+import { i18n } from "@/i18n-config"
 
 // Request validation schema
 const CreateCheckoutSessionSchema = z.object({
   planType: z.enum(["paid1", "paid2"]),
   billingCycle: z.enum(["monthly", "yearly"]),
+  language: z.enum(["en", "es", "pt"]).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -21,9 +23,15 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json()
-    const { planType, billingCycle } = CreateCheckoutSessionSchema.parse(body)
+    const { planType, billingCycle, language } = CreateCheckoutSessionSchema.parse(body)
 
-    logger.info({ userId, planType, billingCycle }, "Creating Stripe checkout session")
+    // Use provided language or fallback to default locale
+    const userLanguage = language || i18n.defaultLocale
+
+    logger.info(
+      { userId, planType, billingCycle, language: userLanguage },
+      "Creating Stripe checkout session",
+    )
 
     // Get plan configuration
     const planConfig = getPlanConfig(planType)
@@ -55,8 +63,27 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe customer if doesn't exist
     if (!customerId) {
-      // Get user details from Clerk (you might want to get email from Clerk user)
+      let userEmail: string | undefined
+
+      try {
+        // Get user details from Clerk to include email
+        const clerk = await clerkClient()
+        const user = await clerk.users.getUser(userId)
+        userEmail = user.emailAddresses[0]?.emailAddress
+
+        logger.info(
+          { userId, userEmail },
+          "Fetched user details from Clerk for Stripe customer creation",
+        )
+      } catch (clerkError) {
+        logger.warn(
+          { userId, clerkError },
+          "Failed to fetch user email from Clerk, creating customer without email",
+        )
+      }
+
       const customer = await stripe.customers.create({
+        ...(userEmail && { email: userEmail }),
         metadata: {
           userId: userId,
         },
@@ -91,8 +118,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "subscription",
-      success_url: `${request.nextUrl.origin}/en/viewer/billing?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.nextUrl.origin}/en/pricing`,
+      success_url: `${request.nextUrl.origin}/${userLanguage}/viewer/billing?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${request.nextUrl.origin}/${userLanguage}/pricing`,
       client_reference_id: userId,
       metadata: {
         userId: userId,

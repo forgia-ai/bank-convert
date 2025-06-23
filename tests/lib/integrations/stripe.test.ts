@@ -48,8 +48,17 @@ describe("Stripe Integration", () => {
     })
 
     it("should throw error if STRIPE_SECRET_KEY is missing", () => {
-      delete process.env.STRIPE_SECRET_KEY
-      expect(() => createStripeClient()).toThrow("Missing STRIPE_SECRET_KEY environment variable")
+      const originalValue = process.env.STRIPE_SECRET_KEY
+      try {
+        delete process.env.STRIPE_SECRET_KEY
+        expect(() => createStripeClient()).toThrow(
+          "Missing STRIPE_SECRET_KEY environment variable",
+        )
+      } finally {
+        if (originalValue !== undefined) {
+          process.env.STRIPE_SECRET_KEY = originalValue
+        }
+      }
     })
   })
 
@@ -60,10 +69,17 @@ describe("Stripe Integration", () => {
     })
 
     it("should throw error if publishable key is missing", () => {
-      delete process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-      expect(() => getStripePublishableKey()).toThrow(
-        "Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable",
-      )
+      const originalValue = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      try {
+        delete process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        expect(() => getStripePublishableKey()).toThrow(
+          "Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable",
+        )
+      } finally {
+        if (originalValue !== undefined) {
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = originalValue
+        }
+      }
     })
   })
 
@@ -74,10 +90,17 @@ describe("Stripe Integration", () => {
     })
 
     it("should throw error if webhook secret is missing", () => {
-      delete process.env.STRIPE_WEBHOOK_SECRET
-      expect(() => getStripeWebhookSecret()).toThrow(
-        "Missing STRIPE_WEBHOOK_SECRET environment variable",
-      )
+      const originalValue = process.env.STRIPE_WEBHOOK_SECRET
+      try {
+        delete process.env.STRIPE_WEBHOOK_SECRET
+        expect(() => getStripeWebhookSecret()).toThrow(
+          "Missing STRIPE_WEBHOOK_SECRET environment variable",
+        )
+      } finally {
+        if (originalValue !== undefined) {
+          process.env.STRIPE_WEBHOOK_SECRET = originalValue
+        }
+      }
     })
   })
 

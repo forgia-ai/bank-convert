@@ -49,6 +49,7 @@ describe("Stripe Client", () => {
         body: JSON.stringify({
           planType: "paid1",
           billingCycle: "monthly",
+          language: undefined,
         }),
       })
 
@@ -75,10 +76,38 @@ describe("Stripe Client", () => {
         body: JSON.stringify({
           planType: "paid2",
           billingCycle: "yearly",
+          language: undefined,
         }),
       })
 
       expect(mockLocation.href).toBe("https://checkout.stripe.com/pay/cs_test_yearly")
+    })
+
+    it("should include language parameter when provided", async () => {
+      const mockResponse = {
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          url: "https://checkout.stripe.com/pay/cs_test_es",
+        }),
+      }
+
+      mockFetch.mockResolvedValue(mockResponse as any)
+
+      await createCheckoutSession("paid1", "monthly", "es")
+
+      expect(mockFetch).toHaveBeenCalledWith("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planType: "paid1",
+          billingCycle: "monthly",
+          language: "es",
+        }),
+      })
+
+      expect(mockLocation.href).toBe("https://checkout.stripe.com/pay/cs_test_es")
     })
 
     it("should throw error if API response is not ok", async () => {

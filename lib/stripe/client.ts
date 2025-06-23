@@ -15,6 +15,7 @@ export function getStripe() {
 export async function createCheckoutSession(
   planType: "paid1" | "paid2",
   billingCycle: "monthly" | "yearly",
+  language?: "en" | "es" | "pt",
 ) {
   try {
     const response = await fetch("/api/stripe/create-checkout-session", {
@@ -25,6 +26,7 @@ export async function createCheckoutSession(
       body: JSON.stringify({
         planType,
         billingCycle,
+        language,
       }),
     })
 
