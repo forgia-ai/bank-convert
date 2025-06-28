@@ -18,12 +18,15 @@ export async function POST(request: NextRequest) {
     const stripe = createStripeClient()
     const supabase = createServerSupabaseClient()
 
-    // Get user's Stripe customer ID
-    const { data: subscription, error } = await supabase
+    // Get user's most recent Stripe customer ID
+    const { data: subscriptions, error } = await supabase
       .from("user_subscriptions")
       .select("stripe_customer_id, stripe_subscription_id, status")
       .eq("user_id", userId)
-      .maybeSingle()
+      .order("created_at", { ascending: false })
+      .limit(1)
+
+    const subscription = subscriptions?.[0]
 
     if (error) {
       logger.error({ userId, error }, "Database error fetching subscription")

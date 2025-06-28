@@ -2,7 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { checkUserUsageLimit, recordUserPageUsage, getCurrentUserUsage } from "@/lib/usage/actions"
-import { updateUserSubscriptionPlan, getUserCurrentPlan } from "@/lib/subscriptions/actions"
+import {
+  updateUserSubscriptionPlan,
+  getUserCurrentPlan,
+  getUserPlanAndUsage,
+} from "@/lib/subscriptions/actions"
 import { type PlanType } from "@/lib/usage/tracking"
 
 // Types
@@ -27,6 +31,7 @@ export interface UserLimitsData {
 export interface UserLimitsContextType {
   // Current state
   userLimits: UserLimitsData
+  isLoading: boolean
 
   // Actions
   incrementUsage: (pages: number) => void
@@ -115,54 +120,42 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     })
   }
 
-  // Function to refresh limits from server
+  // Function to refresh limits from server (OPTIMIZED - single database call)
   const refreshLimits = async (planType?: SubscriptionPlan) => {
     try {
       setIsLoading(true)
 
-      // Get current plan from database if not provided
-      let currentPlanType: PlanType
-      if (planType) {
-        currentPlanType = planType as PlanType
-      } else {
-        // Get the user's current plan from database
-        const planResult = await getUserCurrentPlan()
-        if (planResult.success && planResult.data) {
-          currentPlanType = planResult.data
-        } else {
-          // Fallback to free if we can't get the plan
-          currentPlanType = "free"
-        }
-      }
-
-      const result = await getCurrentUserUsage(currentPlanType)
+      // Use optimized action that gets both plan and usage in one call
+      const result = await getUserPlanAndUsage()
 
       if (result.success && result.data) {
-        const usageData = result.data
-        const planDetails = getPlanDetails(usageData.planType as SubscriptionPlan)
-        const userType = planTypeToUserType(usageData.planType as SubscriptionPlan)
+        const data = result.data
+        const planDetails = getPlanDetails(data.planType as SubscriptionPlan)
+        const userType = planTypeToUserType(data.planType as SubscriptionPlan)
 
         setUserLimits({
           userType,
-          subscriptionPlan: usageData.planType as SubscriptionPlan,
-          currentUsage: usageData.currentPeriodUsage,
-          limit: usageData.planLimit,
-          usagePercentage: usageData.usagePercentage,
-          isAtLimit: usageData.currentPeriodUsage >= usageData.planLimit,
-          isNearLimit: usageData.usagePercentage >= 75,
-          isCritical: usageData.usagePercentage >= 90,
-          resetDate:
-            userType === "paid"
-              ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
-              : undefined,
-          isMonthlyLimit: userType === "paid",
+          subscriptionPlan: data.planType as SubscriptionPlan,
+          currentUsage: data.currentUsage,
+          limit: data.planLimit,
+          usagePercentage: data.usagePercentage,
+          isAtLimit: data.currentUsage >= data.planLimit,
+          isNearLimit: data.usagePercentage >= 75,
+          isCritical: data.usagePercentage >= 90,
+          resetDate: data.resetDate,
+          isMonthlyLimit: data.isMonthlyLimit,
           planName: planDetails.planKey,
           planPrice: planDetails.price,
         })
+      } else {
+        // Fallback to default state on error
+        console.error("Failed to get user data:", result.error)
+        setUserLimits(getDefaultUserLimits())
       }
     } catch (error) {
       console.error("Failed to refresh user limits:", error)
-      // Keep existing state on error
+      // Fallback to default state on error
+      setUserLimits(getDefaultUserLimits())
     } finally {
       setIsLoading(false)
     }
@@ -276,6 +269,7 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
 
   const contextValue: UserLimitsContextType = {
     userLimits,
+    isLoading,
     incrementUsage,
     refreshLimits,
     subscribeToPlan,

@@ -127,39 +127,64 @@ export async function createTestSubscription(
 /**
  * Get user's active subscription record from user_subscriptions table
  * Returns null if no active subscription found
+ * Uses order + limit to handle multiple active records gracefully
  */
 export async function getActiveSubscription(userId: string): Promise<SubscriptionRecord | null> {
   const supabase = createServerSupabaseClient()
 
-  const { data: subscription, error } = await supabase
+  const { data: subscriptions, error } = await supabase
     .from("user_subscriptions")
     .select("*")
     .eq("user_id", userId)
     .eq("status", "active")
-    .maybeSingle()
+    .order("created_at", { ascending: false })
 
   if (error) {
     logger.error({ error, userId }, "Error querying active subscription")
     throw new Error("Failed to retrieve active subscription")
   }
 
-  return subscription as SubscriptionRecord | null
+  if (!subscriptions || subscriptions.length === 0) {
+    return null
+  }
+
+  // Check for multiple active subscriptions (data consistency issue)
+  if (subscriptions.length > 1) {
+    logger.warn(
+      {
+        userId,
+        count: subscriptions.length,
+        subscriptionIds: subscriptions.map((s) => s.id),
+      },
+      "Multiple active subscriptions found - using most recent",
+    )
+
+    // TODO: Consider cleaning up old active subscriptions here
+    // For now, we'll use the most recent one
+  }
+
+  return subscriptions[0] as SubscriptionRecord
 }
 
 /**
  * Create or update subscription record in user_subscriptions table
  * This is the authoritative source for subscription data
  */
-export async function upsertSubscription(subscriptionData: {
-  user_id: string
-  stripe_customer_id: string
-  stripe_subscription_id?: string
-  plan_type: PlanType
-  status: SubscriptionStatus
-  current_period_start?: Date
-  current_period_end?: Date
-  canceled_at?: Date
-}): Promise<SubscriptionRecord> {
+export async function upsertSubscription(
+  subscriptionData: {
+    user_id: string
+    stripe_customer_id: string
+    stripe_subscription_id?: string
+    plan_type: PlanType
+    status: SubscriptionStatus
+    current_period_start?: Date
+    current_period_end?: Date
+    canceled_at?: Date
+  },
+  options?: {
+    deactivateOldSubscriptions?: boolean
+  },
+): Promise<SubscriptionRecord> {
   const supabase = createServerSupabaseClient()
 
   logger.info(
@@ -182,43 +207,16 @@ export async function upsertSubscription(subscriptionData: {
     canceled_at: subscriptionData.canceled_at?.toISOString() || null,
   }
 
-  // Try to update existing subscription first
-  const { data: existingSubscription, error: selectError } = await supabase
+  // Use upsert with ON CONFLICT to handle race conditions
+  const { data, error } = await supabase
     .from("user_subscriptions")
-    .select("id")
-    .eq("user_id", subscriptionData.user_id)
-    .eq("stripe_customer_id", subscriptionData.stripe_customer_id)
-    .maybeSingle()
+    .upsert(subscriptionRecord, {
+      onConflict: "stripe_customer_id",
+    })
+    .select()
+    .single()
 
-  if (selectError) {
-    logger.error(
-      { error: selectError, userId: subscriptionData.user_id },
-      "Error checking existing subscription",
-    )
-    throw new Error("Failed to check existing subscription")
-  }
-
-  let result
-  if (existingSubscription) {
-    // Update existing subscription
-    const { data, error } = await supabase
-      .from("user_subscriptions")
-      .update(subscriptionRecord)
-      .eq("id", existingSubscription.id)
-      .select()
-      .single()
-
-    result = { data, error }
-  } else {
-    // Insert new subscription
-    const { data, error } = await supabase
-      .from("user_subscriptions")
-      .insert(subscriptionRecord)
-      .select()
-      .single()
-
-    result = { data, error }
-  }
+  const result = { data, error }
 
   if (result.error) {
     logger.error(
@@ -229,6 +227,11 @@ export async function upsertSubscription(subscriptionData: {
   }
 
   const subscription = result.data as SubscriptionRecord
+
+  // If this is a new active subscription and cleanup is requested, deactivate old ones
+  if (options?.deactivateOldSubscriptions && subscriptionData.status === "active") {
+    await deactivateOldSubscriptions(subscriptionData.user_id, subscription.id)
+  }
 
   // Sync user_usage table with subscription data
   await syncUsageWithSubscription(subscription)
@@ -302,4 +305,43 @@ export async function getUserPlan(
 
   logger.info({ userId, planType: "free" }, "Retrieved user plan from database")
   return usageRecord.plan_type as PlanType
+}
+
+/**
+ * Deactivate old active subscriptions for a user
+ * Called when creating a new active subscription (plan changes)
+ */
+async function deactivateOldSubscriptions(
+  userId: string,
+  excludeSubscriptionId?: string,
+): Promise<void> {
+  const supabase = createServerSupabaseClient()
+
+  logger.info({ userId, excludeSubscriptionId }, "Deactivating old active subscriptions")
+
+  let query = supabase
+    .from("user_subscriptions")
+    .update({ status: "canceled", canceled_at: new Date().toISOString() })
+    .eq("user_id", userId)
+    .eq("status", "active")
+
+  // If we're updating an existing subscription, exclude it from deactivation
+  if (excludeSubscriptionId) {
+    query = query.neq("id", excludeSubscriptionId)
+  }
+
+  const { data, error } = await query.select()
+
+  if (error) {
+    logger.error({ error, userId }, "Error deactivating old subscriptions")
+    // Don't throw - this is cleanup, shouldn't block main operation
+    return
+  }
+
+  if (data && data.length > 0) {
+    logger.info(
+      { userId, deactivatedCount: data.length },
+      "Successfully deactivated old active subscriptions",
+    )
+  }
 }

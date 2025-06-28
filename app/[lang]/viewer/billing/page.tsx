@@ -14,16 +14,17 @@ import {
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { CreditCard, FileText, AlertTriangle, ExternalLink, CheckCircle } from "lucide-react"
 import { useUserLimits } from "@/contexts/user-limits-context"
 import { createPortalSession } from "@/lib/stripe/client"
 import { toast } from "sonner"
 
 export default function BillingPage() {
-  const { userLimits, refreshLimits } = useUserLimits()
+  const { userLimits, refreshLimits, isLoading: isLoadingPlan } = useUserLimits()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPortalLoading, setIsPortalLoading] = useState(false)
 
   // Check for successful checkout
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function BillingPage() {
       return
     }
 
-    setIsLoading(true)
+    setIsPortalLoading(true)
     try {
       await createPortalSession()
     } catch (error) {
@@ -55,7 +56,7 @@ export default function BillingPage() {
       toast.error(errorMessage)
       console.error("Error opening billing portal:", error)
     } finally {
-      setIsLoading(false)
+      setIsPortalLoading(false)
     }
   }
 
@@ -77,6 +78,85 @@ export default function BillingPage() {
   const getStatusVariant = () => {
     if (userLimits.subscriptionPlan === "free") return "secondary"
     return "default"
+  }
+
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div>
+      <h1 className="text-3xl font-bold tracking-tight mb-2">Billing & Subscription</h1>
+      <p className="text-muted-foreground mb-8">
+        Manage your subscription, view billing history, and update payment methods.
+      </p>
+
+      <div className="grid gap-8 md:grid-cols-3">
+        {/* Current Plan Card Skeleton */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Current Subscription</CardTitle>
+            <CardDescription>Overview of your active plan and usage.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-baseline">
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-6 w-20" />
+            </div>
+            <div>
+              <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                <span>Page Usage</span>
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <Skeleton className="h-2 w-full" />
+            </div>
+            <Skeleton className="h-4 w-48" />
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <Skeleton className="h-10 w-32" />
+          </CardFooter>
+        </Card>
+
+        {/* Plan Features Card Skeleton */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan Features</CardTitle>
+            <CardDescription>What&apos;s included in your current plan.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Skeleton className="h-10 w-full" />
+          </CardFooter>
+        </Card>
+      </div>
+
+      <Separator className="my-8" />
+
+      {/* Billing Management Skeleton */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Billing Management</CardTitle>
+          <CardDescription>
+            <Skeleton className="h-4 w-64" />
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center text-center p-10 border-2 border-dashed rounded-lg">
+            <Skeleton className="h-12 w-12 rounded-lg mb-3" />
+            <Skeleton className="h-6 w-40 mb-1" />
+            <Skeleton className="h-4 w-64 mb-4" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  if (isLoadingPlan) {
+    return <LoadingSkeleton />
   }
 
   return (
@@ -137,7 +217,7 @@ export default function BillingPage() {
             <Button
               variant="outline"
               onClick={handleManageSubscription}
-              disabled={isLoading}
+              disabled={isPortalLoading}
               className="flex items-center gap-2 cursor-pointer"
             >
               {userLimits.subscriptionPlan === "free" ? (
@@ -231,7 +311,7 @@ export default function BillingPage() {
               </p>
               <Button
                 onClick={handleManageSubscription}
-                disabled={isLoading}
+                disabled={isPortalLoading}
                 className="flex items-center gap-2 cursor-pointer"
               >
                 Open Billing Portal

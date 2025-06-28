@@ -2,8 +2,9 @@
 
 import { auth } from "@clerk/nextjs/server"
 import { updateUserPlan, getUserPlan } from "@/lib/subscriptions/management"
-import { type PlanType } from "@/lib/usage/tracking"
+import { type PlanType, calculateBillingPeriod, PLAN_LIMITS } from "@/lib/usage/tracking"
 import { logger } from "@/lib/utils/logger"
+import { createServerSupabaseClient } from "@/lib/integrations/supabase"
 
 /**
  * Server action to update user's subscription plan
@@ -77,6 +78,145 @@ export async function getUserCurrentPlan(): Promise<{
     return {
       success: false,
       error: "Failed to get current plan",
+    }
+  }
+}
+
+/**
+ * Optimized server action to get user's plan and usage data in a single call
+ * Reduces database round trips for better performance
+ */
+export async function getUserPlanAndUsage(): Promise<{
+  success: boolean
+  data?: {
+    planType: PlanType
+    currentUsage: number
+    planLimit: number
+    usagePercentage: number
+    billingPeriodStart: string
+    billingPeriodEnd: string
+    remainingPages: number
+    isMonthlyLimit: boolean
+    resetDate?: string
+  }
+  error?: string
+}> {
+  try {
+    const { userId } = await auth()
+
+    if (!userId) {
+      return {
+        success: false,
+        error: "User not authenticated",
+      }
+    }
+
+    const supabase = createServerSupabaseClient()
+
+    // Single query to get active subscription if exists
+    const { data: activeSubscriptions, error: subscriptionError } = await supabase
+      .from("user_subscriptions")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+
+    if (subscriptionError) {
+      logger.error({ error: subscriptionError, userId }, "Error querying active subscription")
+      return {
+        success: false,
+        error: "Failed to retrieve subscription data",
+      }
+    }
+
+    // Determine plan type
+    const activeSubscription =
+      activeSubscriptions && activeSubscriptions.length > 0 ? activeSubscriptions[0] : null
+    const planType: PlanType = activeSubscription?.plan_type || "free"
+    const subscriptionStartDate = activeSubscription?.current_period_start
+      ? new Date(activeSubscription.current_period_start)
+      : new Date()
+
+    // Calculate billing period
+    const { periodStart, periodEnd } = calculateBillingPeriod(subscriptionStartDate)
+
+    // Single query to get or create usage record
+    let usageRecord
+    const { data: existingUsage, error: usageSelectError } = await supabase
+      .from("user_usage")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("billing_period_start", periodStart)
+      .maybeSingle()
+
+    if (usageSelectError) {
+      logger.error({ error: usageSelectError, userId }, "Error fetching usage record")
+      return {
+        success: false,
+        error: "Failed to retrieve usage data",
+      }
+    }
+
+    if (existingUsage) {
+      usageRecord = existingUsage
+    } else {
+      // Create new usage record
+      const { data: newUsage, error: usageInsertError } = await supabase
+        .from("user_usage")
+        .insert({
+          user_id: userId,
+          billing_period_start: periodStart,
+          billing_period_end: periodEnd,
+          pages_consumed: 0,
+          plan_type: planType,
+        })
+        .select()
+        .single()
+
+      if (usageInsertError) {
+        logger.error({ error: usageInsertError, userId }, "Error creating usage record")
+        return {
+          success: false,
+          error: "Failed to create usage record",
+        }
+      }
+
+      usageRecord = newUsage
+    }
+
+    // Calculate derived values
+    const planLimit = PLAN_LIMITS[planType]
+    const currentUsage = usageRecord.pages_consumed
+    const remainingPages = Math.max(0, planLimit - currentUsage)
+    const usagePercentage = Math.min(100, (currentUsage / planLimit) * 100)
+    const isMonthlyLimit = planType !== "free"
+
+    // Calculate reset date (next billing period start for paid users)
+    let resetDate: string | undefined
+    if (isMonthlyLimit && activeSubscription?.current_period_end) {
+      resetDate = new Date(activeSubscription.current_period_end).toISOString()
+    }
+
+    return {
+      success: true,
+      data: {
+        planType,
+        currentUsage,
+        planLimit,
+        usagePercentage,
+        billingPeriodStart: usageRecord.billing_period_start,
+        billingPeriodEnd: usageRecord.billing_period_end,
+        remainingPages,
+        isMonthlyLimit,
+        resetDate,
+      },
+    }
+  } catch (error) {
+    logger.error({ error }, "Error getting user plan and usage")
+    return {
+      success: false,
+      error: "Failed to get user data",
     }
   }
 }

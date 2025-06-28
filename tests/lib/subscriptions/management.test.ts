@@ -25,6 +25,7 @@ beforeEach(() => {
       single: vi.fn(() => ({ data: null, error: null })),
       maybeSingle: vi.fn(() => ({ data: null, error: null })),
       order: vi.fn(() => createChainableMock()),
+      limit: vi.fn(() => createChainableMock()),
     }
     return mock
   }
