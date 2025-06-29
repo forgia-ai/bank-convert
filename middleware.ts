@@ -6,7 +6,7 @@ import Negotiator from "negotiator"
 
 const isProtectedRoute = createRouteMatcher([
   "/:lang/dashboard(.*)", // Matches /en/dashboard, /es/dashboard/profile, etc.
-  "/:lang/billing(.*)", // Matches /en/billing, /es/billing/invoices, etc.
+  "/:lang/viewer(.*)", // Matches /en/viewer, /es/viewer/billing, etc.
 ])
 
 function getLocale(request: NextRequest): string {

@@ -26,6 +26,9 @@ export interface UserLimitsData {
   isMonthlyLimit: boolean // true for paid, false for free (lifetime)
   planName: string // Plan key for the plan (e.g., 'free', 'paid1', 'paid2')
   planPrice: string // Display price for the plan
+  isCancelled: boolean // true if subscription has been cancelled
+  cancelledAt?: string // when subscription was cancelled
+  expiresAt?: string // when access ends for cancelled subscriptions
 }
 
 export interface UserLimitsContextType {
@@ -61,6 +64,9 @@ const getDefaultUserLimits = (): UserLimitsData => ({
   isMonthlyLimit: false,
   planName: "free",
   planPrice: "$0",
+  isCancelled: false,
+  cancelledAt: undefined,
+  expiresAt: undefined,
 })
 
 // Context
@@ -146,6 +152,9 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
           isMonthlyLimit: data.isMonthlyLimit,
           planName: planDetails.planKey,
           planPrice: planDetails.price,
+          isCancelled: data.isCancelled,
+          cancelledAt: data.cancelledAt,
+          expiresAt: data.expiresAt,
         })
       } else {
         // Fallback to default state on error
@@ -186,6 +195,9 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
           planPrice: planDetails.price,
           isMonthlyLimit: userType === "paid",
           resetDate: undefined,
+          isCancelled: false, // Free plan is never cancelled
+          cancelledAt: undefined,
+          expiresAt: undefined,
           // Recalculate percentages with new limit
           usagePercentage: (prev.currentUsage / planDetails.limit) * 100,
           isAtLimit: prev.currentUsage >= planDetails.limit,

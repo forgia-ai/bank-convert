@@ -98,6 +98,9 @@ export async function getUserPlanAndUsage(): Promise<{
     remainingPages: number
     isMonthlyLimit: boolean
     resetDate?: string
+    isCancelled: boolean
+    cancelledAt?: string
+    expiresAt?: string
   }
   error?: string
 }> {
@@ -113,10 +116,10 @@ export async function getUserPlanAndUsage(): Promise<{
 
     const supabase = createServerSupabaseClient()
 
-    // Single query to get active subscription if exists
+    // Single query to get active subscription if exists (including cancellation info)
     const { data: activeSubscriptions, error: subscriptionError } = await supabase
       .from("user_subscriptions")
-      .select("*")
+      .select("*, canceled_at, current_period_end")
       .eq("user_id", userId)
       .eq("status", "active")
       .order("created_at", { ascending: false })
@@ -192,10 +195,20 @@ export async function getUserPlanAndUsage(): Promise<{
     const usagePercentage = Math.min(100, (currentUsage / planLimit) * 100)
     const isMonthlyLimit = planType !== "free"
 
-    // Calculate reset date (next billing period start for paid users)
+    // Calculate reset date and cancellation info
     let resetDate: string | undefined
+    let isCancelled = false
+    let cancelledAt: string | undefined
+    let expiresAt: string | undefined
+
     if (isMonthlyLimit && activeSubscription?.current_period_end) {
       resetDate = new Date(activeSubscription.current_period_end).toISOString()
+      expiresAt = resetDate // For cancelled subscriptions, this is when access ends
+    }
+
+    if (activeSubscription?.canceled_at) {
+      isCancelled = true
+      cancelledAt = new Date(activeSubscription.canceled_at).toISOString()
     }
 
     return {
@@ -210,6 +223,9 @@ export async function getUserPlanAndUsage(): Promise<{
         remainingPages,
         isMonthlyLimit,
         resetDate,
+        isCancelled,
+        cancelledAt,
+        expiresAt,
       },
     }
   } catch (error) {

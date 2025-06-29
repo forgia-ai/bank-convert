@@ -241,6 +241,47 @@
   "plans": {
     "free": "Plan Gratuito",
     "growth": "Plan de Crecimiento",
-    "premium": "Plan Premium"
+    "premium": "Plan Premium",
+    "unknown": "Plan Desconocido"
+  },
+  "billing_page": {
+    "title": "Facturación y Suscripción",
+    "subtitle": "Administra tu suscripción, ve el historial de facturación y actualiza métodos de pago.",
+    "current_subscription": "Suscripción Actual",
+    "subscription_overview": "Resumen de tu plan activo y uso.",
+    "plan_features": "Características del Plan",
+    "plan_features_description": "Lo que está incluido en tu plan actual.",
+    "billing_management": "Gestión de Facturación",
+    "billing_management_free": "Actualiza a un plan de pago para acceder a funciones de facturación.",
+    "billing_management_paid": "Ve tu historial de facturación, actualiza métodos de pago y gestiona tu suscripción.",
+    "page_usage": "Uso de Páginas",
+    "upgrade_plan": "Actualizar Plan",
+    "manage_subscription": "Gestionar Suscripción",
+    "view_all_plans": "Ver Todos los Planes",
+    "view_pricing_plans": "Ver Planes de Precios",
+    "open_billing_portal": "Abrir Portal de Facturación",
+    "plan_renews_on": "Tu plan se renueva el {date}.",
+    "subscription_cancelled": "Tu suscripción ha sido cancelada.",
+    "access_until": "Mantendrás acceso hasta el {date}.",
+    "cancelled_on": "Cancelado el {date}",
+    "no_billing_info": "Sin Información de Facturación",
+    "no_billing_description": "Actualmente estás en el plan gratuito. Actualiza para acceder a funciones de facturación y límites aumentados.",
+    "manage_subscription_description": "Accede a tu historial de facturación, actualiza métodos de pago y gestiona tu suscripción a través del portal seguro de Stripe.",
+    "usage_critical_warning": "Estás al {percentage}% de tu límite. Actualiza tu plan para continuar procesando documentos.",
+    "usage_warning": "Te estás acercando a tu límite de páginas {limitType}. Considera actualizar para evitar interrupciones del servicio.",
+    "plan_price_free": "Gratis",
+    "plan_price_monthly": "/mes",
+    "status_free": "Gratis",
+    "status_active": "Activo",
+    "features": {
+      "pages_per_month": "{limit} páginas {period}",
+      "pages_total": "{limit} páginas totales",
+      "pages_monthly": "por mes",
+      "pdf_csv_support": "Soporte PDF y CSV",
+      "priority_support": "Soporte prioritario",
+      "advanced_features": "Características avanzadas"
+    },
+    "payment_successful": "¡Pago exitoso! Tu suscripción está ahora activa.",
+    "billing_portal_error": "Error al abrir el portal de facturación"
   }
 }

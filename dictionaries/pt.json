@@ -241,6 +241,47 @@
   "plans": {
     "free": "Plano Gratuito",
     "growth": "Plano Crescimento",
-    "premium": "Plano Premium"
+    "premium": "Plano Premium",
+    "unknown": "Plano Desconhecido"
+  },
+  "billing_page": {
+    "title": "Faturamento e Assinatura",
+    "subtitle": "Gerencie sua assinatura, veja o histórico de faturamento e atualize métodos de pagamento.",
+    "current_subscription": "Assinatura Atual",
+    "subscription_overview": "Visão geral do seu plano ativo e uso.",
+    "plan_features": "Recursos do Plano",
+    "plan_features_description": "O que está incluído no seu plano atual.",
+    "billing_management": "Gestão de Faturamento",
+    "billing_management_free": "Faça upgrade para um plano pago para acessar recursos de faturamento.",
+    "billing_management_paid": "Veja seu histórico de faturamento, atualize métodos de pagamento e gerencie sua assinatura.",
+    "page_usage": "Uso de Páginas",
+    "upgrade_plan": "Fazer Upgrade do Plano",
+    "manage_subscription": "Gerenciar Assinatura",
+    "view_all_plans": "Ver Todos os Planos",
+    "view_pricing_plans": "Ver Planos de Preços",
+    "open_billing_portal": "Abrir Portal de Faturamento",
+    "plan_renews_on": "Seu plano renova em {date}.",
+    "subscription_cancelled": "Sua assinatura foi cancelada.",
+    "access_until": "Você manterá acesso até {date}.",
+    "cancelled_on": "Cancelado em {date}",
+    "no_billing_info": "Sem Informações de Faturamento",
+    "no_billing_description": "Você está atualmente no plano gratuito. Faça upgrade para acessar recursos de faturamento e limites aumentados.",
+    "manage_subscription_description": "Acesse seu histórico de faturamento, atualize métodos de pagamento e gerencie sua assinatura através do portal seguro do Stripe.",
+    "usage_critical_warning": "Você está em {percentage}% do seu limite. Faça upgrade do seu plano para continuar processando documentos.",
+    "usage_warning": "Você está se aproximando do seu limite de páginas {limitType}. Considere fazer upgrade para evitar interrupções do serviço.",
+    "plan_price_free": "Grátis",
+    "plan_price_monthly": "/mês",
+    "status_free": "Grátis",
+    "status_active": "Ativo",
+    "features": {
+      "pages_per_month": "{limit} páginas {period}",
+      "pages_total": "{limit} páginas totais",
+      "pages_monthly": "por mês",
+      "pdf_csv_support": "Suporte PDF e CSV",
+      "priority_support": "Suporte prioritário",
+      "advanced_features": "Recursos avançados"
+    },
+    "payment_successful": "Pagamento bem-sucedido! Sua assinatura está agora ativa.",
+    "billing_portal_error": "Falha ao abrir o portal de faturamento"
   }
 }
