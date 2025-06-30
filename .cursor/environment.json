@@ -1,3 +1,5 @@
 {
-  "agentCanUpdateSnapshot": true
+  "agentCanUpdateSnapshot": true,
+  "install": "corepack enable && yarn install",
+  "start": "yarn dev"
 }
