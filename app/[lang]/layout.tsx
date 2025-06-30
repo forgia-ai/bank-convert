@@ -3,6 +3,8 @@ import "../globals.css" // Adjusted path for CSS from app/[lang] to app/globals.
 import { ClerkProvider } from "@clerk/nextjs"
 import { i18n, type Locale } from "@/i18n-config"
 import { UserLimitsProvider } from "@/contexts/user-limits-context"
+import { getDictionary } from "@/lib/utils/get-dictionary"
+import type { Metadata } from "next"
 // AppNavbar and Footer will be imported by specific route group layouts
 // import { getDictionary } from "@/lib/get-dictionary" // No longer needed here
 
@@ -16,16 +18,129 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-// This function can be used to generate dynamic metadata based on the locale
-// For example, loading titles from your dictionary
-// import { getDictionary } from '@/lib/get-dictionary'; // Assuming getDictionary is in lib
-// export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
-//   const dictionary = await getDictionary(params.lang);
-//   return {
-//     title: dictionary.navbar.home, // Example: Using a general title or a specific one
-//     description: dictionary.homepage.subtitle, // Example
-//   }
-// }
+// Get base URL for canonical URLs and Open Graph
+const getBaseUrl = (): string => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://bankstatementconverter.com" // Replace with your actual domain
+  }
+  return "http://localhost:3000"
+}
+
+// Generate dynamic metadata based on locale
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  const dictionary = await getDictionary(lang)
+  const baseUrl = getBaseUrl()
+
+  // Get localized title and description from dictionary
+  const title =
+    dictionary.marketing_homepage?.heroTitle || "Convert Bank Statements to Excel in Seconds"
+  const description =
+    dictionary.marketing_homepage?.heroSubtitle ||
+    "Upload PDF, get structured data instantly. Try it free!"
+
+  // Create localized metadata
+  const metadata: Metadata = {
+    title: {
+      template: "%s | Bank Statement Converter",
+      default: title,
+    },
+    description,
+    keywords: [
+      "bank statement converter",
+      "PDF to Excel converter",
+      "bank statement to Excel",
+      "convert bank statement PDF",
+      "financial data extraction",
+      "free bank statement converter",
+      "AI-powered data extraction",
+    ],
+    authors: [{ name: "Bank Statement Converter" }],
+    creator: "Bank Statement Converter",
+    publisher: "Bank Statement Converter",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+
+    // Canonical URL and language alternates
+    alternates: {
+      canonical: `${baseUrl}/${lang}`,
+      languages: {
+        en: `${baseUrl}/en`,
+        es: `${baseUrl}/es`,
+        pt: `${baseUrl}/pt`,
+        "x-default": `${baseUrl}/en`,
+      },
+    },
+
+    // Open Graph metadata for social media
+    openGraph: {
+      type: "website",
+      locale: lang,
+      url: `${baseUrl}/${lang}`,
+      siteName: "Bank Statement Converter",
+      title,
+      description,
+      images: [
+        {
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+
+    // Twitter metadata
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      creator: "@bankconverter", // Update with actual Twitter handle
+      images: [
+        `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}`,
+      ],
+    },
+
+    // Verification for search engines
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+      yandex: process.env.YANDEX_VERIFICATION,
+      yahoo: process.env.YAHOO_VERIFICATION,
+    },
+
+    // PWA and app metadata
+    applicationName: "Bank Statement Converter",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Bank Statement Converter",
+    },
+    formatDetection: {
+      telephone: false,
+    },
+
+    // Additional metadata
+    category: "finance",
+  }
+
+  return metadata
+}
 
 // Define static params for Next.js to know which locales to pre-render
 export async function generateStaticParams() {

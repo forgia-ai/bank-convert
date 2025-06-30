@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import InteractiveHeroSection from "@/components/marketing/InteractiveHeroSection"
 import FeatureCard from "@/components/marketing/FeatureCard"
 import TestimonialCard from "@/components/marketing/TestimonialCard"
+import StructuredData from "@/components/seo/StructuredData"
 import {
   Accordion,
   AccordionContent,
@@ -29,6 +30,9 @@ export default async function MarketingHomePage({
 
   return (
     <>
+      {/* Structured Data for SEO */}
+      <StructuredData dictionary={dictionary} lang={lang} />
+
       <main>
         <InteractiveHeroSection
           heroTitle={dictionary.marketing_homepage.heroTitle}
