@@ -336,5 +336,40 @@
     },
     "payment_successful": "Payment successful! Your subscription is now active.",
     "billing_portal_error": "Failed to open billing portal"
+  },
+  "about_page": {
+    "title": "About Bank Statement Converter",
+    "subtitle": "Learn more about our mission, vision, and the team dedicated to simplifying your financial data management.",
+    "mission_vision_title": "Our Mission & Vision",
+    "mission_text": "To empower individuals and businesses by providing an intuitive, secure, and accurate tool for converting bank statements into actionable data. We aim to save you time and effort in managing your financial records.",
+    "vision_text": "To be the leading solution for financial document conversion and analysis, continuously innovating to meet the evolving needs of our users and helping them achieve greater financial clarity and control.",
+    "our_story_title": "Our Story",
+    "story_paragraph_1": "Bank Statement Converter was born out of a simple frustration: the tedious and time-consuming process of manually transcribing bank statement data. As finance professionals and software developers, we knew there had to be a better way.",
+    "story_paragraph_2": "We envisioned a tool that was not only powerful but also accessible and easy to use for everyone, regardless of their technical expertise. After months of research, development, and user feedback, Bank Statement Converter came to life.",
+    "story_paragraph_3": "Today, we're proud to help thousands of users streamline their financial workflows, and we're just getting started!",
+    "core_values_title": "Our Core Values",
+    "value_1_title": "User-Centricity",
+    "value_1_description": "Our users are at the heart of everything we do. We strive to understand their needs and deliver solutions that genuinely help.",
+    "value_2_title": "Security & Privacy",
+    "value_2_description": "We are committed to protecting your data with the highest security standards and respecting your privacy.",
+    "value_3_title": "Accuracy & Reliability",
+    "value_3_description": "We aim for precision in every conversion, ensuring you can trust the data you work with.",
+    "cta_title": "Ready to Simplify Your Finances?",
+    "cta_description": "Join thousands of satisfied users and take control of your bank statement data today.",
+    "cta_button": "View Pricing & Plans"
+  },
+  "contact_page": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you! Whether you have a question, feedback, or need support, feel free to reach out.",
+    "form_name_label": "Full Name",
+    "form_name_placeholder": "Your Name",
+    "form_email_label": "Email Address",
+    "form_email_placeholder": "your.email@example.com",
+    "form_subject_label": "Subject",
+    "form_subject_placeholder": "Question about pricing",
+    "form_message_label": "Message",
+    "form_message_placeholder": "Your message here...",
+    "form_submit_button": "Send Message",
+    "form_success_message": "Message sent successfully! We'll get back to you soon."
   }
 }

@@ -52,6 +52,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
   const { isSignedIn } = useAuth()
   const { subscribeToPlan } = useUserLimits()
   const [isAnnual, setIsAnnual] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Real Stripe subscription handler
   const handlePlanSelection = async (planName: string) => {
@@ -63,6 +64,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
 
     // Handle free plan differently
     if (planName === "Free") {
+      setIsLoading(true)
       try {
         await subscribeToPlan("free")
         // Redirect to viewer after successful subscription - preserve language
@@ -70,6 +72,8 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
       } catch (error) {
         console.error("Failed to subscribe to free plan:", error)
         toast.error("Failed to activate free plan")
+      } finally {
+        setIsLoading(false)
       }
       return
     }
@@ -82,6 +86,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
 
     const planType = planMap[planName]
     if (planType) {
+      setIsLoading(true)
       try {
         // Determine billing cycle based on toggle
         const billingCycle = isAnnual ? "yearly" : "monthly"
@@ -91,6 +96,8 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
       } catch (error) {
         console.error("Failed to create checkout session:", error)
         toast.error("Failed to start checkout process")
+      } finally {
+        setIsLoading(false)
       }
     }
   }
@@ -237,6 +244,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
               features={plan.features}
               ctaText={plan.cta}
               isPopular={plan.popular}
+              isLoading={isLoading}
               onPlanSelect={handlePlanSelection}
             />
           ))}

@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2 } from "lucide-react" // Using an icon for features
+import { CheckCircle2, Loader2 } from "lucide-react" // Using an icon for features
 
 interface PricingCardProps {
   planName: string
@@ -18,6 +18,7 @@ interface PricingCardProps {
   features: string[]
   ctaText: string
   isPopular?: boolean
+  isLoading?: boolean
   className?: string
   onPlanSelect?: (planName: string) => void // Add click handler
 }
@@ -30,6 +31,7 @@ export default function PricingCard({
   features,
   ctaText,
   isPopular = false,
+  isLoading = false,
   className = "",
   onPlanSelect,
 }: PricingCardProps) {
@@ -72,9 +74,17 @@ export default function PricingCard({
           size="lg"
           className="w-full cursor-pointer"
           variant={isPopular ? "default" : "outline"}
+          disabled={isLoading}
           onClick={() => onPlanSelect?.(planName)}
         >
-          {ctaText}
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Processing...
+            </>
+          ) : (
+            ctaText
+          )}
         </Button>
       </CardFooter>
     </Card>

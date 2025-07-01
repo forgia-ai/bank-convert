@@ -336,5 +336,40 @@
     },
     "payment_successful": "Pagamento bem-sucedido! Sua assinatura está agora ativa.",
     "billing_portal_error": "Falha ao abrir o portal de faturamento"
+  },
+  "about_page": {
+    "title": "Sobre o Conversor de Extratos Bancários",
+    "subtitle": "Saiba mais sobre nossa missão, visão e equipe dedicada a simplificar o gerenciamento de seus dados financeiros.",
+    "mission_vision_title": "Nossa Missão e Visão",
+    "mission_text": "Capacitar indivíduos e empresas fornecendo uma ferramenta intuitiva, segura e precisa para converter extratos bancários em dados acionáveis. Nosso objetivo é economizar seu tempo e esforço no gerenciamento de seus registros financeiros.",
+    "vision_text": "Ser a solução líder para conversão e análise de documentos financeiros, inovando continuamente para atender às necessidades evolutivas de nossos usuários e ajudá-los a alcançar maior clareza e controle financeiro.",
+    "our_story_title": "Nossa História",
+    "story_paragraph_1": "O Conversor de Extratos Bancários nasceu de uma simples frustração: o processo tedioso e demorado de transcrever manualmente dados de extratos bancários. Como profissionais de finanças e desenvolvedores de software, sabíamos que deveria haver uma maneira melhor.",
+    "story_paragraph_2": "Visualizamos uma ferramenta que não fosse apenas poderosa, mas também acessível e fácil de usar para todos, independentemente de sua experiência técnica. Após meses de pesquisa, desenvolvimento e feedback dos usuários, o Conversor de Extratos Bancários ganhou vida.",
+    "story_paragraph_3": "Hoje, temos orgulho de ajudar milhares de usuários a otimizar seus fluxos de trabalho financeiros, e estamos apenas começando!",
+    "core_values_title": "Nossos Valores Fundamentais",
+    "value_1_title": "Foco no Usuário",
+    "value_1_description": "Nossos usuários estão no centro de tudo o que fazemos. Nos esforçamos para entender suas necessidades e entregar soluções que realmente ajudem.",
+    "value_2_title": "Segurança e Privacidade",
+    "value_2_description": "Estamos comprometidos em proteger seus dados com os mais altos padrões de segurança e respeitando sua privacidade.",
+    "value_3_title": "Precisão e Confiabilidade",
+    "value_3_description": "Buscamos precisão em cada conversão, garantindo que você possa confiar nos dados com os quais trabalha.",
+    "cta_title": "Pronto para Simplificar suas Finanças?",
+    "cta_description": "Junte-se a milhares de usuários satisfeitos e assuma o controle dos dados de seus extratos bancários hoje.",
+    "cta_button": "Ver Preços e Planos"
+  },
+  "contact_page": {
+    "title": "Entre em Contato",
+    "subtitle": "Adoraríamos ouvir de você! Seja uma pergunta, feedback ou necessidade de suporte, sinta-se à vontade para entrar em contato.",
+    "form_name_label": "Nome Completo",
+    "form_name_placeholder": "Seu Nome",
+    "form_email_label": "Endereço de Email",
+    "form_email_placeholder": "seu.email@exemplo.com",
+    "form_subject_label": "Assunto",
+    "form_subject_placeholder": "Pergunta sobre preços",
+    "form_message_label": "Mensagem",
+    "form_message_placeholder": "Sua mensagem aqui...",
+    "form_submit_button": "Enviar Mensagem",
+    "form_success_message": "Mensagem enviada com sucesso! Entraremos em contato em breve."
   }
 }
