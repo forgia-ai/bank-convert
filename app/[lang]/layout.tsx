@@ -111,7 +111,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      creator: "@bankconverter", // Update with actual Twitter handle
+      creator: "@bankstatementconvert", // Update with actual Twitter handle
       images: [
         `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}`,
       ],

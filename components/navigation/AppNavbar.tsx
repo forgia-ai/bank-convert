@@ -166,7 +166,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                   strokeOpacity="0.5"
                 />
               </svg>
-              <span className="font-semibold">BankConvert</span>
+              <span className="font-semibold">BankStatementConvert</span>
             </Link>
           </SignedIn>
           <SignedOut>
@@ -202,7 +202,7 @@ export default function AppNavbar({ navStrings, dictionary = {} }: AppNavbarProp
                   strokeOpacity="0.5"
                 />
               </svg>
-              <span className="font-semibold">BankConvert</span>
+              <span className="font-semibold">BankStatementConvert</span>
             </Link>
           </SignedOut>
         </div>

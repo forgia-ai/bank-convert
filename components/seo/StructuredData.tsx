@@ -57,7 +57,10 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
     logo: `${baseUrl}/logo.png`,
     description: "Professional bank statement conversion service with AI-powered accuracy",
     foundingDate: "2024",
-    sameAs: ["https://twitter.com/bankconverter", "https://linkedin.com/company/bankconverter"],
+    sameAs: [
+      "https://twitter.com/bankstatementconvert",
+      "https://linkedin.com/company/bankstatementconvert",
+    ],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
