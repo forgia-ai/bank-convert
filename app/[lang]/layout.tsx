@@ -20,12 +20,11 @@ const geistMono = Geist_Mono({
 
 // Get base URL for canonical URLs and Open Graph
 const getBaseUrl = (): string => {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`
-  }
+  // In production, always use the production domain regardless of VERCEL_URL
   if (process.env.NODE_ENV === "production") {
-    return "https://www.bankstatementconvert.to" // Replace with your actual domain
+    return "https://www.bankstatementconvert.to"
   }
+  // For local development
   return "http://localhost:3000"
 }
 

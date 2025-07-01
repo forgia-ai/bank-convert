@@ -244,6 +244,59 @@
     "premium": "Premium Plan",
     "unknown": "Unknown Plan"
   },
+  "pricing_page": {
+    "title": "Find the Perfect Plan",
+    "subtitle": "Start for free, or choose a plan that scales with your needs. No hidden fees, cancel anytime.",
+    "billing_monthly": "Monthly",
+    "billing_annual": "Annual",
+    "save_badge": "Save 40%",
+    "free_description": "Perfect for quick, occasional conversions.",
+    "free_features": ["50 pages total", "Basic email support"],
+    "free_cta": "Get Started",
+    "growth_description": "Ideal for regular individual use.",
+    "growth_features": [
+      "500 pages/month",
+      "Priority email support",
+      "Access to all core features"
+    ],
+    "growth_cta": "Choose Growth",
+    "premium_description": "Best for power users and small businesses.",
+    "premium_features": [
+      "1000 pages/month",
+      "Dedicated chat support",
+      "Advanced analytics",
+      "Early access to new features"
+    ],
+    "premium_cta": "Choose Premium",
+    "faq_title": "Frequently Asked Questions",
+    "faq_subtitle": "Have more questions? We're here to help.",
+    "faqs": [
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all major credit cards, including Visa, Mastercard, American Express, and Discover. Payments are processed securely via Stripe."
+      },
+      {
+        "question": "Can I change my plan later?",
+        "answer": "Yes, you can upgrade or downgrade your plan at any time from your account settings. Changes will be prorated."
+      },
+      {
+        "question": "Is there a discount for annual billing?",
+        "answer": "Yes! You can save significantly (up to ~40% depending on the plan) by choosing to pay annually instead of monthly."
+      },
+      {
+        "question": "What counts as a 'page' for billing?",
+        "answer": "A 'page' refers to one page of a processed bank statement document. For example, a 5-page PDF statement will count as 5 pages towards your monthly limit."
+      },
+      {
+        "question": "What happens if I exceed my monthly page limit?",
+        "answer": "If you exceed your monthly page limit, you'll be prompted to upgrade to a higher plan. Alternatively, you can wait until your next billing cycle for your quota to reset."
+      },
+      {
+        "question": "Do you offer refunds?",
+        "answer": "We offer a 7-day money-back guarantee on new subscriptions if you're not satisfied. Please contact support for assistance."
+      }
+    ]
+  },
   "billing_page": {
     "title": "Billing & Subscription",
     "subtitle": "Manage your subscription, view billing history, and update payment methods.",

@@ -244,6 +244,59 @@
     "premium": "Plan Premium",
     "unknown": "Plan Desconocido"
   },
+  "pricing_page": {
+    "title": "Encuentra el Plan Perfecto",
+    "subtitle": "Comienza gratis, o elige un plan que se adapte a tus necesidades. Sin tarifas ocultas, cancela cuando quieras.",
+    "billing_monthly": "Mensual",
+    "billing_annual": "Anual",
+    "save_badge": "Ahorra 40%",
+    "free_description": "Perfecto para conversiones rápidas y ocasionales.",
+    "free_features": ["50 páginas total", "Soporte básico por email"],
+    "free_cta": "Comenzar",
+    "growth_description": "Ideal para uso individual regular.",
+    "growth_features": [
+      "500 páginas/mes",
+      "Soporte prioritario por email",
+      "Acceso a todas las funciones principales"
+    ],
+    "growth_cta": "Elegir Crecimiento",
+    "premium_description": "Lo mejor para usuarios avanzados y pequeñas empresas.",
+    "premium_features": [
+      "1000 páginas/mes",
+      "Soporte dedicado por chat",
+      "Análisis avanzados",
+      "Acceso temprano a nuevas funciones"
+    ],
+    "premium_cta": "Elegir Premium",
+    "faq_title": "Preguntas Frecuentes",
+    "faq_subtitle": "¿Tienes más preguntas? Estamos aquí para ayudar.",
+    "faqs": [
+      {
+        "question": "¿Qué métodos de pago aceptan?",
+        "answer": "Aceptamos todas las tarjetas de crédito principales, incluyendo Visa, Mastercard, American Express y Discover. Los pagos se procesan de forma segura a través de Stripe."
+      },
+      {
+        "question": "¿Puedo cambiar mi plan después?",
+        "answer": "Sí, puedes actualizar o degradar tu plan en cualquier momento desde la configuración de tu cuenta. Los cambios se prorratearán."
+      },
+      {
+        "question": "¿Hay descuento por facturación anual?",
+        "answer": "¡Sí! Puedes ahorrar significativamente (hasta ~40% dependiendo del plan) eligiendo pagar anualmente en lugar de mensualmente."
+      },
+      {
+        "question": "¿Qué cuenta como una 'página' para facturación?",
+        "answer": "Una 'página' se refiere a una página de un documento de extracto bancario procesado. Por ejemplo, un extracto PDF de 5 páginas contará como 5 páginas hacia tu límite mensual."
+      },
+      {
+        "question": "¿Qué pasa si excedo mi límite mensual de páginas?",
+        "answer": "Si excedes tu límite mensual de páginas, se te pedirá actualizar a un plan superior. Alternativamente, puedes esperar hasta tu próximo ciclo de facturación para que se reinicie tu cuota."
+      },
+      {
+        "question": "¿Ofrecen reembolsos?",
+        "answer": "Ofrecemos una garantía de devolución de dinero de 7 días en nuevas suscripciones si no estás satisfecho. Por favor contacta a soporte para asistencia."
+      }
+    ]
+  },
   "billing_page": {
     "title": "Facturación y Suscripción",
     "subtitle": "Administra tu suscripción, ve el historial de facturación y actualiza métodos de pago.",
