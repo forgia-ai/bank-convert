@@ -24,7 +24,7 @@ const getBaseUrl = (): string => {
     return `https://${process.env.VERCEL_URL}`
   }
   if (process.env.NODE_ENV === "production") {
-    return "https://bankstatementconverter.com" // Replace with your actual domain
+    return "https://www.bankstatementconvert.to" // Replace with your actual domain
   }
   return "http://localhost:3000"
 }

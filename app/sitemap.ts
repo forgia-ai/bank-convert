@@ -4,7 +4,7 @@ import { i18n } from "@/i18n-config"
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl =
     process.env.NODE_ENV === "production"
-      ? "https://bankstatementconverter.com" // Replace with your actual domain
+      ? "https://www.bankstatementconvert.to" // Replace with your actual domain
       : "http://localhost:3000"
 
   // Define pages with their properties

@@ -94,10 +94,10 @@ export default function ContactPage() {
                   <h3 className="font-semibold text-foreground">Email Us Directly</h3>
                   <p>For general inquiries, support, or feedback:</p>
                   <a
-                    href="mailto:support@bankstatementconverter.com"
+                    href="mailto:support@www.bankstatementconvert.to"
                     className="text-primary hover:underline"
                   >
-                    support@bankstatementconverter.com
+                    support@www.bankstatementconvert.to
                   </a>
                 </div>
               </div>

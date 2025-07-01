@@ -9,7 +9,7 @@ interface StructuredDataProps {
 export default function StructuredData({ dictionary, lang }: StructuredDataProps) {
   const baseUrl =
     process.env.NODE_ENV === "production"
-      ? "https://bankstatementconverter.com" // Replace with your actual domain
+      ? "https://www.bankstatementconvert.to" // Replace with your actual domain
       : "http://localhost:3000"
 
   // WebApplication Schema

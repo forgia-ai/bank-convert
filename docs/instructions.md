@@ -322,10 +322,10 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [x] **File Upload UI:** Interface for selecting and uploading files.
     - [x] **Transaction Display UI:** Table to display extracted transactions (using mock data).
     - [x] **Export UI:** Button to trigger mock data export.
-    - [ ] **Usage Tracking UI:** Display for consumed pages (mock data).
-5.  **[ ] User Profile/Settings UI (Mock & Basic Clerk):**
-    - [ ] UI for managing profile settings (e.g., change password - leveraging Clerk where possible).
-    - [ ] UI for viewing current subscription plan and upgrade options.
+    - [x] **Usage Tracking UI:** Display for consumed pages.
+5.  **[x] User Profile/Settings UI (Mock & Basic Clerk):**
+    - [x] UI for managing profile settings (e.g., change password - leveraging Clerk where possible).
+    - [x] UI for viewing current subscription plan and upgrade options.
 6.  **[x] Language Support UI (Initial Setup):**
     - [x] Basic UI elements for language selection.
     - [x] Set up i18n (e.g., `next-i18next`) with placeholder translations for UI text.
@@ -381,11 +381,20 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [ ] Review for common web vulnerabilities (XSS, CSRF, etc.).
     - [ ] Ensure proper handling of API keys and sensitive data (environment variables).
 5.  **[ ] SEO Finalization:**
-    - [ ] Verify meta tags, structured data, sitemap.xml, and robots.txt for landing pages.
-6.  **[ ] Vercel Deployment Configuration:**
-    - [ ] Configure production environment variables on Vercel.
-    - [ ] Set up custom domain(s).
+    - [x] Verify meta tags, structured data, sitemap.xml, and robots.txt for landing pages.
+    - [ ] Add Open Graph images
+6.  **[x] Vercel Deployment Configuration:**
+    - [x] Configure production environment variables on Vercel.
+    - [x] Set up custom domain(s).
 7.  **[ ] Pre-launch Checklist & Go-Live.**
+    - [ ] Change Clerk keys to production keys.
+    - [ ] Change Stripe keys to production keys.
+    - [ ] Improve landing page.
+      - [ ] Update the top authority bar.
+      - [ ] Improve features section.
+    - [ ] Add favicon.
+    - [ ] Add analytics.
+    - [ ] Improve color schema.
 
 ---
 
