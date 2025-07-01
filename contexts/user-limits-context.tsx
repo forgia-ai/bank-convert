@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { useAuth } from "@clerk/nextjs"
 import { checkUserUsageLimit, recordUserPageUsage, getCurrentUserUsage } from "@/lib/usage/actions"
 import {
   updateUserSubscriptionPlan,
@@ -78,6 +79,7 @@ interface UserLimitsProviderProps {
 }
 
 export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
+  const { isSignedIn, isLoaded } = useAuth()
   const [userLimits, setUserLimits] = useState<UserLimitsData>(getDefaultUserLimits())
   const [isLoading, setIsLoading] = useState(true)
 
@@ -131,6 +133,13 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     try {
       setIsLoading(true)
 
+      // Check if user is authenticated before making API call
+      if (!isSignedIn) {
+        setUserLimits(getDefaultUserLimits())
+        setIsLoading(false)
+        return
+      }
+
       // Use optimized action that gets both plan and usage in one call
       const result = await getUserPlanAndUsage()
 
@@ -173,6 +182,11 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   // Subscribe to a plan - handles both free plan updates and Stripe redirects
   const subscribeToPlan = async (plan: SubscriptionPlan) => {
     try {
+      // Check authentication before proceeding
+      if (!isSignedIn) {
+        throw new Error("User must be authenticated to subscribe to a plan")
+      }
+
       // For free plan, update directly in database
       if (plan === "free") {
         const result = await updateUserSubscriptionPlan(plan as PlanType)
@@ -221,6 +235,11 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   // Function to process a document with usage tracking
   const processDocument = async (pageCount: number): Promise<boolean> => {
     try {
+      // Check authentication before proceeding
+      if (!isSignedIn) {
+        return false
+      }
+
       // Check if user can process this many pages
       if (!canProcessPages(pageCount)) {
         return false
@@ -274,10 +293,17 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
     return "subtle"
   }
 
-  // Initialize data on mount
+  // Initialize data on mount - only for authenticated users
   useEffect(() => {
-    refreshLimits()
-  }, [])
+    if (isLoaded) {
+      if (isSignedIn) {
+        refreshLimits()
+      } else {
+        // User is not signed in, use default limits and stop loading
+        setIsLoading(false)
+      }
+    }
+  }, [isLoaded, isSignedIn])
 
   const contextValue: UserLimitsContextType = {
     userLimits,

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export default function AboutPage() {
   return (
-    <div className="py-12 md:py-20">
+    <div className="py-6 md:py-10">
       <div className="container mx-auto px-4">
         {/* Page Header */}
         <div className="text-center mb-12 md:mb-16">

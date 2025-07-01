@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone } from "lucide-react" // Icons for contact info
 
 export default function ContactPage() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -14,7 +13,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="py-12 md:py-20">
+    <div className="py-6 md:py-10">
       <div className="container mx-auto px-4">
         {/* Page Header */}
         <div className="text-center mb-12 md:mb-16">

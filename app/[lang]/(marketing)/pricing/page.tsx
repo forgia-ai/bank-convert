@@ -1,20 +1,18 @@
 "use client" // For the toggle functionality later
 
-import { useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import PricingCard from "@/components/marketing/PricingCard" // New import
+import PricingCard from "@/components/marketing/PricingCard"
+import { createCheckoutSession } from "@/lib/stripe/client"
+import { useUserLimits } from "@/contexts/user-limits-context"
+import { i18n, type Locale } from "@/i18n-config"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion" // New import
-import { useUserLimits } from "@/contexts/user-limits-context"
+} from "@/components/ui/accordion"
+import { useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@clerk/nextjs"
-import { i18n, type Locale } from "@/i18n-config"
-import { createCheckoutSession } from "@/lib/stripe/client"
 import { toast } from "sonner"
 
 export default function PricingPage() {
@@ -146,41 +144,48 @@ export default function PricingPage() {
   ]
 
   return (
-    <div className="py-12 md:py-20">
+    <div className="py-6 md:py-10">
       <div className="container mx-auto px-4">
         {/* Page Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-3">
             Find the Perfect Plan
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-8">
             Start for free, or choose a plan that scales with your needs. No hidden fees, cancel
             anytime.
           </p>
-          <div className="mt-8 flex items-center justify-center space-x-2">
-            <Label
-              htmlFor="billing-cycle"
-              className={!isAnnual ? "font-semibold text-primary" : "text-muted-foreground"}
+
+          {/* Enhanced Billing Toggle */}
+          <div className="inline-flex items-center p-1 bg-muted rounded-lg relative mb-8">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                !isAnnual
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               Monthly
-            </Label>
-            <Switch
-              id="billing-cycle"
-              checked={isAnnual}
-              onCheckedChange={setIsAnnual}
-              aria-label="Toggle billing cycle"
-            />
-            <Label
-              htmlFor="billing-cycle"
-              className={isAnnual ? "font-semibold text-primary" : "text-muted-foreground"}
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                isAnnual
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              Annual <span className="text-sm font-normal text-green-600">(Save up to ~40%)</span>
-            </Label>
+              Annual
+            </button>
+            <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+              Save 40%
+            </span>
           </div>
         </div>
 
         {/* Pricing Tiers Section */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch mb-16 md:mb-24">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch mb-10 md:mb-12">
           {" "}
           {/* items-stretch for equal height cards */}
           {plans.map((plan) => (
@@ -211,7 +216,7 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16 md:mt-24">
+        <div className="mt-12 md:mt-16">
           <div className="text-center mb-10 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
               Frequently Asked Questions

@@ -387,7 +387,7 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [x] Configure production environment variables on Vercel.
     - [x] Set up custom domain(s).
 7.  **[ ] Pre-launch Checklist & Go-Live.**
-    - [ ] Change Clerk keys to production keys.
+    - [x] Change Clerk keys to production keys.
     - [ ] Change Stripe keys to production keys.
     - [ ] Improve landing page.
       - [ ] Update the top authority bar.

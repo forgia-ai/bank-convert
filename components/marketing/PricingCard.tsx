@@ -42,23 +42,23 @@ export default function PricingCard({
           Most Popular
         </div>
       )}
-      <CardHeader className="items-center text-center pt-8">
+      <CardHeader className="items-center text-center pt-6">
         {" "}
-        {/* Added padding top */}
+        {/* Reduced padding top */}
         <CardTitle className="text-2xl font-bold">{planName}</CardTitle>
-        <div className="mt-2">
+        <div className="mt-1">
           <span className="text-4xl font-extrabold">{price}</span>
           {priceFrequency && (
             <span className="text-sm text-muted-foreground ml-1">{priceFrequency}</span>
           )}
         </div>
-        <CardDescription className="mt-3 h-12">{description}</CardDescription>{" "}
-        {/* Set fixed height for description */}
+        <CardDescription className="mt-2 h-10">{description}</CardDescription>{" "}
+        {/* Reduced height and margin */}
       </CardHeader>
       <CardContent className="flex-grow">
         {" "}
         {/* flex-grow to push footer down */}
-        <ul className="space-y-3 mb-6">
+        <ul className="space-y-2 mb-4">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-2 text-muted-foreground">
               <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
