@@ -17,11 +17,11 @@ This comprehensive SEO plan outlines the technical and content optimizations nee
 
 ### Primary Target Keywords (High Priority)
 
-- **"bank statement converter"** (Vol: 2,400/mo, KD: 45)
 - **"PDF to Excel converter"** (Vol: 8,100/mo, KD: 52)
+- **"bank statement converter"** (Vol: 2,400/mo, KD: 45)
 - **"bank statement to Excel"** (Vol: 1,200/mo, KD: 38)
 - **"convert bank statement PDF"** (Vol: 890/mo, KD: 42)
-- **"financial data extraction"** (Vol: 720/mo, KD: 55)
+- **"bank statement convert"** (Vol: 720/mo, KD: 16) - **EXACT DOMAIN MATCH**
 
 ### Long-tail Keywords (Medium Priority)
 
@@ -55,6 +55,9 @@ This comprehensive SEO plan outlines the technical and content optimizations nee
 ### 1. Site Architecture & URL Structure
 
 **Current Structure:** ✅ Already optimized
+
+**Domain:** bankstatementconvert.to (Primary SEO domain)
+**Brand Domain:** bankconvert.to (Marketing/redirect domain)
 
 ```
 /en/ (English)
@@ -139,10 +142,10 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Bank Statement Converter",
-  "url": "https://bankstatementconverter.com",
-  "logo": "https://bankstatementconverter.com/logo.png",
-  "sameAs": ["https://twitter.com/bankconverter", "https://linkedin.com/company/bankconverter"],
+  "name": "Bank Statement Convert",
+  "url": "https://bankstatementconvert.to",
+  "logo": "https://bankstatementconvert.to/logo.png",
+  "sameAs": ["https://twitter.com/bankconvert", "https://linkedin.com/company/bankconvert"],
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",
@@ -273,7 +276,7 @@ Disallow: /
 User-agent: ChatGPT-User
 Disallow: /
 
-Sitemap: https://bankstatementconverter.com/sitemap.xml
+Sitemap: https://bankstatementconvert.to/sitemap.xml
 ```
 
 #### Sitemap (`app/sitemap.ts`)
@@ -306,12 +309,12 @@ Sitemap: https://bankstatementconverter.com/sitemap.xml
 
 ```typescript
 alternates: {
-  canonical: `${baseUrl}/${lang}`,
+  canonical: `https://bankstatementconvert.to/${lang}`,
   languages: {
-    'en': `${baseUrl}/en`,
-    'es': `${baseUrl}/es`,
-    'pt': `${baseUrl}/pt`,
-    'x-default': `${baseUrl}/en`
+    'en': `https://bankstatementconvert.to/en`,
+    'es': `https://bankstatementconvert.to/es`,
+    'pt': `https://bankstatementconvert.to/pt`,
+    'x-default': `https://bankstatementconvert.to/en`
   }
 }
 ```
@@ -554,11 +557,12 @@ alternates: {
 
 ### Differentiation Strategy
 
-1. **Free Tier Advantage:** Promote 50 free pages prominently
-2. **AI Technology:** Emphasize AI-powered accuracy
-3. **Preview Functionality:** Unique try-before-signup feature
-4. **Multi-language Support:** Target underserved international markets
-5. **User Experience:** Focus on simplicity and speed
+1. **Exact Match Domain:** bankstatementconvert.to provides perfect SEO alignment
+2. **Free Tier Advantage:** Promote 50 free pages prominently
+3. **AI Technology:** Emphasize AI-powered accuracy
+4. **Preview Functionality:** Unique try-before-signup feature
+5. **Multi-language Support:** Target underserved international markets
+6. **User Experience:** Focus on simplicity and speed
 
 ## 📋 Technical Requirements Checklist
 
@@ -608,11 +612,12 @@ alternates: {
 
 ### Success Indicators
 
-1. **Top 3 ranking** for "bank statement converter"
-2. **Featured snippet** for "how to convert bank statement"
-3. **Organic traffic** becomes primary acquisition channel
-4. **International markets** contribute 25%+ of traffic
-5. **Brand recognition** through knowledge panel/entity establishment
+1. **Top 3 ranking** for "bank statement convert" (exact domain match)
+2. **Top 5 ranking** for "bank statement converter"
+3. **Featured snippet** for "how to convert bank statement"
+4. **Organic traffic** becomes primary acquisition channel
+5. **International markets** contribute 25%+ of traffic
+6. **Brand recognition** through knowledge panel/entity establishment
 
 ---
 
