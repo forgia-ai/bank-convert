@@ -13,27 +13,8 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/viewer/billing", "/sign-in/", "/sign-up/", "/_next/"],
       },
-      // Block AI crawlers from accessing financial data
-      {
-        userAgent: "GPTBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "ChatGPT-User",
-        disallow: "/",
-      },
-      {
-        userAgent: "CCBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "anthropic-ai",
-        disallow: "/",
-      },
-      {
-        userAgent: "Claude-Web",
-        disallow: "/",
-      },
+      // Note: We welcome AI crawlers to help users discover our service
+      // through AI-powered search and recommendations
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   }
