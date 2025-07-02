@@ -371,5 +371,11 @@
     "form_message_placeholder": "Your message here...",
     "form_submit_button": "Send Message",
     "form_success_message": "Message sent successfully! We'll get back to you soon."
+  },
+  "metadata": {
+    "pricing": {
+      "title": "Bank Statement Converter Pricing | Free & Premium Plans",
+      "description": "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees."
+    }
   }
 }

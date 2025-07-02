@@ -371,15 +371,15 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [ ] Thoroughly test the entire user workflow: signup -> login -> file upload -> data extraction -> (optional review) -> XLSX download.
     - [ ] Test subscription purchase and management flows.
     - [ ] Test different file types and edge cases for extraction.
-2.  **[ ] Error Handling & Logging:**
-    - [ ] Implement robust error handling on both frontend and backend.
-    - [ ] Utilize Vercel's logging for server-side issues.
+2.  **[x] Error Handling & Logging:**
+    - [x] Implement robust error handling on both frontend and backend.
+    - [x] Utilize Vercel's logging for server-side issues.
 3.  **[ ] Performance Optimization:**
     - [ ] Analyze and optimize Next.js build sizes, page load times, and API response times.
     - [ ] Image optimization for landing pages.
 4.  **[ ] Security Hardening:**
     - [ ] Review for common web vulnerabilities (XSS, CSRF, etc.).
-    - [ ] Ensure proper handling of API keys and sensitive data (environment variables).
+    - [x] Ensure proper handling of API keys and sensitive data (environment variables).
 5.  **[ ] SEO Finalization:**
     - [x] Verify meta tags, structured data, sitemap.xml, and robots.txt for landing pages.
     - [ ] Add Open Graph images
@@ -388,7 +388,7 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [x] Set up custom domain(s).
 7.  **[ ] Pre-launch Checklist & Go-Live.**
     - [x] Change Clerk keys to production keys.
-    - [ ] Change Stripe keys to production keys.
+    - [x] Change Stripe keys to production keys.
     - [ ] Improve landing page.
       - [ ] Update the top authority bar.
       - [ ] Improve features section.

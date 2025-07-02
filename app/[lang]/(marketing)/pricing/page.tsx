@@ -20,21 +20,15 @@ export async function generateMetadata({
   const { lang } = await params
   const baseUrl = getBaseUrl()
 
-  // Pricing-specific titles and descriptions
-  const pricingTitles = {
-    en: "Bank Statement Converter Pricing | Free & Premium Plans",
-    es: "Precios del Conversor de Extractos Bancarios | Planes Gratuitos y Premium",
-    pt: "Preços do Conversor de Extratos Bancários | Planos Gratuitos e Premium",
-  }
+  // Get dictionary for metadata translations
+  const dictionary = await getDictionary(lang)
 
-  const pricingDescriptions = {
-    en: "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees.",
-    es: "Elige el plan perfecto para tus necesidades. Plan gratuito incluye 50 páginas. Planes premium ofrecen conversiones ilimitadas, soporte prioritario y características avanzadas. Sin tarifas ocultas.",
-    pt: "Escolha o plano perfeito para suas necessidades. Plano gratuito inclui 50 páginas. Planos premium oferecem conversões ilimitadas, suporte prioritário e recursos avançados. Sem taxas ocultas.",
-  }
-
-  const title = pricingTitles[lang] || pricingTitles.en
-  const description = pricingDescriptions[lang] || pricingDescriptions.en
+  const title =
+    dictionary.metadata?.pricing?.title ||
+    "Bank Statement Converter Pricing | Free & Premium Plans"
+  const description =
+    dictionary.metadata?.pricing?.description ||
+    "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees."
 
   return {
     title,

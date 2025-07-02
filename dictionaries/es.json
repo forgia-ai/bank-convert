@@ -371,5 +371,11 @@
     "form_message_placeholder": "Tu mensaje aquí...",
     "form_submit_button": "Enviar Mensaje",
     "form_success_message": "¡Mensaje enviado exitosamente! Te responderemos pronto."
+  },
+  "metadata": {
+    "pricing": {
+      "title": "Precios del Conversor de Extractos Bancarios | Planes Gratuitos y Premium",
+      "description": "Elige el plan perfecto para tus necesidades. Plan gratuito incluye 50 páginas. Planes premium ofrecen conversiones ilimitadas, soporte prioritario y características avanzadas. Sin tarifas ocultas."
+    }
   }
 }
