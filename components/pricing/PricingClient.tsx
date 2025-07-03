@@ -257,7 +257,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-12 md:mt-16">
+        <div className="mt-12 md:mt-16 mb-12 md:mb-16">
           <div className="text-center mb-10 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tighter">
               {pricingTexts.faq_title || "Frequently Asked Questions"}
