@@ -48,7 +48,7 @@ export async function generateMetadata({
   // Create localized metadata
   const metadata: Metadata = {
     title: {
-      template: "%s | Bank Statement Converter",
+      template: "%s | Bank Statement Convert",
       default: title,
     },
     description,
@@ -61,9 +61,9 @@ export async function generateMetadata({
       "free bank statement converter",
       "AI-powered data extraction",
     ],
-    authors: [{ name: "Bank Statement Converter" }],
-    creator: "Bank Statement Converter",
-    publisher: "Bank Statement Converter",
+    authors: [{ name: "Bank Statement Convert" }],
+    creator: "Bank Statement Convert",
+    publisher: "Bank Statement Convert",
     robots: {
       index: true,
       follow: true,
@@ -92,7 +92,7 @@ export async function generateMetadata({
       type: "website",
       locale: lang,
       url: `${baseUrl}/${lang}`,
-      siteName: "Bank Statement Converter",
+      siteName: "Bank Statement Convert",
       title,
       description,
       images: [
@@ -124,11 +124,11 @@ export async function generateMetadata({
     },
 
     // PWA and app metadata
-    applicationName: "Bank Statement Converter",
+    applicationName: "Bank Statement Convert",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "Bank Statement Converter",
+      title: "Bank Statement Convert",
     },
     formatDetection: {
       telephone: false,

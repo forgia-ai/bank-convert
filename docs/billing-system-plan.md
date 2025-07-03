@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the implementation plan for the billing system with Stripe integration for the Bank Statement Converter application. The system enables users to subscribe to different plans (Free, Growth, Premium), manage their subscriptions, and upgrade/downgrade as needed.
+This document outlines the implementation plan for the billing system with Stripe integration for the Bank Statement Convert application. The system enables users to subscribe to different plans (Free, Growth, Premium), manage their subscriptions, and upgrade/downgrade as needed.
 
 ## 1. Analysis of Current Implementation
 

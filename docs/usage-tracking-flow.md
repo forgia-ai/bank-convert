@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Bank Statement Converter implements a comprehensive usage tracking system that monitors and limits user document processing based on page consumption. The system supports both anonymous users (marketing flow) and authenticated users (viewer flow) with different plan tiers and limits.
+The Bank Statement Convert implements a comprehensive usage tracking system that monitors and limits user document processing based on page consumption. The system supports both anonymous users (marketing flow) and authenticated users (viewer flow) with different plan tiers and limits.
 
 ## Architecture
 

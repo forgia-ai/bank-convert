@@ -43,7 +43,7 @@ export default async function MarketingHomePage({
           fileUploadModuleStrings={dictionary.marketing_homepage.file_upload_module_strings}
         />
         {/* How It Works Section */}
-        <section id="how-it-works" className="py-16 md:py-24 bg-muted/30">
+        <section id="how-it-works" className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4 md:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               {dictionary.marketing_homepage.howItWorksTitle}
@@ -88,32 +88,86 @@ export default async function MarketingHomePage({
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               <FeatureCard
-                icon="📄➡️📊"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature1Title}
                 description={dictionary.marketing_homepage.feature1Description}
               />
               <FeatureCard
-                icon="🧠✨"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature2Title}
                 description={dictionary.marketing_homepage.feature2Description}
               />
               <FeatureCard
-                icon="🛡️🔒"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature3Title}
                 description={dictionary.marketing_homepage.feature3Description}
               />
               <FeatureCard
-                icon="⏱️⚡"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature4Title}
                 description={dictionary.marketing_homepage.feature4Description}
               />
               <FeatureCard
-                icon="🌐🌍"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature5Title}
                 description={dictionary.marketing_homepage.feature5Description}
               />
               <FeatureCard
-                icon="📈📉"
+                icon={
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-8 h-8">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                    />
+                  </svg>
+                }
                 title={dictionary.marketing_homepage.feature6Title}
                 description={dictionary.marketing_homepage.feature6Description}
               />

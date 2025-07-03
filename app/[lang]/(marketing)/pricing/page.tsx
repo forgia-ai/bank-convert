@@ -24,8 +24,7 @@ export async function generateMetadata({
   const dictionary = await getDictionary(lang)
 
   const title =
-    dictionary.metadata?.pricing?.title ||
-    "Bank Statement Converter Pricing | Free & Premium Plans"
+    dictionary.metadata?.pricing?.title || "Bank Statement Convert Pricing | Free & Premium Plans"
   const description =
     dictionary.metadata?.pricing?.description ||
     "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees."
@@ -34,7 +33,7 @@ export async function generateMetadata({
     title,
     description,
     keywords: [
-      "bank statement converter pricing",
+      "bank statement convert pricing",
       "PDF to Excel pricing",
       "free plan",
       "premium plans",

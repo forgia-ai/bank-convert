@@ -20,7 +20,7 @@
     "privacy": "Privacy Policy"
   },
   "homepage": {
-    "title": "Welcome to Bank Convert",
+    "title": "Welcome to Bank Statement Convert",
     "subtitle": "Your easy solution for bank statement conversion."
   },
   "dashboard_page": {
@@ -64,7 +64,9 @@
       "progressExtracting": "Extracting transaction data..."
     },
     "top_authority_bar": {
-      "trust_message": "Trusted by 10,000+ Happy Users Worldwide!"
+      "statements_processed": "8,420+ statements processed successfully",
+      "customer_quote": "Saved me 3 hours",
+      "privacy_message": "We respect your privacy!"
     },
     "howItWorksTitle": "How It Works in 3 Simple Steps",
     "step1Title": "Upload Your Statement",
@@ -73,19 +75,19 @@
     "step2Description": "Our smart AI processes and structures your transaction data accurately.",
     "step3Title": "Download Excel",
     "step3Description": "Get a clean, organized Excel file ready for your needs.",
-    "featuresTitle": "Unlock Powerful Features",
-    "feature1Title": "PDF Support",
-    "feature1Description": "Effortlessly convert PDF bank statements into clean Excel files.",
-    "feature2Title": "AI-Powered Accuracy",
-    "feature2Description": "Leverage advanced AI to ensure precise extraction of all transaction details.",
-    "feature3Title": "Secure & Confidential",
-    "feature3Description": "Your financial data is encrypted and processed with utmost privacy.",
-    "feature4Title": "Blazing Fast Speed",
-    "feature4Description": "Get your converted files in seconds, not minutes. Save valuable time.",
-    "feature5Title": "Multi-Language Interface",
-    "feature5Description": "Access and use the converter in your preferred language for a better experience.",
-    "feature6Title": "Consolidated View",
-    "feature6Description": "Merge data from multiple statements for a comprehensive financial overview.",
+    "featuresTitle": "Powerful Features for Bank Statement Conversion",
+    "feature1Title": "PDF to Excel Converter",
+    "feature1Description": "Transform any PDF bank statement into clean, structured Excel spreadsheets. Extract transactions from Chase, Wells Fargo, Bank of America, and 500+ major banks worldwide.",
+    "feature2Title": "AI-Powered Data Extraction",
+    "feature2Description": "Advanced artificial intelligence ensures 99%+ accuracy when extracting dates, amounts, descriptions, and transaction types from your bank statements.",
+    "feature3Title": "Bank-Level Security & Privacy",
+    "feature3Description": "Your financial data is protected with enterprise-grade encryption. GDPR compliant with zero data retention - files deleted immediately after processing.",
+    "feature4Title": "Instant Processing Speed",
+    "feature4Description": "Convert bank statements in under 30 seconds. Process multi-page documents instantly and download your Excel file immediately.",
+    "feature5Title": "Multi-Language Support",
+    "feature5Description": "Convert bank statements in English, Spanish, and Portuguese. Works with international banks and supports multiple currency formats automatically.",
+    "feature6Title": "Free Online Tool",
+    "feature6Description": "Start with 50 free pages - no credit card required. Upgrade for unlimited monthly conversions and priority support when you need more capacity.",
     "testimonialsTitle": "Loved by Users Like You",
     "testimonial1Quote": "This tool saved me hours of manual data entry! Converting PDF statements to Excel is now a breeze.",
     "testimonial1Author": "Sarah L.",
@@ -94,22 +96,22 @@
     "testimonial3Quote": "Secure, fast, and accurate. What more could you ask for?",
     "testimonial3Author": "John B., Accountant",
     "faqTitle": "Frequently Asked Questions",
-    "faq1Question": "Is Bank Convert secure?",
+    "faq1Question": "Is Bank Statement Convert secure?",
     "faq1Answer": "Yes, absolutely. We prioritize your data's security and privacy. All uploads and processing are encrypted, and we adhere to strict data protection policies. We do not store your files after processing.",
     "faq2Question": "What file formats are supported?",
-    "faq2Answer": "Currently, Bank Convert supports PDF files. We are continuously working to expand our support for other formats.",
+    "faq2Answer": "Currently, Bank Statement supports PDF files. We are continuously working to expand our support for other formats.",
     "faq3Question": "How accurate is the data extraction?",
     "faq3Answer": "Our AI is trained on a vast number of bank statements to ensure high accuracy. While we strive for perfection, we recommend a quick review of the converted Excel file, especially for complex statements.",
     "faq4Question": "Is there a limit on file size or number of pages?",
     "faq4Answer": "Our free plan has certain limitations. Paid plans offer higher limits on file size and the number of pages you can convert per month. Please check our Pricing page for more details.",
-    "faq5Question": "Can I use Bank Convert on my mobile device?",
-    "faq5Answer": "Yes, Bank Convert is designed to be responsive and can be accessed from any device, including desktops, tablets, and smartphones.",
+    "faq5Question": "Can I use Bank Statement Convert on my mobile device?",
+    "faq5Answer": "Yes, Bank Statement Convert is designed to be responsive and can be accessed from any device, including desktops, tablets, and smartphones.",
     "ctaTitle": "Ready to Simplify Your Bank Statement Conversions?",
     "ctaSubtitle": "Stop wasting time on manual data entry. Start converting your bank statements to Excel effortlessly today.",
     "ctaButtonText": "Get Started for Free"
   },
   "viewer_page": {
-    "title": "Bank Statement Converter",
+    "title": "Bank Statement Convert",
     "upload_headline": "Upload Your Bank Statement",
     "success_message": "Extraction Complete!",
     "results_for_prefix": "Results for: ",
@@ -338,14 +340,14 @@
     "billing_portal_error": "Failed to open billing portal"
   },
   "about_page": {
-    "title": "About Bank Statement Converter",
+    "title": "About Bank Statement Convert",
     "subtitle": "Learn more about our mission, vision, and the team dedicated to simplifying your financial data management.",
     "mission_vision_title": "Our Mission & Vision",
     "mission_text": "To empower individuals and businesses by providing an intuitive, secure, and accurate tool for converting bank statements into actionable data. We aim to save you time and effort in managing your financial records.",
     "vision_text": "To be the leading solution for financial document conversion and analysis, continuously innovating to meet the evolving needs of our users and helping them achieve greater financial clarity and control.",
     "our_story_title": "Our Story",
-    "story_paragraph_1": "Bank Statement Converter was born out of a simple frustration: the tedious and time-consuming process of manually transcribing bank statement data. As finance professionals and software developers, we knew there had to be a better way.",
-    "story_paragraph_2": "We envisioned a tool that was not only powerful but also accessible and easy to use for everyone, regardless of their technical expertise. After months of research, development, and user feedback, Bank Statement Converter came to life.",
+    "story_paragraph_1": "Bank Statement Convert was born out of a simple frustration: the tedious and time-consuming process of manually transcribing bank statement data. As finance professionals and software developers, we knew there had to be a better way.",
+    "story_paragraph_2": "We envisioned a tool that was not only powerful but also accessible and easy to use for everyone, regardless of their technical expertise. After months of research, development, and user feedback, Bank Statement Convert came to life.",
     "story_paragraph_3": "Today, we're proud to help thousands of users streamline their financial workflows, and we're just getting started!",
     "core_values_title": "Our Core Values",
     "value_1_title": "User-Centricity",
@@ -374,7 +376,7 @@
   },
   "metadata": {
     "pricing": {
-      "title": "Bank Statement Converter Pricing | Free & Premium Plans",
+      "title": "Bank Statement Convert Pricing | Free & Premium Plans",
       "description": "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees."
     }
   }

@@ -15,9 +15,7 @@ export default async function MarketingLayout({
   const dictionary = await getDictionary(lang)
   return (
     <div className="flex flex-col min-h-screen">
-      <TopAuthorityBar
-        trustMessage={dictionary.marketing_homepage.top_authority_bar.trust_message}
-      />
+      <TopAuthorityBar topAuthorityBarStrings={dictionary.marketing_homepage.top_authority_bar} />
       <AppNavbar navStrings={dictionary.navbar} dictionary={dictionary} />
       <main className="flex-grow pt-8">{children}</main>
       <Footer footerStrings={dictionary.footer} currentLocale={lang} />

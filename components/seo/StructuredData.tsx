@@ -16,7 +16,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
   const webApplicationSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Bank Statement Converter",
+    name: "Bank Statement Convert",
     url: `${baseUrl}/${lang}`,
     description:
       dictionary.marketing_homepage?.heroSubtitle ||
@@ -38,7 +38,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
       "Multi-language interface",
       "Free preview functionality",
     ],
-    screenshot: `${baseUrl}/api/og?title=${encodeURIComponent(dictionary.marketing_homepage?.heroTitle || "Bank Statement Converter")}&lang=${lang}`,
+    screenshot: `${baseUrl}/api/og?title=${encodeURIComponent(dictionary.marketing_homepage?.heroTitle || "Bank Statement Convert")}&lang=${lang}`,
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "4.8",
@@ -52,7 +52,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Bank Statement Converter",
+    name: "Bank Statement Convert",
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description: "Professional bank statement conversion service with AI-powered accuracy",
@@ -82,7 +82,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
     description: "Professional bank statement conversion service using AI technology",
     provider: {
       "@type": "Organization",
-      name: "Bank Statement Converter",
+      name: "Bank Statement Convert",
     },
     serviceType: "Financial Data Conversion",
     areaServed: "Worldwide",
@@ -172,7 +172,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
     mainEntity: [
       {
         "@type": "Question",
-        name: dictionary.marketing_homepage?.faq1Question || "Is Bank Convert secure?",
+        name: dictionary.marketing_homepage?.faq1Question || "Is Bank Statement Convert secure?",
         acceptedAnswer: {
           "@type": "Answer",
           text:
@@ -187,7 +187,7 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
           "@type": "Answer",
           text:
             dictionary.marketing_homepage?.faq2Answer ||
-            "Currently, Bank Convert supports PDF files.",
+            "Currently, Bank Statement Convert supports PDF files.",
         },
       },
       {
@@ -217,12 +217,12 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
         "@type": "Question",
         name:
           dictionary.marketing_homepage?.faq5Question ||
-          "Can I use Bank Convert on my mobile device?",
+          "Can I use Bank Statement Convert on my mobile device?",
         acceptedAnswer: {
           "@type": "Answer",
           text:
             dictionary.marketing_homepage?.faq5Answer ||
-            "Yes, Bank Convert is designed to be responsive and can be accessed from any device.",
+            "Yes, Bank Statement Convert is designed to be responsive and can be accessed from any device.",
         },
       },
     ],

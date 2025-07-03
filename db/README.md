@@ -1,6 +1,6 @@
 # Database Setup
 
-This directory contains the database migrations and setup for the Bank Statement Converter application using Supabase.
+This directory contains the database migrations and setup for the Bank Statement Convert application using Supabase.
 
 ## Environment Variables
 

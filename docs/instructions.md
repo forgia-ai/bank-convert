@@ -1,8 +1,8 @@
-# Bank Statement Converter Application Specifications
+# Bank Statement Convert Application Specifications
 
 ## Overview
 
-The Bank Statement Converter is a web application designed to help users extract transaction data from their bank statements and convert it into an Excel (XLSX) format. The application will feature user authentication, allowing users to sign up for different plans with varying usage limits. It will also include landing pages optimized for search engines (SEO) to attract new users.
+The Bank Statement Convert is a web application designed to help users extract transaction data from their bank statements and convert it into an Excel (XLSX) format. The application will feature user authentication, allowing users to sign up for different plans with varying usage limits. It will also include landing pages optimized for search engines (SEO) to attract new users.
 
 ## Features
 
@@ -77,7 +77,7 @@ sequenceDiagram
 
 ## Detailed UI/UX Page and Component Layout
 
-This section provides a detailed plan for the layout and components of each page in the Bank Statement Converter application.
+This section provides a detailed plan for the layout and components of each page in the Bank Statement Convert application.
 
 ### I. Marketing Pages (Logged-out Users)
 
@@ -245,7 +245,7 @@ These pages share a common `UserNavbar` at the top, providing consistent navigat
     - Center (or right of logo): Navigation Links (e.g., "Convert/Dashboard", "Settings", "Billing" - if separate).
     - Right: `UsageTracker` (e.g., "Credits: 450/500"), `LanguageSelector`, User Avatar/Profile `IconButton` (dropdown with link to "Settings" and "Logout").
   - **Main Content Area (Below `UserNavbar`)**:
-    - Main Page Title (e.g., `<h1>Bank Statement Converter</h1>`)
+    - Main Page Title (e.g., `<h1>Bank Statement Convert</h1>`)
     - **File Upload Module (Prominent Top Section)**:
       - Headline (e.g., "Upload Your Bank Statement").
       - `FileUploadZone`: Drag-and-drop area with icon and text (e.g., "Drag & drop PDF or CSV here, or click to select").
@@ -390,8 +390,8 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [x] Change Clerk keys to production keys.
     - [x] Change Stripe keys to production keys.
     - [ ] Improve landing page.
-      - [ ] Update the top authority bar.
-      - [ ] Improve features section.
+      - [x] Update the top authority bar.
+      - [x] Improve features section.
     - [ ] Add favicon.
     - [ ] Add analytics.
     - [ ] Improve color schema.
@@ -469,4 +469,4 @@ With the billing system complete, the application is ready for:
 3. **Revenue Generation**: Complete SaaS billing infrastructure operational
 4. **Future Enhancements**: API access, additional payment methods, analytics
 
-**🎉 The Bank Statement Converter now has enterprise-grade billing capabilities!**
+**🎉 The Bank Statement Convert now has enterprise-grade billing capabilities!**

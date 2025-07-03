@@ -1,4 +1,4 @@
-# SEO Optimization Plan for Bank Statement Converter
+# SEO Optimization Plan for Bank Statement Convert
 
 ## 📊 Executive Summary
 
@@ -84,7 +84,7 @@ This comprehensive SEO plan outlines the technical and content optimizations nee
 // Implementation needed:
 export async function generateMetadata({ params }): Promise<Metadata> {
   // Localized base metadata
-  // Template structure: "%s | Bank Statement Converter"
+  // Template structure: "%s | Bank Statement Convert"
   // Proper hreflang implementation
   // Social media metadata
   // PWA metadata

@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
                     lineHeight: 1.2,
                   }}
                 >
-                  Bank Statement Converter
+                  Bank Statement Convert
                 </span>
                 <span
                   style={{
@@ -307,7 +307,7 @@ export async function GET(request: NextRequest) {
             color: "#ffffff",
           }}
         >
-          <h1 style={{ fontSize: "60px", fontWeight: "bold" }}>Bank Statement Converter</h1>
+          <h1 style={{ fontSize: "60px", fontWeight: "bold" }}>Bank Statement Convert</h1>
           <p style={{ fontSize: "24px", marginTop: "20px" }}>Convert PDF to Excel Instantly</p>
         </div>
       ),
