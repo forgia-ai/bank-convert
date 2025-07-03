@@ -392,7 +392,7 @@ This plan outlines the development phases, starting with frontend UI and mock da
     - [x] Improve landing page.
       - [x] Update the top authority bar.
       - [x] Improve features section.
-    - [ ] Add favicon.
+    - [x] Add favicon.
     - [x] Add analytics.
     - [ ] Improve color schema.
 

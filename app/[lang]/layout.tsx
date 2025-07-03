@@ -137,6 +137,13 @@ export async function generateMetadata({
 
     // Additional metadata
     category: "finance",
+
+    // Force favicon for Safari (temporary)
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
+      apple: "/apple-icon.png",
+    },
   }
 
   return metadata
