@@ -99,7 +99,7 @@
     "faq1Question": "Is Bank Statement Convert secure?",
     "faq1Answer": "Yes, absolutely. We prioritize your data's security and privacy. All uploads and processing are encrypted, and we adhere to strict data protection policies. We do not store your files after processing.",
     "faq2Question": "What file formats are supported?",
-    "faq2Answer": "Currently, Bank Statement supports PDF files. We are continuously working to expand our support for other formats.",
+    "faq2Answer": "Currently, Bank Statement Convert supports PDF files. We are continuously working to expand our support for other formats.",
     "faq3Question": "How accurate is the data extraction?",
     "faq3Answer": "Our AI is trained on a vast number of bank statements to ensure high accuracy. While we strive for perfection, we recommend a quick review of the converted Excel file, especially for complex statements.",
     "faq4Question": "Is there a limit on file size or number of pages?",
