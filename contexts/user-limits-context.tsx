@@ -100,8 +100,8 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   const getPlanDetails = (plan: SubscriptionPlan) => {
     const planDetails = {
       free: { planKey: "free", price: "$0", limit: 50 },
-      paid1: { planKey: "paid1", price: "$8/month", limit: 500 },
-      paid2: { planKey: "paid2", price: "$14/month", limit: 1000 },
+      paid1: { planKey: "paid1", price: "$12", limit: 500 },
+      paid2: { planKey: "paid2", price: "$24", limit: 1000 },
     }
     return planDetails[plan]
   }

@@ -20,6 +20,9 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
   const [previewData, setPreviewData] = useState<PreviewData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Get localized pages per month text
+  const pagesPerMonth = dictionary.common?.pages_per_month || "pages/month"
+
   useEffect(() => {
     // Get preview data from localStorage
     if (typeof window !== "undefined") {
@@ -235,13 +238,19 @@ export default function PreviewWorkflow({ lang, dictionary }: PreviewWorkflowPro
               <li className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span>
-                  {dictionary.preview_page?.feature_growth_plan || "Growth: 100 pages/month"}
+                  {dictionary.preview_page?.feature_growth_plan?.replace(
+                    "{pages_per_month}",
+                    pagesPerMonth,
+                  ) || `Lite: 500 ${pagesPerMonth}`}
                 </span>
               </li>
               <li className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span>
-                  {dictionary.preview_page?.feature_premium_plan || "Premium: 500 pages/month"}
+                  {dictionary.preview_page?.feature_premium_plan?.replace(
+                    "{pages_per_month}",
+                    pagesPerMonth,
+                  ) || `Pro: 1000 ${pagesPerMonth}`}
                 </span>
               </li>
               <li className="flex items-center space-x-2">

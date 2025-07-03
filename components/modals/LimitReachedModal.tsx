@@ -159,7 +159,7 @@ export default function LimitReachedModal({
           {userType === "free" ? (
             <>
               <Button className="flex-1 cursor-pointer" onClick={handleQuickUpgrade}>
-                Upgrade to Growth
+                Upgrade to Lite
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Link href={content.primaryHref} className="flex-1">

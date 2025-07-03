@@ -103,9 +103,9 @@ export default function StructuredData({ dictionary, lang }: StructuredDataProps
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Growth Plan",
+            name: "Lite Plan",
           },
-          price: "8",
+          price: "12",
           priceCurrency: "USD",
         },
       ],

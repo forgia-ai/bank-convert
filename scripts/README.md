@@ -150,5 +150,5 @@ SELECT DISTINCT user_id FROM user_usage LIMIT 5;
 ## 📈 Plan Types
 
 - `free` → Free Plan (50 pages total)
-- `paid1` → Growth Plan (500 pages/month) 
-- `paid2` → Premium Plan (1000 pages/month) 
+- `paid1` → Lite Plan (500 pages/month) 
+- `paid2` → Pro Plan (1000 pages/month) 

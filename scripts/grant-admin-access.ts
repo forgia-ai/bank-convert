@@ -6,7 +6,7 @@ config({ path: ".env.local" })
 /**
  * Grant Admin Access Script
  *
- * This script grants a user Premium plan access without going through Stripe payment.
+ * This script grants a user Pro plan access without going through Stripe payment.
  * Perfect for giving admin users full access when moving to production.
  *
  * Usage: yarn tsx scripts/grant-admin-access.ts [USER_ID]
@@ -21,9 +21,9 @@ const DEFAULT_USER_ID = "user_2xXeIhp0iMJeS5C9wXYfeZxIkMt"
 
 async function grantAdminAccess(userId: string) {
   try {
-    console.log(`🚀 Granting Premium plan access to user: ${userId}`)
+    console.log(`🚀 Granting Pro plan access to user: ${userId}`)
 
-    // Grant Premium plan (paid2) without Stripe payment
+    // Grant Pro plan (paid2) without Stripe payment
     const subscription = await createTestSubscription(
       userId,
       "paid2", // Premium plan
@@ -32,7 +32,7 @@ async function grantAdminAccess(userId: string) {
 
     console.log("✅ SUCCESS! Admin access granted:")
     console.log(`   - User ID: ${userId}`)
-    console.log(`   - Plan: Premium (paid2)`)
+    console.log(`   - Plan: Pro (paid2)`)
     console.log(`   - Status: ${subscription.status}`)
     console.log(`   - Subscription ID: ${subscription.id}`)
     console.log(`   - Valid until: ${subscription.current_period_end}`)

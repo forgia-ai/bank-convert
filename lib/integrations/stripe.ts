@@ -42,17 +42,17 @@ export const STRIPE_PLAN_CONFIG = {
     monthlyPriceId: process.env.STRIPE_PAID1_MONTHLY_PRICE_ID,
     yearlyPriceId: process.env.STRIPE_PAID1_YEARLY_PRICE_ID,
     planType: "paid1" as const,
-    name: "Growth",
-    monthlyPrice: 1333, // $13.33 in cents
-    yearlyPrice: 800, // $8.00 in cents (billed annually)
+    name: "Lite",
+    monthlyPrice: 2000, // $20.00 in cents
+    yearlyPrice: 1200, // $12.00 in cents (billed annually)
   },
   paid2: {
     monthlyPriceId: process.env.STRIPE_PAID2_MONTHLY_PRICE_ID,
     yearlyPriceId: process.env.STRIPE_PAID2_YEARLY_PRICE_ID,
     planType: "paid2" as const,
-    name: "Premium",
-    monthlyPrice: 2333, // $23.33 in cents
-    yearlyPrice: 1400, // $14.00 in cents (billed annually)
+    name: "Pro",
+    monthlyPrice: 4000, // $40.00 in cents
+    yearlyPrice: 2400, // $24.00 in cents (billed annually)
   },
 } as const
 

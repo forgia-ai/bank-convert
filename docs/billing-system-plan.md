@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the implementation plan for the billing system with Stripe integration for the Bank Statement Convert application. The system enables users to subscribe to different plans (Free, Growth, Premium), manage their subscriptions, and upgrade/downgrade as needed.
+This document outlines the implementation plan for the billing system with Stripe integration for the Bank Statement Convert application. The system enables users to subscribe to different plans (Free, Lite, Pro), manage their subscriptions, and upgrade/downgrade as needed.
 
 ## 1. Analysis of Current Implementation
 
@@ -174,8 +174,8 @@ sequenceDiagram
 | Plan Type | Database ID | Display Name | Monthly Price | Yearly Price | Pages/Month |
 | --------- | ----------- | ------------ | ------------- | ------------ | ----------- |
 | Free      | free        | Free Plan    | $0            | $0           | 50 total    |
-| Growth    | paid1       | Growth Plan  | $13.33        | $8.00        | 500         |
-| Premium   | paid2       | Premium Plan | $23.33        | $14.00       | 1000        |
+| Lite      | paid1       | Lite Plan    | $20.00        | $12.00       | 500         |
+| Pro       | paid2       | Pro Plan     | $40.00        | $24.00       | 1000        |
 
 ### 2.3 Webhook Events Handling
 
@@ -200,8 +200,8 @@ sequenceDiagram
 **Completed Actions:**
 
 1. ✅ Created products in Stripe Dashboard:
-   - Growth Plan (paid1)
-   - Premium Plan (paid2)
+   - Lite Plan (paid1)
+   - Pro Plan (paid2)
 2. ✅ Created prices for each product (monthly/yearly)
 3. ✅ Updated .env with actual price IDs
 4. ✅ Configured webhook endpoint: `https://yourdomain.com/api/stripe/webhook`
@@ -412,12 +412,12 @@ Here's what you need to do to launch:
 **Create Products & Prices:**
 
 1. Login to [Stripe Dashboard](https://dashboard.stripe.com)
-2. Go to Products → Create product "Growth Plan"
-   - Monthly price: $13.33/month
-   - Yearly price: $96/year ($8/month)
-3. Create product "Premium Plan"
-   - Monthly price: $23.33/month
-   - Yearly price: $168/year ($14/month)
+2. Go to Products → Create product "Lite Plan"
+   - Monthly price: $20.00/month
+   - Yearly price: $144/year ($12/month)
+3. Create product "Pro Plan"
+   - Monthly price: $40.00/month
+   - Yearly price: $288/year ($24/month)
 4. Copy the price IDs (price_xxx format)
 
 **Configure Webhook:**
@@ -445,11 +445,11 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx  # Use pk_test_xxx for testing
 # Get from webhook configuration
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 
-# Get from Products → Growth Plan → Pricing
+# Get from Products → Lite Plan → Pricing
 STRIPE_PAID1_MONTHLY_PRICE_ID=price_xxx
 STRIPE_PAID1_YEARLY_PRICE_ID=price_xxx
 
-# Get from Products → Premium Plan → Pricing
+# Get from Products → Pro Plan → Pricing
 STRIPE_PAID2_MONTHLY_PRICE_ID=price_xxx
 STRIPE_PAID2_YEARLY_PRICE_ID=price_xxx
 ```
@@ -468,7 +468,7 @@ Run the migration if not already done:
 **Test the complete flow:**
 
 1. Go to `/pricing` page
-2. Click "Choose Growth" → Should redirect to Stripe checkout
+2. Click "Choose Lite" → Should redirect to Stripe checkout
 3. Use test card: `4242 4242 4242 4242` (any future date, any CVC)
 4. Complete checkout → Should redirect back to `/billing`
 5. Verify subscription shows as active
@@ -543,7 +543,7 @@ The Stripe integration implementation is **100% COMPLETE** with a robust, produc
 
 **Stripe Integration:**
 
-- ✅ **Stripe Products & Pricing** - Growth ($8/month) and Premium ($14/month) plans
+- ✅ **Stripe Products & Pricing** - Lite ($12/month) and Pro ($24/month) plans
 - ✅ **Stripe Checkout** - Seamless subscription creation flow
 - ✅ **Stripe Customer Portal** - Full subscription management for customers
 - ✅ **Stripe Webhooks** - Automated subscription status updates

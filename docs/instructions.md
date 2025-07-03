@@ -158,19 +158,19 @@ These pages share a common structure: `MainNavbar` at the top and a `Footer` at 
         - Description: "Perfect for quick, occasional conversions."
         - Features/Limits: "1 page per day", "PDF & CSV support", "Basic Features".
         - `PrimaryButton`: "Get Started".
-      - **"Growth" Plan Card**:
-        - Plan Name: "Growth"
-        - Price: "$13.33/month" (or "$8/month, billed annually at $96/year")
+      - **"Lite" Plan Card**:
+        - Plan Name: "Lite"
+        - Price: "$20/month" (or "$12/month, billed annually at $144/year")
         - Description: "Ideal for regular individual use."
         - Features/Limits: "500 pages/month", "All Free features", "Priority Email Support".
-        - `PrimaryButton`: "Choose Growth".
-      - **"Premium" Plan Card**:
-        - Plan Name: "Premium"
-        - Price: "$23.33/month" (or "$14/month, billed annually at $168/year")
+        - `PrimaryButton`: "Choose Lite".
+      - **"Pro" Plan Card**:
+        - Plan Name: "Pro"
+        - Price: "$40/month" (or "$24/month, billed annually at $288/year")
         - Description: "Best for power users and small businesses."
         - Features/Limits: "1000 pages/month", "All Basic features", "Advanced Features (e.g., API access - future)", "Dedicated Support".
-        - `PrimaryButton`: "Choose Premium".
-    - One plan (e.g., "Growth") could be highlighted as "Most Popular".
+        - `PrimaryButton`: "Choose Pro".
+    - One plan (e.g., "Lite") could be highlighted as "Most Popular".
   - **Features Comparison Table (Optional but Recommended)**:
     - A `DataTable`-like structure (can be a simple HTML table) comparing features across all plans in detail. Rows for features, columns for plans, with checkmarks or specific limits.
   - **FAQ Section**:

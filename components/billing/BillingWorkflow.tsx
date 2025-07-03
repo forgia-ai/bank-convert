@@ -21,7 +21,16 @@ import { toast } from "sonner"
 import type { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
-type Dictionary = Awaited<ReturnType<typeof getDictionary>>
+// Define the common section interface for type safety
+interface DictionaryCommon {
+  plan_price_monthly?: string
+  pages_per_month?: string
+}
+
+// Create a type that extends the base dictionary with explicit common section
+type Dictionary = Awaited<ReturnType<typeof getDictionary>> & {
+  common: DictionaryCommon
+}
 
 interface BillingWorkflowProps {
   lang: Locale
@@ -95,7 +104,9 @@ export default function BillingWorkflow({ lang, dictionary }: BillingWorkflowPro
     if (userLimits.subscriptionPlan === "free") {
       return t.plan_price_free
     }
-    return userLimits.planPrice || t.plan_price_monthly
+    // For paid plans, combine the price with localized frequency text
+    const basePrice = userLimits.planPrice || "$0"
+    return `${basePrice}${dictionary.common?.plan_price_monthly || "/month"}`
   }
 
   // Loading skeleton component

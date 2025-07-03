@@ -157,8 +157,8 @@
     "transaction_type_debit": "Debit",
     "limit_error_title": "Page Limit Reached",
     "limit_error_badge": "{planName}: {currentUsage}/{limit} pages used",
-    "limit_error_description": "This statement would exceed your current limit of {limit} pages. Upgrade to Growth plan to get 500 pages per month and continue processing unlimited bank statements.",
-    "limit_error_upgrade_button": "Upgrade to Growth",
+    "limit_error_description": "This statement would exceed your current limit of {limit} pages. Upgrade to Lite plan to get 500 pages per month and continue processing unlimited bank statements.",
+    "limit_error_upgrade_button": "Upgrade to Lite",
     "processing_error_title": "Processing Error",
     "error_pdf_processing_failed": "Unexpected server error while processing the PDF.",
     "error_data_extraction_failed": "Unexpected server error while extracting banking data.",
@@ -176,8 +176,8 @@
     "feature_extract_pages": "Extract 50 pages for free",
     "feature_excel_export": "Full Excel export",
     "feature_no_credit_card": "No credit card required",
-    "feature_growth_plan": "Growth: 100 pages/month",
-    "feature_premium_plan": "Premium: 500 pages/month",
+    "feature_growth_plan": "Lite: 500 {pages_per_month}",
+    "feature_premium_plan": "Pro: 1000 {pages_per_month}",
     "feature_priority_support": "Priority support"
   },
   "usage_tracker": {
@@ -242,8 +242,8 @@
   },
   "plans": {
     "free": "Free Plan",
-    "growth": "Growth Plan",
-    "premium": "Premium Plan",
+    "growth": "Lite Plan",
+    "premium": "Pro Plan",
     "unknown": "Unknown Plan"
   },
   "pricing_page": {
@@ -261,7 +261,7 @@
       "Priority email support",
       "Access to all core features"
     ],
-    "growth_cta": "Choose Growth",
+    "growth_cta": "Choose Lite",
     "premium_description": "Best for power users and small businesses.",
     "premium_features": [
       "1000 pages/month",
@@ -269,7 +269,7 @@
       "Advanced analytics",
       "Early access to new features"
     ],
-    "premium_cta": "Choose Premium",
+    "premium_cta": "Choose Pro",
     "faq_title": "Frequently Asked Questions",
     "faq_subtitle": "Have more questions? We're here to help.",
     "faqs": [
@@ -325,7 +325,6 @@
     "usage_critical_warning": "You are at {percentage}% of your limit. Upgrade your plan to continue processing documents.",
     "usage_warning": "You are approaching your {limitType} page limit. Consider upgrading to avoid service interruptions.",
     "plan_price_free": "Free",
-    "plan_price_monthly": "/month",
     "status_free": "Free",
     "status_active": "Active",
     "features": {
@@ -376,8 +375,12 @@
   },
   "metadata": {
     "pricing": {
-      "title": "Bank Statement Convert Pricing | Free & Premium Plans",
-      "description": "Choose the perfect plan for your needs. Free plan includes 50 pages. Premium plans offer unlimited conversions, priority support & advanced features. No hidden fees."
+      "title": "Bank Statement Convert Pricing | Free & Pro Plans",
+      "description": "Choose the perfect plan for your needs. Free plan includes 50 pages. Pro plans offer unlimited conversions, priority support & advanced features. No hidden fees."
     }
+  },
+  "common": {
+    "plan_price_monthly": "/month",
+    "pages_per_month": "pages/month"
   }
 }

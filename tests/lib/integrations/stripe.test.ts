@@ -111,16 +111,16 @@ describe("Stripe Integration", () => {
 
       expect(STRIPE_PLAN_CONFIG.paid1).toMatchObject({
         planType: "paid1",
-        name: "Growth",
-        monthlyPrice: 1333,
-        yearlyPrice: 800,
+        name: "Lite",
+        monthlyPrice: 2000,
+        yearlyPrice: 1200,
       })
 
       expect(STRIPE_PLAN_CONFIG.paid2).toMatchObject({
         planType: "paid2",
-        name: "Premium",
-        monthlyPrice: 2333,
-        yearlyPrice: 1400,
+        name: "Pro",
+        monthlyPrice: 4000,
+        yearlyPrice: 2400,
       })
     })
 

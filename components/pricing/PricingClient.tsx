@@ -40,6 +40,10 @@ interface Dictionary {
     faq_subtitle?: string
     faqs?: FAQ[]
   }
+  common?: {
+    plan_price_monthly?: string
+    pages_per_month?: string
+  }
 }
 
 interface PricingClientProps {
@@ -80,8 +84,8 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
 
     // Map plan names to Stripe plan types
     const planMap: Record<string, "paid1" | "paid2"> = {
-      Growth: "paid1",
-      Premium: "paid2",
+      Lite: "paid1",
+      Pro: "paid2",
     }
 
     const planType = planMap[planName]
@@ -104,6 +108,8 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
 
   // Get translations
   const pricingTexts = dictionary.pricing_page || {}
+  const monthlyFrequency = dictionary.common?.plan_price_monthly || "/month"
+  const pagesPerMonth = dictionary.common?.pages_per_month || "pages/month"
 
   const plans = [
     {
@@ -116,31 +122,31 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
       popular: false,
     },
     {
-      name: "Growth",
-      monthlyPrice: 13.33,
-      annualPrice: 8, // per month, billed annually ($96/year)
+      name: "Lite",
+      monthlyPrice: 20,
+      annualPrice: 12, // per month, billed annually ($144/year)
       description: pricingTexts.growth_description || "Ideal for regular individual use.",
       features: pricingTexts.growth_features || [
-        "500 pages/month",
+        `500 ${pagesPerMonth}`,
         "Priority email support",
         "Access to all core features",
       ],
-      cta: pricingTexts.growth_cta || "Choose Growth",
+      cta: pricingTexts.growth_cta || "Choose Lite",
       popular: true,
     },
     {
-      name: "Premium",
-      monthlyPrice: 23.33,
-      annualPrice: 14, // per month, billed annually ($168/year)
+      name: "Pro",
+      monthlyPrice: 40,
+      annualPrice: 24, // per month, billed annually ($288/year)
       description:
         pricingTexts.premium_description || "Best for power users and small businesses.",
       features: pricingTexts.premium_features || [
-        "1000 pages/month",
+        `1000 ${pagesPerMonth}`,
         "Dedicated chat support",
         "Advanced analytics",
         "Early access to new features",
       ],
-      cta: pricingTexts.premium_cta || "Choose Premium",
+      cta: pricingTexts.premium_cta || "Choose Pro",
       popular: false,
     },
   ]
@@ -231,13 +237,13 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
                   ? "$0"
                   : isAnnual
                     ? `$${plan.annualPrice}`
-                    : `$${plan.monthlyPrice.toFixed(2)}`
+                    : `$${plan.monthlyPrice}`
               }
               priceFrequency={
                 plan.monthlyPrice > 0
                   ? isAnnual && plan.annualPrice > 0
-                    ? "/month"
-                    : "/month"
+                    ? monthlyFrequency
+                    : monthlyFrequency
                   : undefined
               }
               description={plan.description}

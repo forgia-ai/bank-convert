@@ -30,7 +30,7 @@ export default function UpgradePrompt({
   const { getUpgradePromptConfig } = useUpgradePrompts()
   const promptConfig = getUpgradePromptConfig(context)
 
-  // Mock quick upgrade handler (subscribes to Growth plan)
+  // Mock quick upgrade handler (subscribes to Lite plan)
   const handleQuickUpgrade = async () => {
     try {
       await subscribeToPlan("paid1")
@@ -116,7 +116,7 @@ export default function UpgradePrompt({
               className="flex-1 cursor-pointer"
               onClick={handleQuickUpgrade}
             >
-              Upgrade to Growth
+              Upgrade to Lite
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Link href={`/${lang}/pricing`} className="flex-1">

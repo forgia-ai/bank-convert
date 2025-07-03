@@ -12,7 +12,7 @@ import { CheckCircle2, Loader2 } from "lucide-react" // Using an icon for featur
 
 interface PricingCardProps {
   planName: string
-  price: string // e.g., "$0", "$8/month"
+  price: string // e.g., "$0", "$12/month"
   priceFrequency?: string // e.g., "/month", "billed annually"
   description: string
   features: string[]

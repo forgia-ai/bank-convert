@@ -176,8 +176,8 @@
     "feature_extract_pages": "Extrae 50 páginas gratis",
     "feature_excel_export": "Exportación completa a Excel",
     "feature_no_credit_card": "No se requiere tarjeta de crédito",
-    "feature_growth_plan": "Crecimiento: 100 páginas/mes",
-    "feature_premium_plan": "Premium: 500 páginas/mes",
+    "feature_growth_plan": "Lite: 500 {pages_per_month}",
+    "feature_premium_plan": "Pro: 1000 {pages_per_month}",
     "feature_priority_support": "Soporte prioritario"
   },
   "usage_tracker": {
@@ -242,8 +242,8 @@
   },
   "plans": {
     "free": "Plan Gratuito",
-    "growth": "Plan de Crecimiento",
-    "premium": "Plan Premium",
+    "growth": "Plan Lite",
+    "premium": "Plan Pro",
     "unknown": "Plan Desconocido"
   },
   "pricing_page": {
@@ -261,7 +261,7 @@
       "Soporte prioritario por email",
       "Acceso a todas las funciones principales"
     ],
-    "growth_cta": "Elegir Crecimiento",
+    "growth_cta": "Elegir Lite",
     "premium_description": "Lo mejor para usuarios avanzados y pequeñas empresas.",
     "premium_features": [
       "1000 páginas/mes",
@@ -269,7 +269,7 @@
       "Análisis avanzados",
       "Acceso temprano a nuevas funciones"
     ],
-    "premium_cta": "Elegir Premium",
+    "premium_cta": "Elegir Pro",
     "faq_title": "Preguntas Frecuentes",
     "faq_subtitle": "¿Tienes más preguntas? Estamos aquí para ayudar.",
     "faqs": [
@@ -376,8 +376,12 @@
   },
   "metadata": {
     "pricing": {
-      "title": "Precios del Conversor de Extractos Bancarios | Planes Gratuitos y Premium",
-      "description": "Elige el plan perfecto para tus necesidades. Plan gratuito incluye 50 páginas. Planes premium ofrecen conversiones ilimitadas, soporte prioritario y características avanzadas. Sin tarifas ocultas."
+      "title": "Precios del Conversor de Extractos Bancarios | Planes Gratuitos y Pro",
+      "description": "Elige el plan perfecto para tus necesidades. Plan gratuito incluye 50 páginas. Planes Pro ofrecen conversiones ilimitadas, soporte prioritario y características avanzadas. Sin tarifas ocultas."
     }
+  },
+  "common": {
+    "plan_price_monthly": "/mes",
+    "pages_per_month": "páginas/mes"
   }
 }

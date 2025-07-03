@@ -176,8 +176,8 @@
     "feature_extract_pages": "Extraia 50 páginas gratuitamente",
     "feature_excel_export": "Exportação completa para Excel",
     "feature_no_credit_card": "Não é necessário cartão de crédito",
-    "feature_growth_plan": "Crescimento: 100 páginas/mês",
-    "feature_premium_plan": "Premium: 500 páginas/mês",
+    "feature_growth_plan": "Lite: 500 {pages_per_month}",
+    "feature_premium_plan": "Pro: 1000 {pages_per_month}",
     "feature_priority_support": "Suporte prioritário"
   },
   "usage_tracker": {
@@ -242,8 +242,8 @@
   },
   "plans": {
     "free": "Plano Gratuito",
-    "growth": "Plano Crescimento",
-    "premium": "Plano Premium",
+    "growth": "Plano Lite",
+    "premium": "Plano Pro",
     "unknown": "Plano Desconhecido"
   },
   "pricing_page": {
@@ -261,7 +261,7 @@
       "Suporte prioritário por email",
       "Acesso a todas as funcionalidades principais"
     ],
-    "growth_cta": "Escolher Crescimento",
+    "growth_cta": "Escolher Lite",
     "premium_description": "Melhor para usuários avançados e pequenas empresas.",
     "premium_features": [
       "1000 páginas/mês",
@@ -269,7 +269,7 @@
       "Análises avançadas",
       "Acesso antecipado a novas funcionalidades"
     ],
-    "premium_cta": "Escolher Premium",
+    "premium_cta": "Escolher Pro",
     "faq_title": "Perguntas Frequentes",
     "faq_subtitle": "Tem mais perguntas? Estamos aqui para ajudar.",
     "faqs": [
@@ -337,7 +337,7 @@
       "advanced_features": "Recursos avançados"
     },
     "payment_successful": "Pagamento bem-sucedido! Sua assinatura está agora ativa.",
-    "billing_portal_error": "Falha ao abrir o portal de faturamento"
+    "billing_portal_error": "Falha ao abrir portal de faturamento"
   },
   "about_page": {
     "title": "Sobre o Conversor de Extratos Bancários",
@@ -376,8 +376,12 @@
   },
   "metadata": {
     "pricing": {
-      "title": "Preços do Conversor de Extratos Bancários | Planos Gratuitos e Premium",
-      "description": "Escolha o plano perfeito para suas necessidades. Plano gratuito inclui 50 páginas. Planos premium oferecem conversões ilimitadas, suporte prioritário e recursos avançados. Sem taxas ocultas."
+      "title": "Preços do Conversor de Extratos Bancários | Planos Gratuitos e Pro",
+      "description": "Escolha o plano perfeito para suas necessidades. Plano gratuito inclui 50 páginas. Planos Pro oferecem conversões ilimitadas, suporte prioritário e recursos avançados. Sem taxas ocultas."
     }
+  },
+  "common": {
+    "plan_price_monthly": "/mês",
+    "pages_per_month": "páginas/mês"
   }
 }

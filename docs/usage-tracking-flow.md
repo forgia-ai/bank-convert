@@ -95,8 +95,8 @@ export const PLAN_LIMITS = {
 ### Plan Characteristics:
 
 - **Free Plan**: 50 pages per billing period, no recurring payments
-- **Paid1 Plan (Growth)**: 500 pages per month, $8/month (billed annually)
-- **Paid2 Plan (Premium)**: 1000 pages per month, $15/month (billed annually)
+- **Paid1 Plan (Lite)**: 500 pages per month, $12/month (billed annually)
+- **Paid2 Plan (Pro)**: 1000 pages per month, $24/month (billed annually)
 
 ## Billing Period Calculation
 
