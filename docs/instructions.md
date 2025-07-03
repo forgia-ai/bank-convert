@@ -389,11 +389,11 @@ This plan outlines the development phases, starting with frontend UI and mock da
 7.  **[ ] Pre-launch Checklist & Go-Live.**
     - [x] Change Clerk keys to production keys.
     - [x] Change Stripe keys to production keys.
-    - [ ] Improve landing page.
+    - [x] Improve landing page.
       - [x] Update the top authority bar.
       - [x] Improve features section.
     - [ ] Add favicon.
-    - [ ] Add analytics.
+    - [x] Add analytics.
     - [ ] Improve color schema.
 
 ---

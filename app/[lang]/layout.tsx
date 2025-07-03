@@ -5,6 +5,7 @@ import { i18n, type Locale } from "@/i18n-config"
 import { UserLimitsProvider } from "@/contexts/user-limits-context"
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import type { Metadata } from "next"
+import PlausibleProvider from "next-plausible"
 // AppNavbar and Footer will be imported by specific route group layouts
 // import { getDictionary } from "@/lib/get-dictionary" // No longer needed here
 
@@ -163,25 +164,27 @@ export default async function RootLayout({
   const afterSignOutUrl = `/${lang}`
 
   return (
-    <ClerkProvider
-      signInUrl={signInUrl}
-      signUpUrl={signUpUrl}
-      afterSignInUrl={afterSignInUrl}
-      afterSignUpUrl={afterSignUpUrl}
-      afterSignOutUrl={afterSignOutUrl}
-    >
-      {/* Set the lang attribute dynamically */}
-      <html lang={lang} suppressHydrationWarning={true}>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
-        >
-          <UserLimitsProvider>
-            {/* AppNavbar will be rendered by the specific route group layout */}
-            <main className="flex-grow">{children}</main>
-            {/* Footer will be rendered by the specific route group layout */}
-          </UserLimitsProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <PlausibleProvider domain="www.bankstatementconvert.to">
+      <ClerkProvider
+        signInUrl={signInUrl}
+        signUpUrl={signUpUrl}
+        afterSignInUrl={afterSignInUrl}
+        afterSignUpUrl={afterSignUpUrl}
+        afterSignOutUrl={afterSignOutUrl}
+      >
+        {/* Set the lang attribute dynamically */}
+        <html lang={lang} suppressHydrationWarning={true}>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+          >
+            <UserLimitsProvider>
+              {/* AppNavbar will be rendered by the specific route group layout */}
+              <main className="flex-grow">{children}</main>
+              {/* Footer will be rendered by the specific route group layout */}
+            </UserLimitsProvider>
+          </body>
+        </html>
+      </ClerkProvider>
+    </PlausibleProvider>
   )
 }
