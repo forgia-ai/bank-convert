@@ -1,7 +1,15 @@
+// This page displays the Terms and Conditions for the application.
+
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
-export default async function TermsPage({ params: { lang } }: { params: { lang: Locale } }) {
+interface TermsPageProps {
+  params: {
+    lang: Locale
+  }
+}
+
+export default async function TermsPage({ params: { lang } }: TermsPageProps) {
   const dictionary = await getDictionary(lang)
 
   return (
