@@ -4,12 +4,13 @@ import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 
 interface TermsPageProps {
-  params: {
+  params: Promise<{
     lang: Locale
-  }
+  }>
 }
 
-export default async function TermsPage({ params: { lang } }: TermsPageProps) {
+export default async function TermsPage({ params }: TermsPageProps) {
+  const { lang } = await params
   const dictionary = await getDictionary(lang)
 
   return (
