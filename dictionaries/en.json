@@ -317,7 +317,7 @@
     "cancelled_on": "Cancelled on {date}",
     "no_billing_info": "No Billing Information",
     "no_billing_description": "You're currently on the free plan. Upgrade to access billing features and increased limits.",
-    "manage_subscription_description": "Access your billing history, update payment methods, and manage your subscription through Stripe's secure portal.",
+    "manage_subscription_description": "Access your billing history, update payment methods, and manage your subscription through Paddle's secure portal.",
     "usage_critical_warning": "You are at {percentage}% of your limit. Upgrade your plan to continue processing documents.",
     "usage_warning": "You are approaching your {limitType} page limit. Consider upgrading to avoid service interruptions.",
     "plan_price_free": "Free",
@@ -402,7 +402,7 @@
     "section_11_title": "11. Governing Law",
     "section_11_content": "These Terms shall be governed by the laws of the jurisdiction in which our company is registered, without regard to its conflict of law provisions.",
     "section_12_title": "12. Contact Information",
-    "section_12_content": "If you have any questions about these Terms, please contact us through our contact page."
+    "section_12_content": "Bank Statement Convert is developed and operated by Forgia AI Desenvolvimento de Software LTDA. If you have any questions about these Terms, please contact us through our contact page."
   },
   "privacy_page": {
     "title": "Privacy Policy",
