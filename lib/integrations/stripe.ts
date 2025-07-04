@@ -41,24 +41,40 @@ export const STRIPE_PLAN_CONFIG = {
   paid1: {
     monthlyPriceId: process.env.STRIPE_PAID1_MONTHLY_PRICE_ID,
     yearlyPriceId: process.env.STRIPE_PAID1_YEARLY_PRICE_ID,
+    monthlyPriceIdBRL: process.env.STRIPE_PAID1_MONTHLY_PRICE_ID_BRL,
+    yearlyPriceIdBRL: process.env.STRIPE_PAID1_YEARLY_PRICE_ID_BRL,
     planType: "paid1" as const,
     name: "Lite",
     monthlyPrice: 2000, // $20.00 in cents
     yearlyPrice: 1200, // $12.00 in cents (billed annually)
+    monthlyPriceBRL: 10000, // R$100.00 in cents (approximate)
+    yearlyPriceBRL: 6000, // R$60.00 in cents (approximate)
   },
   paid2: {
     monthlyPriceId: process.env.STRIPE_PAID2_MONTHLY_PRICE_ID,
     yearlyPriceId: process.env.STRIPE_PAID2_YEARLY_PRICE_ID,
+    monthlyPriceIdBRL: process.env.STRIPE_PAID2_MONTHLY_PRICE_ID_BRL,
+    yearlyPriceIdBRL: process.env.STRIPE_PAID2_YEARLY_PRICE_ID_BRL,
     planType: "paid2" as const,
     name: "Pro",
     monthlyPrice: 4000, // $40.00 in cents
     yearlyPrice: 2400, // $24.00 in cents (billed annually)
+    monthlyPriceBRL: 20000, // R$200.00 in cents (approximate)
+    yearlyPriceBRL: 12000, // R$120.00 in cents (approximate)
   },
 } as const
 
-// Helper function to get plan configuration by plan type
-export function getPlanConfig(planType: "paid1" | "paid2") {
-  return STRIPE_PLAN_CONFIG[planType]
+// Helper function to get plan configuration by plan type and currency
+export function getPlanConfig(planType: "paid1" | "paid2", currency: "USD" | "BRL" = "USD") {
+  const config = STRIPE_PLAN_CONFIG[planType]
+  if (currency === "BRL") {
+    return {
+      ...config,
+      monthlyPriceId: config.monthlyPriceIdBRL,
+      yearlyPriceId: config.yearlyPriceIdBRL,
+    }
+  }
+  return config
 }
 
 // Helper function to get plan type from Stripe price ID

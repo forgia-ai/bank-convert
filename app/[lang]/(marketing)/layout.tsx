@@ -17,7 +17,7 @@ export default async function MarketingLayout({
     <div className="flex flex-col min-h-screen">
       <TopAuthorityBar topAuthorityBarStrings={dictionary.marketing_homepage.top_authority_bar} />
       <AppNavbar navStrings={dictionary.navbar} dictionary={dictionary} />
-      <main className="flex-grow pt-8">{children}</main>
+      <main className="flex-grow pt-8 pb-16">{children}</main>
       <Footer footerStrings={dictionary.footer} currentLocale={lang} />
     </div>
   )
