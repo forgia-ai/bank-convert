@@ -84,6 +84,8 @@ export async function generateMetadata({
       robots: "index, follow",
       "og:locale": lang,
       "og:site_name": "Bank Statement Convert",
+      "og:image:width": "1200",
+      "og:image:height": "630",
     },
 
     // Canonical URL and language alternates
