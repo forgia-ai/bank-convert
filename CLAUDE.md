@@ -150,3 +150,23 @@ yarn tsx {script}           # Execute TypeScript scripts
 3. Run `yarn test {file} --run` to verify tests pass
 4. Run `yarn check` to verify linting, type checking, and formatting
 5. Fix any issues before committing
+
+# OG Image Testing URLs
+
+Test these URLs in localhost during development:
+
+## Homepage OG
+
+http://localhost:3000/api/og?title=Convert%20Bank%20Statements%20to%20Excel%20in%20Seconds&description=Upload%20PDF,%20get%20structured%20data%20instantly.%20Try%20it%20free!&lang=en&type=homepage
+
+## Viewer OG
+
+http://localhost:3000/api/og?title=Bank%20Statement%20Converter%20-%20Convert%20Your%20Files&description=Convert%20your%20bank%20statements%20to%20Excel%20format%20with%20our%20AI-powered%20tool.&lang=en&type=viewer
+
+## Spanish
+
+http://localhost:3000/api/og?title=Convertir%20Extractos%20Bancarios%20a%20Excel&description=Sube%20PDF,%20obten%20datos%20estructurados%20al%20instante&lang=es&type=homepage
+
+## Portuguese
+
+http://localhost:3000/api/og?title=Converter%20Extratos%20Bancários%20para%20Excel&description=Carregue%20PDF,%20obtenha%20dados%20estruturados%20instantaneamente&lang=pt&type=homepage

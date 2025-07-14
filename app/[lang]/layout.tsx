@@ -98,7 +98,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}`,
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=homepage`,
           width: 1200,
           height: 630,
           alt: title,
@@ -113,7 +113,7 @@ export async function generateMetadata({
       description,
       creator: "@bankstatementconvert", // Update with actual Twitter handle
       images: [
-        `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}`,
+        `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=homepage`,
       ],
     },
 
