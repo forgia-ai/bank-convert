@@ -380,9 +380,10 @@ This plan outlines the development phases, starting with frontend UI and mock da
 4.  **[ ] Security Hardening:**
     - [ ] Review for common web vulnerabilities (XSS, CSRF, etc.).
     - [x] Ensure proper handling of API keys and sensitive data (environment variables).
-5.  **[ ] SEO Finalization:**
+5.  **[x] SEO Finalization:**
     - [x] Verify meta tags, structured data, sitemap.xml, and robots.txt for landing pages.
-    - [ ] Add Open Graph images
+    - [x] Add Open Graph images
+    - [ ] Set up Google Search Console
 6.  **[x] Vercel Deployment Configuration:**
     - [x] Configure production environment variables on Vercel.
     - [x] Set up custom domain(s).

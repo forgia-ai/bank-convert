@@ -77,6 +77,15 @@ export async function generateMetadata({
       },
     },
 
+    // Additional meta tags
+    other: {
+      author: "Bank Statement Convert",
+      "theme-color": "#ffffff",
+      robots: "index, follow",
+      "og:locale": lang,
+      "og:site_name": "Bank Statement Convert",
+    },
+
     // Canonical URL and language alternates
     alternates: {
       canonical: `${baseUrl}/${lang}`,
@@ -111,7 +120,6 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      creator: "@bankstatementconvert", // Update with actual Twitter handle
       images: [
         `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=homepage`,
       ],
