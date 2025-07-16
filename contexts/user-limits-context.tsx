@@ -222,9 +222,9 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
         // Refresh from server to get authoritative data with the new plan
         await refreshLimits(plan)
       } else {
-        // For paid plans, this should redirect to Stripe Checkout
+        // For paid plans, this should redirect to Polar Checkout
         // The actual subscription will be handled by webhook
-        throw new Error("Paid plan subscriptions should use Stripe Checkout")
+        throw new Error("Paid plan subscriptions should use Polar Checkout")
       }
     } catch (error) {
       console.error("Error subscribing to plan:", error)

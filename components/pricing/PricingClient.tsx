@@ -1,7 +1,7 @@
 "use client" // For the toggle functionality
 
 import PricingCard from "@/components/marketing/PricingCard"
-import { createCheckoutSession } from "@/lib/stripe/client"
+import { usePolarCheckout } from "@/lib/polar/client"
 import { useUserLimits } from "@/contexts/user-limits-context"
 import { type Locale } from "@/i18n-config"
 import {
@@ -55,10 +55,11 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
   const router = useRouter()
   const { isSignedIn } = useAuth()
   const { subscribeToPlan } = useUserLimits()
+  const { createCheckout } = usePolarCheckout()
   const [isAnnual, setIsAnnual] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Real Stripe subscription handler
+  // Polar subscription handler
   const handlePlanSelection = async (planName: string) => {
     if (!isSignedIn) {
       // Redirect to sign up if not authenticated - preserve language
@@ -82,21 +83,27 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
       return
     }
 
-    // Map plan names to Stripe plan types
-    const planMap: Record<string, "paid1" | "paid2"> = {
-      Lite: "paid1",
-      Pro: "paid2",
+    // Map plan names to Polar plan types (including billing cycle)
+    const planMap: Record<string, string> = {
+      Lite_monthly: "paid1_monthly",
+      Lite_yearly: "paid1_yearly",
+      Pro_monthly: "paid2_monthly",
+      Pro_yearly: "paid2_yearly",
     }
 
-    const planType = planMap[planName]
-    if (planType) {
+    // Build plan key based on name and billing cycle
+    const billingCycle = isAnnual ? "yearly" : "monthly"
+    const planKey = `${planName}_${billingCycle}`
+    const polarPlanType = planMap[planKey]
+
+    if (polarPlanType) {
       setIsLoading(true)
       try {
-        // Determine billing cycle based on toggle
-        const billingCycle = isAnnual ? "yearly" : "monthly"
-
-        // Create Stripe checkout session and redirect
-        await createCheckoutSession(planType, billingCycle, lang)
+        // Create Polar checkout session and redirect
+        await createCheckout(
+          polarPlanType as "paid1_monthly" | "paid1_yearly" | "paid2_monthly" | "paid2_yearly",
+          lang,
+        )
       } catch (error) {
         console.error("Failed to create checkout session:", error)
         toast.error("Failed to start checkout process")
@@ -155,7 +162,7 @@ export default function PricingClient({ lang, dictionary }: PricingClientProps) 
     {
       question: "What payment methods do you accept?",
       answer:
-        "We accept all major credit cards, including Visa, Mastercard, American Express, and Discover. Payments are processed securely via Stripe.",
+        "We accept all major credit cards, including Visa, Mastercard, American Express, and Discover. Payments are processed securely via Polar.",
     },
     {
       question: "Can I change my plan later?",

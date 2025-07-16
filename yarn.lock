@@ -944,6 +944,44 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@polar-sh/adapter-utils@npm:0.2.2":
+  version: 0.2.2
+  resolution: "@polar-sh/adapter-utils@npm:0.2.2"
+  dependencies:
+    "@polar-sh/sdk": "npm:^0.34.5"
+  checksum: 10c0/29f65780205148b1f32de8402cb4be53671f91a92a855f1156da16511fb16858807acb532db715253920ef4b56d14c4e2549193321dfeddb002df59229223e20
+  languageName: node
+  linkType: hard
+
+"@polar-sh/nextjs@npm:^0.4.3":
+  version: 0.4.3
+  resolution: "@polar-sh/nextjs@npm:0.4.3"
+  dependencies:
+    "@polar-sh/adapter-utils": "npm:0.2.2"
+    "@polar-sh/sdk": "npm:^0.34.5"
+  peerDependencies:
+    next: "*"
+  checksum: 10c0/6bfb4d59c436ade88dc61bc6573be922dfbaa6eefad80cb298168329d1ed337e2d5169977b2bef5fec37ea0ef38ef607f99264514ce3de16f3a8fd92a4fed683
+  languageName: node
+  linkType: hard
+
+"@polar-sh/sdk@npm:^0.34.5":
+  version: 0.34.5
+  resolution: "@polar-sh/sdk@npm:0.34.5"
+  dependencies:
+    standardwebhooks: "npm:^1.0.0"
+  peerDependencies:
+    "@modelcontextprotocol/sdk": ">=1.5.0 <1.10.0"
+    zod: ^3
+  peerDependenciesMeta:
+    "@modelcontextprotocol/sdk":
+      optional: true
+  bin:
+    mcp: bin/mcp-server.js
+  checksum: 10c0/e93c88d7f2b0b7cd9370ed3baefcaa643a0e7d1407c152a58f3a0aa0a5e77415fb7f270bcad775ba2ac7c8694f95155b75b1477305f438d78eb870c83259cfe9
+  languageName: node
+  linkType: hard
+
 "@polka/url@npm:^1.0.0-next.24":
   version: 1.0.0-next.29
   resolution: "@polka/url@npm:1.0.0-next.29"
@@ -1903,6 +1941,13 @@ __metadata:
   version: 1.11.0
   resolution: "@rushstack/eslint-patch@npm:1.11.0"
   checksum: 10c0/abea8d8cf2f4f50343f74abd6a8173c521ddd09b102021f5aa379ef373c40af5948b23db0e87eca1682e559e09d97d3f0c48ea71edad682c6bf72b840c8675b3
+  languageName: node
+  linkType: hard
+
+"@stablelib/base64@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@stablelib/base64@npm:1.0.1"
+  checksum: 10c0/6330720f021819d19cecfe274111b79a256caa81df478d6b0ae7effc8842b96915b6aeed85926ff05b4d48ec1fc78ad043d928b730ee4e6cc6e8cba6aa097bed
   languageName: node
   linkType: hard
 
@@ -3009,6 +3054,7 @@ __metadata:
     "@clerk/nextjs": "npm:^6.19.4"
     "@eslint/eslintrc": "npm:^3"
     "@formatjs/intl-localematcher": "npm:^0.6.1"
+    "@polar-sh/nextjs": "npm:^0.4.3"
     "@radix-ui/react-accordion": "npm:^1.2.10"
     "@radix-ui/react-avatar": "npm:^1.1.9"
     "@radix-ui/react-dialog": "npm:^1.1.14"
@@ -4486,6 +4532,13 @@ __metadata:
   version: 2.1.1
   resolution: "fast-safe-stringify@npm:2.1.1"
   checksum: 10c0/d90ec1c963394919828872f21edaa3ad6f1dddd288d2bd4e977027afff09f5db40f94e39536d4646f7e01761d704d72d51dce5af1b93717f3489ef808f5f4e4d
+  languageName: node
+  linkType: hard
+
+"fast-sha256@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "fast-sha256@npm:1.3.0"
+  checksum: 10c0/87f9e4baa7639576cf60a2b6235c9f436e1a1c52323abbd8a705b5bea8355500acf176f2aed0c14f2ecd6d6007e26151461bab2f27b8953bcca8d9d6b76a86e4
   languageName: node
   linkType: hard
 
@@ -7549,6 +7602,16 @@ __metadata:
   version: 0.0.2
   resolution: "stackback@npm:0.0.2"
   checksum: 10c0/89a1416668f950236dd5ac9f9a6b2588e1b9b62b1b6ad8dff1bfc5d1a15dbf0aafc9b52d2226d00c28dffff212da464eaeebfc6b7578b9d180cef3e3782c5983
+  languageName: node
+  linkType: hard
+
+"standardwebhooks@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "standardwebhooks@npm:1.0.0"
+  dependencies:
+    "@stablelib/base64": "npm:^1.0.0"
+    fast-sha256: "npm:^1.3.0"
+  checksum: 10c0/aee097d0f3c05172c19b80df1ed9596a2ce92f8956957650d0bbe47c2ca6d36515796b51d523333cb4a48c889b2ab130d789e7879e14975c4381bc7a61274327
   languageName: node
   linkType: hard
 

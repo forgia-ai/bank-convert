@@ -66,8 +66,16 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          stripe_customer_id: string
+          // Legacy billing provider columns (will be removed in future migration)
+          stripe_customer_id: string | null
           stripe_subscription_id: string | null
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          paddle_transaction_id: string | null
+          // Polar billing provider columns
+          polar_customer_id: string | null
+          polar_subscription_id: string | null
+          polar_product_id: string | null
           plan_type: "free" | "paid1" | "paid2"
           status:
             | "active"
@@ -77,17 +85,27 @@ export interface Database {
             | "past_due"
             | "trialing"
             | "unpaid"
+            | "inactive"
           current_period_start: string | null
           current_period_end: string | null
           canceled_at: string | null
+          migration_status: "pending" | "migrating" | "completed" | "failed"
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          stripe_customer_id: string
+          // Legacy billing provider columns (optional for new records)
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id?: string | null
+          // Polar billing provider columns
+          polar_customer_id?: string | null
+          polar_subscription_id?: string | null
+          polar_product_id?: string | null
           plan_type: "free" | "paid1" | "paid2"
           status:
             | "active"
@@ -97,17 +115,27 @@ export interface Database {
             | "past_due"
             | "trialing"
             | "unpaid"
+            | "inactive"
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
+          migration_status?: "pending" | "migrating" | "completed" | "failed"
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          stripe_customer_id?: string
+          // Legacy billing provider columns
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id?: string | null
+          // Polar billing provider columns
+          polar_customer_id?: string | null
+          polar_subscription_id?: string | null
+          polar_product_id?: string | null
           plan_type?: "free" | "paid1" | "paid2"
           status?:
             | "active"
@@ -117,9 +145,11 @@ export interface Database {
             | "past_due"
             | "trialing"
             | "unpaid"
+            | "inactive"
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
+          migration_status?: "pending" | "migrating" | "completed" | "failed"
           created_at?: string
           updated_at?: string
         }
