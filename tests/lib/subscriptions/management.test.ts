@@ -1,10 +1,4 @@
-import {
-  updateUserPlan,
-  getUserPlan,
-  getActiveSubscription,
-  upsertSubscription,
-  createTestSubscription,
-} from "@/lib/subscriptions/management"
+import { updateUserPlan, getUserPlan, getActiveSubscription } from "@/lib/subscriptions/management"
 import { getOrCreateUsageRecord } from "@/lib/usage/tracking"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
@@ -26,6 +20,7 @@ beforeEach(() => {
       maybeSingle: vi.fn(() => ({ data: null, error: null })),
       order: vi.fn(() => createChainableMock()),
       limit: vi.fn(() => createChainableMock()),
+      in: vi.fn(() => createChainableMock()), // Add support for .in() method
     }
     return mock
   }

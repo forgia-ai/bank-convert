@@ -11,6 +11,7 @@ import {
 export type SubscriptionStatus =
   | "active"
   | "canceled"
+  | "expired"
   | "incomplete"
   | "incomplete_expired"
   | "past_due"
@@ -126,8 +127,8 @@ export async function createTestSubscription(
 
 /**
  * Get user's active subscription record from user_subscriptions table
- * Returns null if no active subscription found
- * Uses order + limit to handle multiple active records gracefully
+ * Returns subscription if active OR canceled but still within period
+ * Returns null if no valid subscription found
  */
 export async function getActiveSubscription(userId: string): Promise<SubscriptionRecord | null> {
   const supabase = createServerSupabaseClient()
@@ -136,34 +137,39 @@ export async function getActiveSubscription(userId: string): Promise<Subscriptio
     .from("user_subscriptions")
     .select("*")
     .eq("user_id", userId)
-    .eq("status", "active")
+    .in("status", ["active", "canceled"]) // Include canceled subscriptions
     .order("created_at", { ascending: false })
 
   if (error) {
-    logger.error({ error, userId }, "Error querying active subscription")
-    throw new Error("Failed to retrieve active subscription")
+    logger.error({ error, userId }, "Error querying subscription")
+    throw new Error("Failed to retrieve subscription")
   }
 
   if (!subscriptions || subscriptions.length === 0) {
     return null
   }
 
-  // Check for multiple active subscriptions (data consistency issue)
-  if (subscriptions.length > 1) {
-    logger.warn(
-      {
-        userId,
-        count: subscriptions.length,
-        subscriptionIds: subscriptions.map((s) => s.id),
-      },
-      "Multiple active subscriptions found - using most recent",
-    )
+  // Find the first subscription that is truly active
+  for (const subscription of subscriptions) {
+    if (subscription.status === "active") {
+      return subscription as SubscriptionRecord
+    } else if (subscription.status === "canceled" && subscription.current_period_end) {
+      // For canceled subscriptions, check if still within active period
+      const periodEnd = new Date(subscription.current_period_end)
+      const now = new Date()
 
-    // TODO: Consider cleaning up old active subscriptions here
-    // For now, we'll use the most recent one
+      if (now <= periodEnd) {
+        // Still within active period - treat as active
+        logger.info(
+          { userId, subscriptionId: subscription.id, periodEnd: periodEnd.toISOString() },
+          "Found canceled subscription still active until period end",
+        )
+        return subscription as SubscriptionRecord
+      }
+    }
   }
 
-  return subscriptions[0] as SubscriptionRecord
+  return null
 }
 
 /**
@@ -260,6 +266,50 @@ async function syncUsageWithSubscription(subscription: SubscriptionRecord): Prom
 
   // Update user_usage to reflect current subscription
   await updateUserPlan(subscription.user_id, subscription.plan_type, subscriptionStart)
+}
+
+/**
+ * Automatically expire a canceled subscription that has passed its period end
+ * Updates the subscription status and reverts user to free plan
+ */
+export async function autoExpireSubscription(
+  userId: string,
+  subscriptionId: string,
+): Promise<void> {
+  logger.info({ userId, subscriptionId }, "Auto-expiring canceled subscription")
+
+  const supabase = createServerSupabaseClient()
+
+  try {
+    // Update subscription status to expired
+    const { error: updateError } = await supabase
+      .from("user_subscriptions")
+      .update({
+        status: "expired",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", subscriptionId)
+      .eq("user_id", userId)
+
+    if (updateError) {
+      logger.error(
+        { error: updateError, userId, subscriptionId },
+        "Failed to update subscription to expired",
+      )
+      throw new Error("Failed to expire subscription")
+    }
+
+    // Update user plan to free for current billing period
+    await updateUserPlan(userId, "free")
+
+    logger.info(
+      { userId, subscriptionId },
+      "Successfully auto-expired subscription and reverted to free plan",
+    )
+  } catch (error) {
+    logger.error({ error, userId, subscriptionId }, "Error auto-expiring subscription")
+    throw error
+  }
 }
 
 /**

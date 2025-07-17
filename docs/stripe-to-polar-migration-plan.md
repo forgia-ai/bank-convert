@@ -1132,6 +1132,35 @@ The estimated timeline of 2.5-3.5 weeks provides adequate buffer for thorough te
 
 ## Tasks
 
-- [ ] Test all plans
-- [ ] Test cancel and upgrade
-- [ ] Add unit tests
+- [x] Test all plans
+- [x] Test cancel and upgrade (including uncancellation)
+- [x] Add comprehensive unit tests (73 tests total)
+- [x] Test plan changes (upgrades/downgrades) ✨
+
+### Plan Change Handling ✨ NEW
+
+The webhook system now properly handles plan upgrades and downgrades:
+
+**✅ Plan Change Detection:**
+
+- Compares current subscription plan with new plan from webhook
+- Detects upgrades (paid1 → paid2) and downgrades (paid2 → paid1)
+- Handles billing cycle changes (monthly ↔ yearly)
+
+**✅ Usage Tracking Updates:**
+
+- Calls `updateUserPlan()` when plan changes are detected
+- Updates user limits immediately (500 pages → 1000 pages for upgrades)
+- Preserves subscription status during plan changes
+
+**✅ Comprehensive Logging:**
+
+- Logs upgrade/downgrade events with plan details
+- Tracks old plan → new plan transitions
+- Distinguishes between plan changes vs billing period updates
+
+**✅ Test Coverage:**
+
+- 27 webhook handler tests including plan change scenarios
+- Tests upgrade, downgrade, and no-change scenarios
+- Validates usage tracking integration

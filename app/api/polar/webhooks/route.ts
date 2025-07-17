@@ -4,10 +4,108 @@ import {
   getPlanConfigByProductId,
 } from "@/lib/integrations/polar"
 import { updateUserPlan } from "@/lib/subscriptions/management"
+import { createServerSupabaseClient } from "@/lib/integrations/supabase"
 import { logger } from "@/lib/utils/logger"
 
 export const POST = Webhooks({
   webhookSecret: process.env.POLAR_WEBHOOK_SECRET!,
+
+  // Handle all webhook payloads - used for events without specific handlers
+  onPayload: async (payload) => {
+    logger.info({ eventType: payload.type }, "Polar webhook received")
+
+    // Handle subscription.uncanceled specifically since the dedicated handler isn't firing
+    if (payload.type === "subscription.uncanceled") {
+      const subscription = payload.data
+      const userId = subscription.metadata?.userId
+
+      logger.info(
+        {
+          userId,
+          subscriptionId: subscription.id,
+          action: "uncancellation_event_received",
+          eventType: payload.type,
+          canceledAt: subscription.canceledAt,
+          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          status: subscription.status,
+        },
+        "Processing subscription.uncanceled event in onPayload handler",
+      )
+
+      if (!userId) {
+        logger.warn({ subscriptionId: subscription.id }, "Subscription uncanceled without userId")
+        return
+      }
+
+      // Validate this is actually an uncancellation by checking payload fields
+      const isValidUncancellation =
+        subscription.canceledAt === null && subscription.cancelAtPeriodEnd === false
+
+      if (!isValidUncancellation) {
+        logger.warn(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            canceledAt: subscription.canceledAt,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          },
+          "Received subscription.uncanceled event but payload doesn't indicate valid uncancellation",
+        )
+        return
+      }
+
+      try {
+        // Get plan information from product ID
+        const planConfig = getPlanConfigByProductId(subscription.productId)
+        const currentPlanType = planConfig?.planType.startsWith("paid1") ? "paid1" : "paid2"
+
+        // Clear cancellation and restore active subscription
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            action: "clearing_cancellation",
+            currentPlanType,
+            payloadCanceledAt: subscription.canceledAt,
+            payloadCancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          },
+          "DEBUG: About to clear cancellation timestamp via onPayload uncanceled handler",
+        )
+
+        await updateUserSubscriptionFromPolar({
+          userId: String(userId),
+          subscription: {
+            id: String(subscription.id),
+            customerId: String(subscription.customerId),
+            productId: String(subscription.productId),
+            currentPeriodStart: subscription.currentPeriodStart
+              ? subscription.currentPeriodStart.toISOString()
+              : undefined,
+            currentPeriodEnd: subscription.currentPeriodEnd
+              ? subscription.currentPeriodEnd.toISOString()
+              : undefined,
+            canceledAt: null, // Clear cancellation timestamp
+          },
+          planType: currentPlanType,
+          status: "active",
+        })
+
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            action: "uncancellation_completed",
+          },
+          "Subscription uncancellation processed successfully via onPayload",
+        )
+      } catch (error) {
+        logger.error(
+          { error, userId, subscriptionId: subscription.id },
+          "Failed to process subscription uncancellation in onPayload",
+        )
+      }
+    }
+  },
 
   // Handle checkout completion (payment completed)
   onCheckoutCreated: async (payload) => {
@@ -51,7 +149,7 @@ export const POST = Webhooks({
       }
 
       // Map Polar plan type to legacy plan type for usage tracking
-      const legacyPlanType = planConfig.planType.startsWith("lite") ? "paid1" : "paid2"
+      const legacyPlanType = planConfig.planType.startsWith("paid1") ? "paid1" : "paid2"
 
       // Update user subscription in database
       await updateUserSubscriptionFromPolar({
@@ -92,8 +190,23 @@ export const POST = Webhooks({
       const planConfig = getPlanConfigByProductId(subscription.productId)
       const planType = planConfig?.planType || "free"
       const legacyPlanType =
-        planType === "free" ? "free" : planConfig?.planType.startsWith("lite") ? "paid1" : "paid2"
+        planType === "free" ? "free" : planConfig?.planType.startsWith("paid1") ? "paid1" : "paid2"
 
+      // Get current subscription to detect plan changes
+      const supabase = createServerSupabaseClient()
+      const { data: currentSubscription } = await supabase
+        .from("user_subscriptions")
+        .select("plan_type")
+        .eq("user_id", userId)
+        .single()
+
+      const currentPlanType = currentSubscription?.plan_type
+      const isUpgrade = currentPlanType === "paid1" && legacyPlanType === "paid2"
+      const isDowngrade = currentPlanType === "paid2" && legacyPlanType === "paid1"
+      const isPlanChange = currentPlanType && currentPlanType !== legacyPlanType
+
+      // For subscription updates, only update essential fields, NOT status or cancellation state
+      // Status changes are handled by specific cancel/uncancel events
       await updateUserSubscriptionFromPolar({
         userId: String(userId),
         subscription: {
@@ -106,27 +219,39 @@ export const POST = Webhooks({
           currentPeriodEnd: subscription.currentPeriodEnd
             ? subscription.currentPeriodEnd.toISOString()
             : undefined,
+          // DO NOT include canceledAt field at all - this preserves existing value
         },
-        planType: legacyPlanType, // Use legacy plan type for UI compatibility
-        status: subscription.status,
+        planType: legacyPlanType,
+        // Don't update status here - let specific cancel/uncancel events handle status changes
+        status: undefined, // This will preserve existing status in the database
       })
 
-      // Update user plan based on subscription status
-      if (subscription.status === "active") {
+      // CRITICAL: Update user plan in usage tracking for plan changes
+      if (isPlanChange) {
         await updateUserPlan(String(userId), legacyPlanType)
-      } else if (subscription.status === "canceled") {
-        await updateUserPlan(String(userId), "free")
-      }
 
-      logger.info(
-        {
-          userId,
-          subscriptionId: subscription.id,
-          status: subscription.status,
-          planType: legacyPlanType,
-        },
-        "Subscription updated",
-      )
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            oldPlan: currentPlanType,
+            newPlan: legacyPlanType,
+            changeType: isUpgrade ? "upgrade" : isDowngrade ? "downgrade" : "change",
+            productId: subscription.productId,
+          },
+          `Plan ${isUpgrade ? "upgraded" : isDowngrade ? "downgraded" : "changed"} successfully`,
+        )
+      } else {
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            planType: legacyPlanType,
+            action: "period_update_only",
+          },
+          "Subscription updated (billing period only, no plan change)",
+        )
+      }
     } catch (error) {
       logger.error(
         { error, userId, subscriptionId: subscription.id },
@@ -147,30 +272,84 @@ export const POST = Webhooks({
     }
 
     try {
-      // Revert user to free plan
-      await updateUserPlan(String(userId), "free")
+      // Get plan information from product ID to maintain current plan until period ends
+      const planConfig = getPlanConfigByProductId(subscription.productId)
+      const currentPlanType = planConfig?.planType.startsWith("paid1") ? "paid1" : "paid2"
 
-      await updateUserSubscriptionFromPolar({
-        userId: String(userId),
-        subscription: {
-          id: String(subscription.id),
-          customerId: String(subscription.customerId),
-          productId: String(subscription.productId),
-          currentPeriodStart: subscription.currentPeriodStart
-            ? subscription.currentPeriodStart.toISOString()
-            : undefined,
-          currentPeriodEnd: subscription.currentPeriodEnd
-            ? subscription.currentPeriodEnd.toISOString()
-            : undefined,
-        },
-        planType: "free", // Canceled subscriptions are always free
-        status: "canceled",
-      })
+      // Check if subscription has already expired
+      const periodEnd = subscription.currentPeriodEnd
+      const isExpired = periodEnd && new Date(periodEnd) <= new Date()
 
-      logger.info(
-        { userId, subscriptionId: subscription.id },
-        "Subscription canceled, user reverted to free plan",
-      )
+      if (isExpired) {
+        // If already expired, downgrade to free immediately
+        await updateUserPlan(String(userId), "free")
+
+        await updateUserSubscriptionFromPolar({
+          userId: String(userId),
+          subscription: {
+            id: String(subscription.id),
+            customerId: String(subscription.customerId),
+            productId: String(subscription.productId),
+            currentPeriodStart: subscription.currentPeriodStart
+              ? subscription.currentPeriodStart.toISOString()
+              : undefined,
+            currentPeriodEnd: subscription.currentPeriodEnd
+              ? subscription.currentPeriodEnd.toISOString()
+              : undefined,
+          },
+          planType: "free",
+          status: "canceled",
+        })
+
+        logger.info(
+          { userId, subscriptionId: subscription.id },
+          "Expired subscription canceled, user downgraded to free plan",
+        )
+      } else {
+        // If not expired, keep status as "active" but set canceled_at timestamp
+        // User retains access until period end (cancelled but active)
+        const canceledAtTimestamp = new Date().toISOString()
+
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            action: "setting_cancellation",
+            canceledAt: canceledAtTimestamp,
+            currentPlanType,
+            periodEnd: subscription.currentPeriodEnd,
+          },
+          "DEBUG: About to set cancellation timestamp",
+        )
+
+        await updateUserSubscriptionFromPolar({
+          userId: String(userId),
+          subscription: {
+            id: String(subscription.id),
+            customerId: String(subscription.customerId),
+            productId: String(subscription.productId),
+            currentPeriodStart: subscription.currentPeriodStart
+              ? subscription.currentPeriodStart.toISOString()
+              : undefined,
+            currentPeriodEnd: subscription.currentPeriodEnd
+              ? subscription.currentPeriodEnd.toISOString()
+              : undefined,
+            canceledAt: canceledAtTimestamp, // Set cancellation timestamp
+          },
+          planType: currentPlanType, // Keep current plan until period ends
+          status: "active", // Keep status as active - cancellation is indicated by canceled_at timestamp
+        })
+
+        logger.info(
+          {
+            userId,
+            subscriptionId: subscription.id,
+            planType: currentPlanType,
+            periodEnd: subscription.currentPeriodEnd,
+          },
+          "Subscription canceled but user retains access until period end",
+        )
+      }
     } catch (error) {
       logger.error(
         { error, userId, subscriptionId: subscription.id },
@@ -178,10 +357,5 @@ export const POST = Webhooks({
       )
       // Don't throw - let webhook complete successfully
     }
-  },
-
-  // General event handler for logging
-  onPayload: async (payload) => {
-    logger.info({ eventType: payload.type }, "Polar webhook received")
   },
 })

@@ -1,7 +1,11 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
-import { updateUserPlan, getUserPlan } from "@/lib/subscriptions/management"
+import {
+  updateUserPlan,
+  getUserPlan,
+  autoExpireSubscription,
+} from "@/lib/subscriptions/management"
 import { type PlanType, calculateBillingPeriod, PLAN_LIMITS } from "@/lib/usage/tracking"
 import { logger } from "@/lib/utils/logger"
 import { createServerSupabaseClient } from "@/lib/integrations/supabase"
@@ -116,12 +120,12 @@ export async function getUserPlanAndUsage(): Promise<{
 
     const supabase = createServerSupabaseClient()
 
-    // Single query to get active subscription if exists (including cancellation info)
+    // Get subscription that is either active OR canceled but still within period
     const { data: activeSubscriptions, error: subscriptionError } = await supabase
       .from("user_subscriptions")
       .select("*, canceled_at, current_period_end")
       .eq("user_id", userId)
-      .eq("status", "active")
+      .in("status", ["active", "canceled"]) // Include canceled subscriptions
       .order("created_at", { ascending: false })
       .limit(1)
 
@@ -133,10 +137,45 @@ export async function getUserPlanAndUsage(): Promise<{
       }
     }
 
-    // Determine plan type
-    const activeSubscription =
-      activeSubscriptions && activeSubscriptions.length > 0 ? activeSubscriptions[0] : null
-    const planType: PlanType = activeSubscription?.plan_type || "free"
+    // Determine plan type based on subscription status and period
+    let activeSubscription = null
+    let planType: PlanType = "free"
+
+    if (activeSubscriptions && activeSubscriptions.length > 0) {
+      const subscription = activeSubscriptions[0]
+
+      // Check if subscription is truly active (either status=active OR canceled but within period)
+      if (subscription.status === "active") {
+        activeSubscription = subscription
+        planType = subscription.plan_type
+      } else if (subscription.status === "canceled" && subscription.current_period_end) {
+        // For canceled subscriptions, check if still within active period
+        const periodEnd = new Date(subscription.current_period_end)
+        const now = new Date()
+
+        if (now <= periodEnd) {
+          // Still within active period - treat as active subscription
+          activeSubscription = subscription
+          planType = subscription.plan_type
+          logger.info(
+            { userId, subscriptionId: subscription.id, periodEnd: periodEnd.toISOString() },
+            "Canceled subscription still active until period end",
+          )
+        } else {
+          // Period has expired - automatically downgrade to free
+          logger.info(
+            { userId, subscriptionId: subscription.id, periodEnd: periodEnd.toISOString() },
+            "Canceled subscription period has expired - auto-downgrading to free",
+          )
+
+          // Update subscription status to expired in database
+          await autoExpireSubscription(userId, subscription.id)
+
+          // User is now on free plan
+          planType = "free"
+        }
+      }
+    }
     const subscriptionStartDate = activeSubscription?.current_period_start
       ? new Date(activeSubscription.current_period_start)
       : new Date()

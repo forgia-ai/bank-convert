@@ -101,6 +101,7 @@ interface PolarSubscription {
   productId: string
   currentPeriodStart?: string
   currentPeriodEnd?: string
+  canceledAt?: string | null
 }
 
 export async function getUserPolarCustomerId(userId: string): Promise<string | null> {
@@ -124,7 +125,7 @@ export async function updateUserSubscriptionFromPolar(params: {
   order?: PolarOrder
   subscription?: PolarSubscription
   planType: PolarPlanType | string
-  status: string
+  status?: string
 }) {
   const { userId, order, subscription, planType, status } = params
   const supabase = createServerSupabaseClient()
@@ -139,11 +140,27 @@ export async function updateUserSubscriptionFromPolar(params: {
 
     const now = new Date().toISOString()
 
+    // Debug logging for cancellation handling
+    if (subscription) {
+      logger.info(
+        {
+          userId,
+          subscriptionId: subscription.id,
+          canceledAtValue: subscription.canceledAt,
+          canceledAtType: typeof subscription.canceledAt,
+          canceledAtUndefined: subscription.canceledAt === undefined,
+          action: "building_subscription_data",
+        },
+        "DEBUG: Processing canceledAt in updateUserSubscriptionFromPolar",
+      )
+    }
+
     const subscriptionData = {
       user_id: userId,
       plan_type: planType,
-      status,
       updated_at: now,
+      // Only include status if it's provided (preserves existing status when undefined)
+      ...(status !== undefined && { status }),
       ...(order && {
         polar_customer_id: order.customerId,
         polar_order_id: order.id,
@@ -155,8 +172,26 @@ export async function updateUserSubscriptionFromPolar(params: {
         polar_product_id: subscription.productId,
         current_period_start: subscription.currentPeriodStart,
         current_period_end: subscription.currentPeriodEnd,
+        // Only set canceled_at if it's explicitly provided (including null to clear it)
+        // If canceledAt is not in the subscription object at all, don't touch the field
+        ...("canceledAt" in subscription && { canceled_at: subscription.canceledAt }),
       }),
     }
+
+    // Debug log the final subscription data
+    logger.info(
+      {
+        userId,
+        subscriptionData: {
+          ...subscriptionData,
+          // Don't log sensitive data, just the structure
+          user_id: "[HIDDEN]",
+        },
+        hasCanceledAt: "canceled_at" in subscriptionData,
+        canceledAtValue: subscriptionData.canceled_at,
+      },
+      "DEBUG: Final subscription data before database update",
+    )
 
     if (existingRecord) {
       // Update existing record
@@ -174,9 +209,20 @@ export async function updateUserSubscriptionFromPolar(params: {
         "Successfully updated existing user subscription from Polar",
       )
     } else {
+      // Only create new record if we have customer information
+      if (!subscription?.customerId && !order?.customerId) {
+        logger.info(
+          { userId, planType },
+          "Skipping subscription record creation - no customer ID available yet (will be created by order event)",
+        )
+        return // Don't create incomplete records
+      }
+
       // Insert new record with all required fields
+      // For new records, status is required, so default to "active" if not provided
       const { error } = await supabase.from("user_subscriptions").insert({
         ...subscriptionData,
+        status: status || "active", // Default to "active" for new records
         created_at: now,
       })
 

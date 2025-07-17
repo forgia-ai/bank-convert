@@ -3,6 +3,7 @@
 import React from "react"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { BarChart3 } from "lucide-react"
 import { type Locale } from "@/i18n-config"
 import { useUserLimits } from "@/contexts/user-limits-context"
@@ -20,7 +21,43 @@ export default function UsageTracker({
   context = "dashboard",
 }: UsageTrackerProps) {
   // Get user limits from context
-  const { userLimits } = useUserLimits()
+  const { userLimits, isLoading } = useUserLimits()
+
+  // Show skeleton while loading
+  if (isLoading) {
+    // Compact navbar skeleton
+    if (context === "navbar") {
+      return (
+        <div className="flex items-center gap-1.5 px-2 py-1 border rounded-md bg-card">
+          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+      )
+    }
+
+    // Dashboard skeleton
+    return (
+      <div className="bg-card border rounded-lg p-4 space-y-3">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-5 w-12" />
+            <Skeleton className="h-5 w-16" />
+          </div>
+          <Skeleton className="h-4 w-20" />
+        </div>
+
+        {/* Progress bar skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-2 w-full" />
+          <div className="flex justify-between">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const usage = userLimits.currentUsage
   const limit = userLimits.limit
