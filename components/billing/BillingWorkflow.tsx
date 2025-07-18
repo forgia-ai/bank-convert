@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,20 +42,36 @@ export default function BillingWorkflow({ lang, dictionary }: BillingWorkflowPro
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPortalLoading, setIsPortalLoading] = useState(false)
+  const processedSuccessRef = useRef<string | null>(null)
 
   const t = dictionary.billing_page
 
-  // Check for successful checkout
+  // Extract search params to satisfy linter
+  const success = searchParams.get("success")
+  const checkoutId = searchParams.get("checkoutId")
+  const sessionId = searchParams.get("session_id")
+
+  // Check for successful checkout from Stripe - only run once per success
   useEffect(() => {
-    const sessionId = searchParams.get("session_id")
-    if (sessionId) {
-      toast.success(t.payment_successful)
+    // Create a unique key for this success event
+    const successKey = checkoutId || sessionId || "unknown"
+
+    // Only process if success is true and we have either checkoutId or sessionId, and haven't processed this one yet
+    if (
+      success === "true" &&
+      (checkoutId || sessionId) &&
+      processedSuccessRef.current !== successKey
+    ) {
+      processedSuccessRef.current = successKey
+      toast.success(t.payment_successful || "Payment successful!")
       // Refresh user limits to get updated plan info
       refreshLimits()
-      // Clean up URL
-      router.replace(`/${lang}/viewer/billing`)
+      // Clean up URL after a short delay to ensure state updates complete
+      setTimeout(() => {
+        router.replace(`/${lang}/viewer/billing`)
+      }, 500)
     }
-  }, [searchParams, refreshLimits, router, lang, t.payment_successful])
+  }, [success, checkoutId, sessionId, refreshLimits, router, lang, t.payment_successful])
 
   const usagePercentage = userLimits.usagePercentage
 

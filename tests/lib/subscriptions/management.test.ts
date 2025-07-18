@@ -18,6 +18,7 @@ beforeEach(() => {
       data: null,
       error: null,
       eq: vi.fn(() => createChainableMock()),
+      in: vi.fn(() => createChainableMock()),
       select: vi.fn(() => createChainableMock()),
       update: vi.fn(() => createChainableMock()),
       insert: vi.fn(() => createChainableMock()),

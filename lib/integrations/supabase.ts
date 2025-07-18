@@ -72,6 +72,7 @@ export interface Database {
           status:
             | "active"
             | "canceled"
+            | "expired"
             | "incomplete"
             | "incomplete_expired"
             | "past_due"
@@ -92,6 +93,7 @@ export interface Database {
           status:
             | "active"
             | "canceled"
+            | "expired"
             | "incomplete"
             | "incomplete_expired"
             | "past_due"
@@ -112,6 +114,7 @@ export interface Database {
           status?:
             | "active"
             | "canceled"
+            | "expired"
             | "incomplete"
             | "incomplete_expired"
             | "past_due"

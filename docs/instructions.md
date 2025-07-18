@@ -369,7 +369,7 @@ This plan outlines the development phases, starting with frontend UI and mock da
 
 1.  **[ ] End-to-End Testing:**
     - [ ] Thoroughly test the entire user workflow: signup -> login -> file upload -> data extraction -> (optional review) -> XLSX download.
-    - [ ] Test subscription purchase and management flows.
+    - [x] Test subscription purchase and management flows.
     - [ ] Test different file types and edge cases for extraction.
 2.  **[x] Error Handling & Logging:**
     - [x] Implement robust error handling on both frontend and backend.
