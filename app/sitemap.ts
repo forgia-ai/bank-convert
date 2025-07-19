@@ -34,6 +34,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       changeFrequency: "weekly" as const,
     },
+    // SEO-optimized converter pages
+    {
+      path: "/excel",
+      priority: 0.9,
+      changeFrequency: "weekly" as const,
+    },
+    {
+      path: "/xlsx",
+      priority: 0.9,
+      changeFrequency: "weekly" as const,
+    },
+    {
+      path: "/xls",
+      priority: 0.9,
+      changeFrequency: "weekly" as const,
+    },
+    // Legal pages
+    {
+      path: "/privacy",
+      priority: 0.5,
+      changeFrequency: "yearly" as const,
+    },
+    {
+      path: "/terms",
+      priority: 0.5,
+      changeFrequency: "yearly" as const,
+    },
   ]
 
   // Generate sitemap entries for all locales and pages
