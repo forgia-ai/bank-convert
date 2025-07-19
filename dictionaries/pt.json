@@ -374,6 +374,18 @@
     "pricing": {
       "title": "Preços do Conversor de Extratos Bancários | Planos Gratuitos e Pro",
       "description": "Escolha o plano perfeito para suas necessidades. Plano gratuito inclui 50 páginas. Planos Pro oferecem conversões ilimitadas, suporte prioritário e recursos avançados. Sem taxas ocultas."
+    },
+    "about": {
+      "title": "Sobre Bank Statement Convert | Nossa História e Missão",
+      "description": "Conheça o Bank Statement Convert - a ferramenta alimentada por IA em que milhares confiam para converter extratos bancários PDF para Excel. Nossa missão é simplificar o processamento de dados financeiros para todos."
+    },
+    "contact": {
+      "title": "Contatar Bank Statement Convert | Obter Suporte e Ajuda",
+      "description": "Entre em contato com a equipe de suporte do Bank Statement Convert. Estamos aqui para ajudar com perguntas, suporte técnico e feedback sobre nossa ferramenta de conversão PDF para Excel."
+    },
+    "preview": {
+      "title": "Visualizar Conversão de Extratos | Experimente Grátis Antes de Se Inscrever",
+      "description": "Experimente nosso conversor de extratos bancários gratuitamente! Carregue seu extrato PDF e veja resultados instantâneos. Não é necessário cadastro para visualização. Extraia transações com precisão de IA."
     }
   },
   "terms_page": {

@@ -1,6 +1,59 @@
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
 import ContactForm from "@/components/marketing/ContactForm"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return "https://www.bankstatementconvert.to"
+  }
+  return "http://localhost:3000"
+}
+
+// Generate metadata for contact page
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  const baseUrl = getBaseUrl()
+  const dictionary = await getDictionary(lang)
+
+  const title =
+    dictionary.metadata?.contact?.title || "Contact Bank Statement Convert | Get Support & Help"
+  const description =
+    dictionary.metadata?.contact?.description ||
+    "Get in touch with Bank Statement Convert support team. We're here to help with questions, technical support, and feedback about our PDF to Excel conversion tool."
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${lang}/contact`,
+      type: "website",
+      images: [
+        {
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=contact`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [
+        `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=contact`,
+      ],
+    },
+  }
+}
 
 interface ContactPageProps {
   params: Promise<{ lang: Locale }>

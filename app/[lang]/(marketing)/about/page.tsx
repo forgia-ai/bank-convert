@@ -2,6 +2,59 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return "https://www.bankstatementconvert.to"
+  }
+  return "http://localhost:3000"
+}
+
+// Generate metadata for about page
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  const baseUrl = getBaseUrl()
+  const dictionary = await getDictionary(lang)
+
+  const title =
+    dictionary.metadata?.about?.title || "About Bank Statement Convert | Our Story & Mission"
+  const description =
+    dictionary.metadata?.about?.description ||
+    "Learn about Bank Statement Convert - the AI-powered tool trusted by thousands to convert PDF bank statements to Excel. Our mission is to simplify financial data processing for everyone."
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${lang}/about`,
+      type: "website",
+      images: [
+        {
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=about`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [
+        `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=about`,
+      ],
+    },
+  }
+}
 
 export default async function AboutPage({
   params: paramsPromise,
