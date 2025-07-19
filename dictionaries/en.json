@@ -385,6 +385,34 @@
     "preview": {
       "title": "Preview Bank Statement Conversion | Try Free Before Signing Up",
       "description": "Try our bank statement converter for free! Upload your PDF statement and see instant results. No signup required for preview. Extract transactions with AI accuracy."
+    },
+    "xls": {
+      "title": "Convert Bank Statement to XLS - Free PDF to XLS Converter",
+      "description": "Convert your bank statements to XLS format instantly. Upload PDF bank statements and get structured XLS files in seconds. Free tool with 99% accuracy.",
+      "keywords": "convert bank statement to xls, pdf to xls, bank statement converter, xls converter, pdf bank statement to xls"
+    },
+    "excel": {
+      "title": "Convert Bank Statement to Excel - Free PDF to Excel Converter",
+      "description": "Convert your bank statements to Excel format instantly. Upload PDF bank statements and get structured Excel files in seconds. Free tool with 99% accuracy.",
+      "keywords": "convert bank statement to excel, pdf to excel, bank statement converter, excel converter, pdf bank statement to excel"
+    },
+    "xlsx": {
+      "title": "Convert Bank Statement to XLSX - Free PDF to XLSX Converter",
+      "description": "Convert your bank statements to XLSX format instantly. Upload PDF bank statements and get structured XLSX files in seconds. Free tool with 99% accuracy.",
+      "keywords": "convert bank statement to xlsx, pdf to xlsx, bank statement converter, xlsx converter, pdf bank statement to xlsx"
+    },
+    "homepage": {
+      "title": "Convert Bank Statements to Excel | Free PDF to Excel Converter",
+      "description": "Transform PDF bank statements into Excel spreadsheets instantly. AI-powered extraction with 99% accuracy. Free tool trusted by thousands worldwide.",
+      "keywords": "bank statement converter, pdf to excel, convert bank statement, excel converter, pdf bank statement to excel"
+    },
+    "privacy": {
+      "title": "Privacy Policy | Bank Statement Convert Data Protection",
+      "description": "Learn how Bank Statement Convert protects your financial data. Our privacy policy explains data handling, security measures, and your rights regarding personal information."
+    },
+    "terms": {
+      "title": "Terms of Service | Bank Statement Convert Legal Terms",
+      "description": "Read the terms of service for Bank Statement Convert. Understand your rights and responsibilities when using our PDF to Excel conversion service."
     }
   },
   "terms_page": {

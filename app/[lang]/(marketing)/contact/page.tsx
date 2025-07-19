@@ -19,14 +19,51 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params
   const baseUrl = getBaseUrl()
-  const dictionary = await getDictionary(lang)
 
-  const title =
-    (dictionary as { metadata?: { contact?: { title?: string; description?: string } } }).metadata
-      ?.contact?.title || "Contact Bank Statement Convert | Get Support & Help"
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is { metadata: { contact?: { title?: string; description?: string } } } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasContactMetadata = (
+    metadata: unknown,
+  ): metadata is { contact: { title?: string; description?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "contact" in metadata &&
+      (metadata as Record<string, unknown>).contact &&
+      typeof (metadata as Record<string, unknown>).contact === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const contactMetadata = metadata && hasContactMetadata(metadata) ? metadata.contact : null
+
+  const title = contactMetadata?.title || "Contact Bank Statement Convert | Get Support & Help"
   const description =
-    (dictionary as { metadata?: { contact?: { title?: string; description?: string } } }).metadata
-      ?.contact?.description ||
+    contactMetadata?.description ||
     "Get in touch with Bank Statement Convert support team. We're here to help with questions, technical support, and feedback about our PDF to Excel conversion tool."
 
   return {

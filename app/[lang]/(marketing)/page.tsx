@@ -12,6 +12,91 @@ import {
 } from "@/components/ui/accordion"
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+}
+
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await paramsPromise
+  const baseUrl = getBaseUrl()
+
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is {
+    metadata: { homepage?: { title?: string; description?: string; keywords?: string } }
+  } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasHomepageMetadata = (
+    metadata: unknown,
+  ): metadata is { homepage: { title?: string; description?: string; keywords?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "homepage" in metadata &&
+      (metadata as Record<string, unknown>).homepage &&
+      typeof (metadata as Record<string, unknown>).homepage === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const homepageMetadata = metadata && hasHomepageMetadata(metadata) ? metadata.homepage : null
+
+  const title =
+    homepageMetadata?.title || "Convert Bank Statements to Excel | Free PDF to Excel Converter"
+  const description =
+    homepageMetadata?.description ||
+    "Transform PDF bank statements into Excel spreadsheets instantly. AI-powered extraction with 99% accuracy. Free tool trusted by thousands worldwide."
+  const keywords =
+    homepageMetadata?.keywords ||
+    "bank statement converter, pdf to excel, convert bank statement, excel converter, pdf bank statement to excel"
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: `${baseUrl}/${lang}`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${baseUrl}/${lang}`,
+    },
+  }
+}
 
 export default async function MarketingHomePage({
   params: paramsPromise, // Renamed to avoid conflict

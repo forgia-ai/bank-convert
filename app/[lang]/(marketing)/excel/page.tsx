@@ -11,7 +11,15 @@ import {
 } from "@/components/ui/accordion"
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
-import { Metadata } from "next"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+}
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -19,22 +27,80 @@ export async function generateMetadata({
   params: Promise<{ lang: Locale }>
 }): Promise<Metadata> {
   const { lang } = await paramsPromise
+  const baseUrl = getBaseUrl()
+
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is {
+    metadata: { excel?: { title?: string; description?: string; keywords?: string } }
+  } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasExcelMetadata = (
+    metadata: unknown,
+  ): metadata is { excel: { title?: string; description?: string; keywords?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "excel" in metadata &&
+      (metadata as Record<string, unknown>).excel &&
+      typeof (metadata as Record<string, unknown>).excel === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const excelMetadata = metadata && hasExcelMetadata(metadata) ? metadata.excel : null
+
+  const title =
+    excelMetadata?.title || "Convert Bank Statement to Excel - Free PDF to Excel Converter"
+  const description =
+    excelMetadata?.description ||
+    "Convert your bank statements to Excel format instantly. Upload PDF bank statements and get structured Excel files in seconds. Free tool with 99% accuracy."
+  const keywords =
+    excelMetadata?.keywords ||
+    "convert bank statement to excel, pdf to excel, bank statement converter, excel converter, pdf bank statement to excel"
 
   return {
-    title: "Convert Bank Statement to Excel - Free PDF to Excel Converter",
-    description:
-      "Convert your bank statements to Excel format instantly. Upload PDF bank statements and get structured Excel files in seconds. Free tool with 99% accuracy.",
-    keywords:
-      "convert bank statement to excel, pdf to excel, bank statement converter, excel converter, pdf bank statement to excel",
+    title,
+    description,
+    keywords,
     alternates: {
-      canonical: `/${lang}/excel`,
+      canonical: `${baseUrl}/${lang}/excel`,
     },
     openGraph: {
-      title: "Convert Bank Statement to Excel - Free PDF to Excel Converter",
-      description:
-        "Convert your bank statements to Excel format instantly. Upload PDF bank statements and get structured Excel files in seconds. Free tool with 99% accuracy.",
+      title,
+      description,
       type: "website",
-      url: `/${lang}/excel`,
+      url: `${baseUrl}/${lang}/excel`,
+      images: [
+        {
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=excel`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
   }
 }

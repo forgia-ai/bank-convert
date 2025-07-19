@@ -11,7 +11,15 @@ import {
 } from "@/components/ui/accordion"
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
-import { Metadata } from "next"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+}
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -19,22 +27,79 @@ export async function generateMetadata({
   params: Promise<{ lang: Locale }>
 }): Promise<Metadata> {
   const { lang } = await paramsPromise
+  const baseUrl = getBaseUrl()
+
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is {
+    metadata: { xls?: { title?: string; description?: string; keywords?: string } }
+  } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasXlsMetadata = (
+    metadata: unknown,
+  ): metadata is { xls: { title?: string; description?: string; keywords?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "xls" in metadata &&
+      (metadata as Record<string, unknown>).xls &&
+      typeof (metadata as Record<string, unknown>).xls === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const xlsMetadata = metadata && hasXlsMetadata(metadata) ? metadata.xls : null
+
+  const title = xlsMetadata?.title || "Convert Bank Statement to XLS - Free PDF to XLS Converter"
+  const description =
+    xlsMetadata?.description ||
+    "Convert your bank statements to XLS format instantly. Upload PDF bank statements and get structured XLS files in seconds. Free tool with 99% accuracy."
+  const keywords =
+    xlsMetadata?.keywords ||
+    "convert bank statement to xls, pdf to xls, bank statement converter, xls converter, pdf bank statement to xls"
 
   return {
-    title: "Convert Bank Statement to XLS - Free PDF to XLS Converter",
-    description:
-      "Convert your bank statements to XLS format instantly. Upload PDF bank statements and get structured XLS files in seconds. Free tool with 99% accuracy.",
-    keywords:
-      "convert bank statement to xls, pdf to xls, bank statement converter, xls converter, pdf bank statement to xls",
+    title,
+    description,
+    keywords,
     alternates: {
-      canonical: `/${lang}/xls`,
+      canonical: `${baseUrl}/${lang}/xls`,
     },
     openGraph: {
-      title: "Convert Bank Statement to XLS - Free PDF to XLS Converter",
-      description:
-        "Convert your bank statements to XLS format instantly. Upload PDF bank statements and get structured XLS files in seconds. Free tool with 99% accuracy.",
+      title,
+      description,
       type: "website",
-      url: `/${lang}/xls`,
+      url: `${baseUrl}/${lang}/xls`,
+      images: [
+        {
+          url: `${baseUrl}/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&lang=${lang}&type=xls`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
   }
 }

@@ -374,6 +374,46 @@
     "pricing": {
       "title": "Precios del Conversor de Extractos Bancarios | Planes Gratuitos y Pro",
       "description": "Elige el plan perfecto para tus necesidades. Plan gratuito incluye 50 páginas. Planes Pro ofrecen conversiones ilimitadas, soporte prioritario y características avanzadas. Sin tarifas ocultas."
+    },
+    "about": {
+      "title": "Acerca de Bank Statement Convert | Nuestra Historia y Misión",
+      "description": "Conoce Bank Statement Convert - la herramienta impulsada por IA en la que confían miles para convertir extractos bancarios PDF a Excel. Nuestra misión es simplificar el procesamiento de datos financieros para todos."
+    },
+    "contact": {
+      "title": "Contactar Bank Statement Convert | Obtener Soporte y Ayuda",
+      "description": "Ponte en contacto con el equipo de soporte de Bank Statement Convert. Estamos aquí para ayudar con preguntas, soporte técnico y comentarios sobre nuestra herramienta de conversión de PDF a Excel."
+    },
+    "preview": {
+      "title": "Vista Previa de Conversión de Extracto Bancario | Prueba Gratis Antes de Registrarte",
+      "description": "¡Prueba nuestro conversor de extractos bancarios gratis! Sube tu extracto PDF y ve resultados instantáneos. No se requiere registro para vista previa. Extrae transacciones con precisión de IA."
+    },
+    "xls": {
+      "title": "Convertir Extracto Bancario a XLS - Conversor PDF a XLS Gratuito",
+      "description": "Convierte tus extractos bancarios a formato XLS al instante. Sube extractos PDF y obtén archivos XLS estructurados en segundos. Herramienta gratuita con 99% de precisión.",
+      "keywords": "convertir extracto bancario a xls, pdf a xls, conversor extracto bancario, conversor xls, pdf extracto bancario a xls"
+    },
+    "excel": {
+      "title": "Convertir Extracto Bancario a Excel - Conversor PDF a Excel Gratuito",
+      "description": "Convierte tus extractos bancarios a formato Excel al instante. Sube extractos PDF y obtén archivos Excel estructurados en segundos. Herramienta gratuita con 99% de precisión.",
+      "keywords": "convertir extracto bancario a excel, pdf a excel, conversor extracto bancario, conversor excel, pdf extracto bancario a excel"
+    },
+    "xlsx": {
+      "title": "Convertir Extracto Bancario a XLSX - Conversor PDF a XLSX Gratuito",
+      "description": "Convierte tus extractos bancarios a formato XLSX al instante. Sube extractos PDF y obtén archivos XLSX estructurados en segundos. Herramienta gratuita con 99% de precisión.",
+      "keywords": "convertir extracto bancario a xlsx, pdf a xlsx, conversor extracto bancario, conversor xlsx, pdf extracto bancario a xlsx"
+    },
+    "homepage": {
+      "title": "Convertir Extractos Bancarios a Excel | Conversor PDF a Excel Gratuito",
+      "description": "Transforma extractos bancarios PDF en hojas de cálculo Excel al instante. Extracción impulsada por IA con 99% de precisión. Herramienta gratuita confiada por miles en todo el mundo.",
+      "keywords": "conversor extracto bancario, pdf a excel, convertir extracto bancario, conversor excel, pdf extracto bancario a excel"
+    },
+    "privacy": {
+      "title": "Política de Privacidad | Protección de Datos Bank Statement Convert",
+      "description": "Aprende cómo Bank Statement Convert protege tus datos financieros. Nuestra política de privacidad explica el manejo de datos, medidas de seguridad y tus derechos sobre información personal."
+    },
+    "terms": {
+      "title": "Términos de Servicio | Términos Legales Bank Statement Convert",
+      "description": "Lee los términos de servicio de Bank Statement Convert. Comprende tus derechos y responsabilidades al usar nuestro servicio de conversión de PDF a Excel."
     }
   },
   "terms_page": {

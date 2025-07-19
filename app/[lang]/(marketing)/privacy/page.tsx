@@ -1,5 +1,83 @@
 import { getDictionary } from "@/lib/utils/get-dictionary"
 import { type Locale } from "@/i18n-config"
+import type { Metadata } from "next"
+
+// Get base URL for metadata
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+  }
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+}
+
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await paramsPromise
+  const baseUrl = getBaseUrl()
+
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is { metadata: { privacy?: { title?: string; description?: string } } } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasPrivacyMetadata = (
+    metadata: unknown,
+  ): metadata is { privacy: { title?: string; description?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "privacy" in metadata &&
+      (metadata as Record<string, unknown>).privacy &&
+      typeof (metadata as Record<string, unknown>).privacy === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const privacyMetadata = metadata && hasPrivacyMetadata(metadata) ? metadata.privacy : null
+
+  const title = privacyMetadata?.title || "Privacy Policy | Bank Statement Convert Data Protection"
+  const description =
+    privacyMetadata?.description ||
+    "Learn how Bank Statement Convert protects your financial data. Our privacy policy explains data handling, security measures, and your rights regarding personal information."
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${baseUrl}/${lang}/privacy`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${baseUrl}/${lang}/privacy`,
+    },
+  }
+}
 
 export default async function PrivacyPage({
   params: paramsPromise,

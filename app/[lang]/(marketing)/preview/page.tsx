@@ -21,14 +21,52 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params
   const baseUrl = getBaseUrl()
-  const dictionary = await getDictionary(lang)
+
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is { metadata: { preview?: { title?: string; description?: string } } } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasPreviewMetadata = (
+    metadata: unknown,
+  ): metadata is { preview: { title?: string; description?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "preview" in metadata &&
+      (metadata as Record<string, unknown>).preview &&
+      typeof (metadata as Record<string, unknown>).preview === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const previewMetadata = metadata && hasPreviewMetadata(metadata) ? metadata.preview : null
 
   const title =
-    (dictionary as { metadata?: { preview?: { title?: string; description?: string } } }).metadata
-      ?.preview?.title || "Preview Bank Statement Conversion | Try Free Before Signing Up"
+    previewMetadata?.title || "Preview Bank Statement Conversion | Try Free Before Signing Up"
   const description =
-    (dictionary as { metadata?: { preview?: { title?: string; description?: string } } }).metadata
-      ?.preview?.description ||
+    previewMetadata?.description ||
     "Try our bank statement converter for free! Upload your PDF statement and see instant results. No signup required for preview. Extract transactions with AI accuracy."
 
   return {

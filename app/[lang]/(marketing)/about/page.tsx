@@ -20,19 +20,59 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params
   const baseUrl = getBaseUrl()
-  const dictionary = await getDictionary(lang)
 
-  const title =
-    (dictionary as { metadata?: { about?: { title?: string; description?: string } } }).metadata
-      ?.about?.title || "About Bank Statement Convert | Our Story & Mission"
+  // Error handling for dictionary fetching
+  let dictionary
+  try {
+    dictionary = await getDictionary(lang)
+  } catch (error) {
+    console.error("Failed to load dictionary for metadata:", error)
+    // Fallback to empty dictionary structure
+    dictionary = { metadata: {} }
+  }
+
+  // Type guard to safely check dictionary structure
+  const hasMetadata = (
+    dict: unknown,
+  ): dict is { metadata: { about?: { title?: string; description?: string } } } => {
+    return !!(
+      dict &&
+      typeof dict === "object" &&
+      dict !== null &&
+      "metadata" in dict &&
+      (dict as Record<string, unknown>).metadata &&
+      typeof (dict as Record<string, unknown>).metadata === "object"
+    )
+  }
+
+  const hasAboutMetadata = (
+    metadata: unknown,
+  ): metadata is { about: { title?: string; description?: string } } => {
+    return !!(
+      metadata &&
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "about" in metadata &&
+      (metadata as Record<string, unknown>).about &&
+      typeof (metadata as Record<string, unknown>).about === "object"
+    )
+  }
+
+  // Safely extract metadata with proper validation
+  const metadata = hasMetadata(dictionary) ? dictionary.metadata : null
+  const aboutMetadata = metadata && hasAboutMetadata(metadata) ? metadata.about : null
+
+  const title = aboutMetadata?.title || "About Bank Statement Convert | Our Story & Mission"
   const description =
-    (dictionary as { metadata?: { about?: { title?: string; description?: string } } }).metadata
-      ?.about?.description ||
+    aboutMetadata?.description ||
     "Learn about Bank Statement Convert - the AI-powered tool trusted by thousands to convert PDF bank statements to Excel. Our mission is to simplify financial data processing for everyone."
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${baseUrl}/${lang}/about`,
+    },
     openGraph: {
       title,
       description,
