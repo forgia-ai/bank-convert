@@ -1,0 +1,105 @@
+# Bank Statement Convert - AI-Powered PDF to Excel Converter
+
+## Overview
+Bank Statement Convert is a free online tool that uses artificial intelligence to convert PDF bank statements into structured Excel spreadsheets. The application supports 500+ banks worldwide and provides instant, accurate transaction extraction with secure processing.
+
+## Core Features
+- **AI-Powered PDF Processing**: Advanced AI extracts transaction data from bank statement PDFs with high accuracy
+- **Multi-Bank Support**: Compatible with 500+ banks including Chase, Bank of America, Wells Fargo, Santander, BBVA, Banco do Brasil, and more
+- **Instant Excel Export**: Converts extracted data to clean, organized Excel (.xlsx) files
+- **Secure Processing**: Bank-grade security with no data storage - files are processed and immediately deleted
+- **Multi-Language Support**: Available in English, Spanish, and Portuguese
+- **Free Tier**: 50 pages total for free accounts, with premium plans for higher volume needs
+
+## Use Cases
+- **Accountants**: Streamline bookkeeping and financial record management
+- **Small Businesses**: Automate expense tracking and financial reporting
+- **Personal Finance**: Organize bank statements for budgeting and tax preparation
+- **Financial Analysts**: Quick data extraction for analysis and reporting
+- **Bookkeepers**: Reduce manual data entry and improve accuracy
+
+## Technical Specifications
+- **Input Formats**: PDF bank statements
+- **Output Formats**: Excel (.xlsx) spreadsheets
+- **Processing Speed**: less than 1 minute average per statement
+- **Security**: End-to-end encryption, no data retention
+- **Accessibility**: Web-based, works on all devices
+- **API**: Available for enterprise integration
+
+## Pricing
+- **Free Plan**: 50 pages total, perfect for personal use
+- **Lite Plan**: 500 pages/month for small businesses
+- **Pro Plan**: 1000 pages/month for growing businesses
+
+## Supported Banks
+### United States
+- Chase Bank, Bank of America, Wells Fargo, Citibank, US Bank, PNC Bank, Capital One, TD Bank, Truist, Fifth Third Bank
+
+### Spain
+- Santander, BBVA, CaixaBank, Banco Sabadell, Bankinter, ING España
+
+### Latin America
+- Banco do Brasil, Itaú, Bradesco, Santander Brasil, Banco de Chile, Bancolombia
+
+### International
+- HSBC, Deutsche Bank, BNP Paribas, ING Group, Barclays, Standard Chartered
+
+## Key Benefits
+- **Time Savings**: Reduces manual data entry from hours to minutes
+- **Accuracy**: AI processing eliminates human transcription errors
+- **Cost Effective**: Free tier and affordable premium plans
+- **Privacy Focused**: No data storage or sharing
+- **User Friendly**: Simple drag-and-drop interface
+- **Scalable**: From personal use to enterprise volumes
+
+## SEO Keywords
+bank statement converter, PDF to Excel, bank statement to Excel, convert bank statements, PDF bank statement parser, financial data extraction, banking data converter, statement processing tool, automated bookkeeping, financial document converter
+
+## Company Information
+- **Website**: https://bankstatementconvert.to
+- **Founded**: 2024
+- **Type**: SaaS Financial Technology Tool
+- **Target Market**: Global (English, Spanish, Portuguese speaking regions)
+- **Business Model**: Freemium with subscription tiers
+
+## Frequently Asked Questions
+
+### Is Bank Statement Convert free?
+Yes, we offer a free plan with 50 pages total. No credit card required to start.
+
+### How secure is the processing?
+We use bank-grade security with end-to-end encryption. Files are processed immediately and permanently deleted - we never store your financial data.
+
+### What file formats are supported?
+We currently support PDF bank statements. Excel output is provided in .xlsx format.
+
+### How accurate is the AI extraction?
+Our AI achieves 95%+ accuracy on standard bank statement formats. Complex or non-standard formats may require manual review.
+
+### Can I process statements from any bank?
+We support 500+ banks worldwide. If your bank isn't supported, contact us and we'll add it.
+
+### Do you offer API access?
+Yes, API access is available for enterprise customers. Contact us for integration details.
+
+### What languages are supported?
+The application is available in English, Spanish, and Portuguese with localized bank support.
+
+## Contact Information
+- **Support**: Available through in-app contact form
+- **Business Inquiries**: Enterprise solutions and partnerships available
+- **Privacy Policy**: Available at /privacy
+- **Terms of Service**: Available at /terms
+
+## Recent Updates
+- Multi-language support (English, Spanish, Portuguese)
+- Enhanced AI accuracy for international bank formats
+- Progressive Web App (PWA) capabilities
+- Improved mobile experience
+- Advanced usage analytics and reporting
+
+---
+
+Last Updated: January 2025
+Version: 1.0
+Status: Active Development
