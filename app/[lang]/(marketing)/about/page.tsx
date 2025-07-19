@@ -23,9 +23,11 @@ export async function generateMetadata({
   const dictionary = await getDictionary(lang)
 
   const title =
-    dictionary.metadata?.about?.title || "About Bank Statement Convert | Our Story & Mission"
+    (dictionary as { metadata?: { about?: { title?: string; description?: string } } }).metadata
+      ?.about?.title || "About Bank Statement Convert | Our Story & Mission"
   const description =
-    dictionary.metadata?.about?.description ||
+    (dictionary as { metadata?: { about?: { title?: string; description?: string } } }).metadata
+      ?.about?.description ||
     "Learn about Bank Statement Convert - the AI-powered tool trusted by thousands to convert PDF bank statements to Excel. Our mission is to simplify financial data processing for everyone."
 
   return {

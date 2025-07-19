@@ -24,10 +24,11 @@ export async function generateMetadata({
   const dictionary = await getDictionary(lang)
 
   const title =
-    dictionary.metadata?.preview?.title ||
-    "Preview Bank Statement Conversion | Try Free Before Signing Up"
+    (dictionary as { metadata?: { preview?: { title?: string; description?: string } } }).metadata
+      ?.preview?.title || "Preview Bank Statement Conversion | Try Free Before Signing Up"
   const description =
-    dictionary.metadata?.preview?.description ||
+    (dictionary as { metadata?: { preview?: { title?: string; description?: string } } }).metadata
+      ?.preview?.description ||
     "Try our bank statement converter for free! Upload your PDF statement and see instant results. No signup required for preview. Extract transactions with AI accuracy."
 
   return {

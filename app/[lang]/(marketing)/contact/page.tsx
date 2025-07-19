@@ -22,9 +22,11 @@ export async function generateMetadata({
   const dictionary = await getDictionary(lang)
 
   const title =
-    dictionary.metadata?.contact?.title || "Contact Bank Statement Convert | Get Support & Help"
+    (dictionary as { metadata?: { contact?: { title?: string; description?: string } } }).metadata
+      ?.contact?.title || "Contact Bank Statement Convert | Get Support & Help"
   const description =
-    dictionary.metadata?.contact?.description ||
+    (dictionary as { metadata?: { contact?: { title?: string; description?: string } } }).metadata
+      ?.contact?.description ||
     "Get in touch with Bank Statement Convert support team. We're here to help with questions, technical support, and feedback about our PDF to Excel conversion tool."
 
   return {
