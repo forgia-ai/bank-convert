@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import { withPlausibleProxy } from "next-plausible"
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pino", "pino-pretty", "pdf-parse"],
@@ -10,6 +11,22 @@ const nextConfig: NextConfig = {
 
     return config
   },
+  // Add additional rewrites for i18n routes to work with Plausible proxy
+  async rewrites() {
+    return [
+      // Handle i18n routes for Plausible proxy
+      {
+        source: "/:lang/proxy/js/script.js",
+        destination: "https://plausible.io/js/script.file-downloads.local.outbound-links.js",
+      },
+      {
+        source: "/:lang/proxy/api/event",
+        destination: "https://plausible.io/api/event",
+      },
+    ]
+  },
 }
 
-export default nextConfig
+// Use withPlausibleProxy as recommended in the docs
+// This automatically sets up the necessary rewrites
+export default withPlausibleProxy()(nextConfig)

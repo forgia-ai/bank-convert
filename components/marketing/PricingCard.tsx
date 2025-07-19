@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, Loader2 } from "lucide-react" // Using an icon for features
+import { usePlausible } from "next-plausible"
 
 interface PricingCardProps {
   planName: string
@@ -35,6 +36,29 @@ export default function PricingCard({
   className = "",
   onPlanSelect,
 }: PricingCardProps) {
+  const plausible = usePlausible()
+
+  const handlePlanClick = async () => {
+    // Send custom event to Plausible for paid plans only
+    if (planName === "Lite" || planName === "Pro") {
+      const eventData = {
+        props: {
+          plan: planName,
+          price: price,
+          billing_type: priceFrequency?.includes("month") ? "monthly" : "annual",
+        },
+      }
+
+      // Send the event
+      plausible("clickCheckout", eventData)
+
+      // Small delay to ensure the event is sent before redirect
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+
+    // Call the original plan selection handler
+    onPlanSelect?.(planName)
+  }
   return (
     <Card
       className={`flex flex-col ${isPopular ? "border-primary shadow-lg relative" : ""} ${className}`}
@@ -75,7 +99,7 @@ export default function PricingCard({
           className="w-full cursor-pointer"
           variant={isPopular ? "default" : "outline"}
           disabled={isLoading}
-          onClick={() => onPlanSelect?.(planName)}
+          onClick={handlePlanClick}
         >
           {isLoading ? (
             <>

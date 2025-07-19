@@ -37,6 +37,17 @@ const I18N_BYPASS_PATTERNS: RegExp[] = [
 export default clerkMiddleware(async (auth, request: NextRequest) => {
   const { pathname } = request.nextUrl
 
+  // Handle Plausible proxy routes - strip cookies to avoid 431 error
+  if (pathname.includes("/proxy/api/event")) {
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set("cookie", "")
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
+  }
+
   // Check if the path should bypass i18n (e.g., Clerk routes, API routes)
   const shouldBypassI18n = I18N_BYPASS_PATTERNS.some((pattern) => pattern.test(pathname))
 

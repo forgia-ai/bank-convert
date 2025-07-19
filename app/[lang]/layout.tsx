@@ -181,7 +181,13 @@ export default async function RootLayout({
   const afterSignOutUrl = `/${lang}`
 
   return (
-    <PlausibleProvider domain="www.bankstatementconvert.to">
+    <PlausibleProvider
+      domain="www.bankstatementconvert.to"
+      trackLocalhost={process.env.NODE_ENV === "development"}
+      enabled={true}
+      trackOutboundLinks={true}
+      trackFileDownloads={true}
+    >
       <ClerkProvider
         signInUrl={signInUrl}
         signUpUrl={signUpUrl}
