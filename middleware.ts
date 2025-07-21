@@ -86,7 +86,7 @@ export const config = {
   matcher: [
     // Match all routes except Next.js internals and static files with common extensions.
     // This ensures the middleware runs for pages, API routes, and specific public files (like robots.txt).
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|txt)).*)",
     // Always run for API routes (ensures Clerk protection if configured, i18n is bypassed for them above)
     "/(api|trpc)(.*)",
   ],
