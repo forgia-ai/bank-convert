@@ -96,14 +96,18 @@ const convertBankingDataToTransactions = (
       }
 
       // Use the standardized amount for calculations but format for display
-      const parsedAmount = parseFloat(transaction.amount) || 0 // LLM should return standardized amounts
+      const baseAmount = parseFloat(transaction.amount) || 0 // LLM returns positive amounts
+
+      // Apply correct sign: debits should be negative, credits should be positive
+      const signedAmount =
+        transaction.type === "debit" ? -Math.abs(baseAmount) : Math.abs(baseAmount)
 
       const formattedDate = formatDateForLocale(transaction.date, locale)
 
       transactions.push({
         date: formattedDate,
         description: transaction.description,
-        amount: parsedAmount, // Keep numeric for calculations
+        amount: signedAmount, // Now correctly signed for calculations
         currency: data.currency || "USD",
         type:
           transaction.type === "debit"
