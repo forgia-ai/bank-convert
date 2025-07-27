@@ -154,9 +154,9 @@ const DataTable: React.FC<DataTableProps> = ({
       <div className="max-h-[70vh] overflow-y-auto">
         <Table>
           <TableBody>
-            {data.map((transaction) => (
+            {data.map((transaction, index) => (
               <TableRow
-                key={`${transaction.date}-${transaction.description}-${transaction.amount}`}
+                key={`${transaction.date}-${transaction.description}-${transaction.amount}-${index}`}
                 className="hover:bg-muted/30"
               >
                 <TableCell className="font-medium w-[120px]">
