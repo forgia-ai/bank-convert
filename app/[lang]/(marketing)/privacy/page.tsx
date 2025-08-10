@@ -1,13 +1,15 @@
 import { getDictionary } from "@/lib/utils/get-dictionary"
+import { getNormalizedEnvSiteUrl, normalizeBaseUrl } from "@/lib/utils/url"
 import { type Locale } from "@/i18n-config"
 import type { Metadata } from "next"
 
-// Get base URL for metadata
+// Get base URL for metadata (normalized)
 const getBaseUrl = (): string => {
-  if (process.env.NODE_ENV === "production") {
-    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
-  }
-  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  const fromEnv = getNormalizedEnvSiteUrl()
+  if (fromEnv) return fromEnv
+  if (process.env.VERCEL_URL) return normalizeBaseUrl(process.env.VERCEL_URL)
+  if (process.env.NODE_ENV === "production") return "https://www.bankstatementconvert.to"
+  return "http://localhost:3000"
 }
 
 export async function generateMetadata({

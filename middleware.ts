@@ -37,6 +37,38 @@ const I18N_BYPASS_PATTERNS: RegExp[] = [
 export default clerkMiddleware(async (auth, request: NextRequest) => {
   const { pathname } = request.nextUrl
 
+  // Enforce single canonical host in production
+  if (process.env.NODE_ENV === "production") {
+    const primaryHost = "www.bankstatementconvert.to"
+    const host = (request.nextUrl.hostname || "").toLowerCase()
+    const isLocal = host === "localhost" || host === "127.0.0.1" || host === "::1"
+    const isVercelPreview = host.endsWith(".vercel.app")
+    const method = request.method
+    const isApiOrTrpc = pathname.startsWith("/api/") || pathname.startsWith("/trpc/")
+
+    if (
+      (method === "GET" || method === "HEAD") &&
+      !isApiOrTrpc &&
+      !isLocal &&
+      !isVercelPreview &&
+      host !== primaryHost
+    ) {
+      // Ensure single-hop by adding locale if missing
+      const hasLocale = i18n.locales.some(
+        (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+      )
+      const locale = hasLocale ? undefined : getLocale(request)
+      const newPathname = hasLocale ? pathname : `/${locale}${pathname === "/" ? "" : pathname}`
+
+      const url = new URL(request.url)
+      url.protocol = "https:" // ensure https
+      url.host = primaryHost
+      url.pathname = newPathname
+      // Permanent redirect to canonical host (single hop)
+      return NextResponse.redirect(url, 308)
+    }
+  }
+
   // Handle Plausible proxy routes - strip cookies to avoid 431 error
   if (pathname.includes("/proxy/api/event")) {
     const requestHeaders = new Headers(request.headers)

@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { createCheckoutSession, createPortalSession } from "@/lib/stripe/client"
 
-// Mock global fetch
-global.fetch = vi.fn()
+// Mock global fetch (Bun typings require `preconnect` on typeof fetch)
+const fetchMock: any = vi.fn()
+fetchMock.preconnect = vi.fn()
+global.fetch = fetchMock as unknown as typeof fetch
 const mockFetch = vi.mocked(fetch)
 
 // Mock window.location

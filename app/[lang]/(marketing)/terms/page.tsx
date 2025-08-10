@@ -7,7 +7,7 @@ import type { Metadata } from "next"
 // Get base URL for metadata
 const getBaseUrl = (): string => {
   if (process.env.NODE_ENV === "production") {
-    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+    return process.env.NEXT_PUBLIC_SITE_URL || "https://www.bankstatementconvert.to"
   }
   return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 }

@@ -10,15 +10,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { getDictionary } from "@/lib/utils/get-dictionary"
+import { getNormalizedEnvSiteUrl, normalizeBaseUrl } from "@/lib/utils/url"
 import { type Locale } from "@/i18n-config"
 import type { Metadata } from "next"
 
-// Get base URL for metadata
+// Get base URL for metadata (normalized, trims trailing slash)
 const getBaseUrl = (): string => {
+  const fromEnv = getNormalizedEnvSiteUrl()
   if (process.env.NODE_ENV === "production") {
-    return process.env.NEXT_PUBLIC_SITE_URL || "https://bankstatementconvert.com"
+    // Prefer env in prod; if absent, fall back to known domain (still normalized)
+    return fromEnv || "https://www.bankstatementconvert.to"
   }
-  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  if (fromEnv) return fromEnv
+  if (process.env.VERCEL_URL) return normalizeBaseUrl(process.env.VERCEL_URL)
+  return "http://localhost:3000"
 }
 
 export async function generateMetadata({
