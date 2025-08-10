@@ -8,8 +8,10 @@ export function createStripeClient(): Stripe {
     throw new Error("Missing STRIPE_SECRET_KEY environment variable")
   }
 
+  const apiVersion = process.env.STRIPE_API_VERSION as Stripe.LatestApiVersion | undefined
+
   return new Stripe(stripeSecretKey, {
-    apiVersion: "2025-06-30.basil",
+    apiVersion,
     typescript: true,
   })
 }
