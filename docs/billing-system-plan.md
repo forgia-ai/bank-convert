@@ -268,13 +268,11 @@ const handlePaymentFailed = async (invoice: Stripe.Invoice) => {
 **Timeline: 1-2 days**
 
 1. **Stripe Dashboard Setup**
-
    - Create products and prices
    - Configure webhook endpoints
    - Test webhook delivery
 
 2. **Environment Configuration**
-
    - Update production environment variables
    - Test Stripe integration in staging
 
@@ -288,13 +286,11 @@ const handlePaymentFailed = async (invoice: Stripe.Invoice) => {
 **Timeline: 1-2 weeks**
 
 1. **Enhanced Error Handling**
-
    - Implement retry mechanisms
    - Add user-friendly error messages
    - Set up monitoring alerts
 
 2. **Billing History**
-
    - Create billing_history table
    - Implement invoice storage
    - Add billing history UI
@@ -309,13 +305,11 @@ const handlePaymentFailed = async (invoice: Stripe.Invoice) => {
 **Timeline: 1 month**
 
 1. **Analytics & Monitoring**
-
    - Subscription metrics dashboard
    - Revenue tracking
    - Churn analysis
 
 2. **Advanced Features**
-
    - Proration handling
    - Plan change webhooks
    - Subscription modification

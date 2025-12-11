@@ -1,6 +1,20 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Database types (we'll expand these as we build the schema)
+// Subscription status type used across the application
+export type SubscriptionStatusType =
+  | "active"
+  | "canceled"
+  | "expired"
+  | "incomplete"
+  | "incomplete_expired"
+  | "past_due"
+  | "trialing"
+  | "unpaid"
+
+// Plan type used across the application
+export type PlanTypeDB = "free" | "paid1" | "paid2"
+
+// Database types for Supabase client with full schema definition
 export interface Database {
   public: {
     Tables: {
@@ -35,6 +49,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       usage_logs: {
         Row: {
@@ -58,9 +73,10 @@ export interface Database {
           user_id?: string
           pages_processed?: number
           file_name?: string | null
-          file_size?: number | null
+          file_size?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       user_subscriptions: {
         Row: {
@@ -68,16 +84,8 @@ export interface Database {
           user_id: string
           stripe_customer_id: string
           stripe_subscription_id: string | null
-          plan_type: "free" | "paid1" | "paid2"
-          status:
-            | "active"
-            | "canceled"
-            | "expired"
-            | "incomplete"
-            | "incomplete_expired"
-            | "past_due"
-            | "trialing"
-            | "unpaid"
+          plan_type: PlanTypeDB
+          status: SubscriptionStatusType
           current_period_start: string | null
           current_period_end: string | null
           canceled_at: string | null
@@ -89,16 +97,8 @@ export interface Database {
           user_id: string
           stripe_customer_id: string
           stripe_subscription_id?: string | null
-          plan_type: "free" | "paid1" | "paid2"
-          status:
-            | "active"
-            | "canceled"
-            | "expired"
-            | "incomplete"
-            | "incomplete_expired"
-            | "past_due"
-            | "trialing"
-            | "unpaid"
+          plan_type: PlanTypeDB
+          status: SubscriptionStatusType
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
@@ -110,23 +110,34 @@ export interface Database {
           user_id?: string
           stripe_customer_id?: string
           stripe_subscription_id?: string | null
-          plan_type?: "free" | "paid1" | "paid2"
-          status?:
-            | "active"
-            | "canceled"
-            | "expired"
-            | "incomplete"
-            | "incomplete_expired"
-            | "past_due"
-            | "trialing"
-            | "unpaid"
+          plan_type?: PlanTypeDB
+          status?: SubscriptionStatusType
           current_period_start?: string | null
           current_period_end?: string | null
           canceled_at?: string | null
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      increment_user_usage: {
+        Args: {
+          usage_id: string
+          increment_by: number
+        }
+        Returns: undefined
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
