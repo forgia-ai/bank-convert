@@ -1,20 +1,13 @@
-import {
-  updateUserPlan,
-  getUserPlan,
-  getActiveSubscription,
-  upsertSubscription,
-  createTestSubscription,
-} from "@/lib/subscriptions/management"
-import { getOrCreateUsageRecord } from "@/lib/usage/tracking"
+import { updateUserPlan, getUserPlan, getActiveSubscription } from "@/lib/subscriptions/management"
+import { getOrCreateUsageRecord, type PlanType } from "@/lib/usage/tracking"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
 // Mock external dependencies
-let mockSupabaseClient: any
+let mockSupabaseClient: ReturnType<typeof createMockSupabaseClient>
 
-beforeEach(() => {
-  // Create a fresh mock for each test
-  const createChainableMock = () => {
-    const mock = {
+function createMockSupabaseClient() {
+  const createChainableMock = (): Record<string, unknown> => {
+    const mock: Record<string, unknown> = {
       data: null,
       error: null,
       eq: vi.fn(() => createChainableMock()),
@@ -31,9 +24,14 @@ beforeEach(() => {
     return mock
   }
 
-  mockSupabaseClient = {
+  return {
     from: vi.fn(() => createChainableMock()),
   }
+}
+
+beforeEach(() => {
+  // Create a fresh mock for each test
+  mockSupabaseClient = createMockSupabaseClient()
 })
 
 vi.mock("@/lib/integrations/supabase", () => ({
@@ -72,7 +70,7 @@ describe("Subscription Management", () => {
     })
 
     it("should validate plan type", async () => {
-      await expect(updateUserPlan("user-123", "invalid" as any)).rejects.toThrow(
+      await expect(updateUserPlan("user-123", "invalid" as unknown as PlanType)).rejects.toThrow(
         "Invalid plan type: invalid",
       )
     })

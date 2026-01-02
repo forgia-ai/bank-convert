@@ -6,12 +6,13 @@ import { type Locale } from "@/i18n-config"
 
 export default async function MarketingLayout({
   children,
-  params: paramsPromise, // Accept params for lang
+  params: paramsPromise,
 }: {
   children: React.ReactNode
-  params: Promise<{ lang: Locale }> // Type params as Promise
+  params: Promise<{ lang: string }>
 }) {
-  const { lang } = await paramsPromise // Await lang from params
+  const { lang: langParam } = await paramsPromise
+  const lang = langParam as Locale
   const dictionary = await getDictionary(lang)
   return (
     <div className="flex flex-col min-h-screen">

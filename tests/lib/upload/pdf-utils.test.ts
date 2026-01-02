@@ -16,19 +16,32 @@ vi.mock("@/lib/utils/logger", () => ({
   },
 }))
 
+// Type for mock result - simplified for testing
+interface MockPdfResult {
+  numpages: number
+  numrender: number
+  text: string
+  info: Record<string, unknown>
+  metadata: null
+  version: string
+}
+
 describe("PDF Utils", () => {
   const mockPdf = vi.mocked(pdf)
   const mockBuffer = Buffer.from("%PDF-1.4 mock pdf content")
 
-  const createMockResult = (overrides: any = {}) => ({
-    numpages: 1,
-    numrender: 1,
-    text: "mock text",
-    info: {},
-    metadata: null,
-    version: "1.0.0",
-    ...overrides,
-  })
+  const createMockResult = (
+    overrides: Partial<MockPdfResult> = {},
+  ): Awaited<ReturnType<typeof pdf>> =>
+    ({
+      numpages: 1,
+      numrender: 1,
+      text: "mock text",
+      info: {},
+      metadata: null,
+      version: "1.0.0",
+      ...overrides,
+    }) as unknown as Awaited<ReturnType<typeof pdf>>
 
   beforeEach(() => {
     vi.clearAllMocks()

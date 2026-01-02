@@ -55,7 +55,7 @@ yarn tsx {script}           # Execute TypeScript scripts
 
 #### AI Processing (Google Gemini)
 
-- **Model**: `gemini-2.5-flash-preview-05-20`
+- **Model**: `gemini-3-flash-preview`
 - **Purpose**: Banking document analysis and transaction extraction
 - **Pipeline**: PDF → AI extraction → validation → standardization
 - Zod schema validation for structured data extraction

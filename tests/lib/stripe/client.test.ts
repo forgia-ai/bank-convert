@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { createCheckoutSession, createPortalSession } from "@/lib/stripe/client"
 
 // Mock global fetch (Bun typings require `preconnect` on typeof fetch)
-const fetchMock: any = vi.fn()
-fetchMock.preconnect = vi.fn()
+const fetchMock = vi.fn()
+;(fetchMock as unknown as { preconnect: ReturnType<typeof vi.fn> }).preconnect = vi.fn()
 global.fetch = fetchMock as unknown as typeof fetch
 const mockFetch = vi.mocked(fetch)
 
@@ -39,7 +39,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await createCheckoutSession("paid1", "monthly")
 
@@ -66,7 +66,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await createCheckoutSession("paid2", "yearly")
 
@@ -93,7 +93,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await createCheckoutSession("paid1", "monthly", "es")
 
@@ -120,7 +120,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createCheckoutSession("paid1", "monthly")).rejects.toThrow("Invalid plan type")
 
@@ -136,7 +136,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createCheckoutSession("paid1", "monthly")).rejects.toThrow(
         "No checkout URL returned",
@@ -159,7 +159,7 @@ describe("Stripe Client", () => {
         json: vi.fn().mockResolvedValue({}),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createCheckoutSession("paid1", "monthly")).rejects.toThrow(
         "Failed to create checkout session",
@@ -176,7 +176,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await createPortalSession()
 
@@ -198,7 +198,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createPortalSession()).rejects.toThrow("No subscription found")
 
@@ -214,7 +214,7 @@ describe("Stripe Client", () => {
         }),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createPortalSession()).rejects.toThrow("No portal URL returned")
 
@@ -235,7 +235,7 @@ describe("Stripe Client", () => {
         json: vi.fn().mockResolvedValue({}),
       }
 
-      mockFetch.mockResolvedValue(mockResponse as any)
+      mockFetch.mockResolvedValue(mockResponse as unknown as Response)
 
       await expect(createPortalSession()).rejects.toThrow("Failed to create portal session")
     })

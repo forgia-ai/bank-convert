@@ -33,7 +33,7 @@ export function useRateLimit() {
   const [isLoading, setIsLoading] = useState(true)
 
   // Mock function to check rate limit - TODO: Replace with API call
-  const checkRateLimit = async (ipAddress?: string): Promise<RateLimitData> => {
+  const checkRateLimit = async (_ipAddress?: string): Promise<RateLimitData> => {
     // TODO: Make API call to check rate limit
     // const response = await fetch('/api/rate-limit/check', {
     //   method: 'POST',
@@ -47,7 +47,7 @@ export function useRateLimit() {
   }
 
   // Mock function to record attempt - TODO: Replace with API call
-  const recordAttempt = async (ipAddress?: string): Promise<void> => {
+  const recordAttempt = async (_ipAddress?: string): Promise<void> => {
     // TODO: Make API call to record attempt
     // await fetch('/api/rate-limit/record', {
     //   method: 'POST',

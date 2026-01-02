@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "build:vercel": "NODE_ENV=production VERCEL=1 next build",
+    "typecheck": "NODE_ENV=production tsc --noEmit",
+    "typecheck:prod": "NODE_ENV=production tsc --noEmit --skipLibCheck false",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -51,7 +53,6 @@
     "zod": "^3.25.56"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/exceljs": "^1.3.2",
     "@types/negotiator": "^0.6.3",

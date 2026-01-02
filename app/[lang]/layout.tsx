@@ -33,9 +33,10 @@ const getBaseUrl = (): string => {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: Locale }>
+  params: Promise<{ lang: string }>
 }): Promise<Metadata> {
-  const { lang } = await params
+  const { lang: langParam } = await params
+  const lang = langParam as Locale
   const dictionary = await getDictionary(lang)
   const baseUrl = getBaseUrl()
 
@@ -166,12 +167,13 @@ export async function generateStaticParams() {
 
 export default async function RootLayout({
   children,
-  params: paramsPromise, // Renamed to avoid conflict with destructured params
+  params: paramsPromise,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ lang: Locale }>
+  params: Promise<{ lang: string }>
 }>) {
-  const { lang } = await paramsPromise
+  const { lang: langParam } = await paramsPromise
+  const lang = langParam as Locale
 
   // Configure language-aware redirect URLs for Clerk
   const signInUrl = `/${lang}/sign-in`

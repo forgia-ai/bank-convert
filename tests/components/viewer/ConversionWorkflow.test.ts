@@ -9,7 +9,7 @@ import { type Locale } from "@/i18n-config"
 
 // Mock the locale formatting functions
 vi.mock("@/lib/upload/locale-formatting", () => ({
-  formatDateForLocale: vi.fn((date: string, locale: Locale) => {
+  formatDateForLocale: vi.fn((date: string, _locale: Locale) => {
     // Simple mock that returns the date as-is for testing
     return date
   }),

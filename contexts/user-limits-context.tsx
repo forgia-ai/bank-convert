@@ -1,13 +1,16 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react"
 import { useAuth } from "@clerk/nextjs"
-import { checkUserUsageLimit, recordUserPageUsage, getCurrentUserUsage } from "@/lib/usage/actions"
-import {
-  updateUserSubscriptionPlan,
-  getUserCurrentPlan,
-  getUserPlanAndUsage,
-} from "@/lib/subscriptions/actions"
+import { checkUserUsageLimit, recordUserPageUsage } from "@/lib/usage/actions"
+import { updateUserSubscriptionPlan, getUserPlanAndUsage } from "@/lib/subscriptions/actions"
 import { type PlanType } from "@/lib/usage/tracking"
 
 // Types
@@ -129,55 +132,58 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
   }
 
   // Function to refresh limits from server (OPTIMIZED - single database call)
-  const refreshLimits = async (planType?: SubscriptionPlan) => {
-    try {
-      setIsLoading(true)
+  const refreshLimits = useCallback(
+    async (_planType?: SubscriptionPlan) => {
+      try {
+        setIsLoading(true)
 
-      // Check if user is authenticated before making API call
-      if (!isSignedIn) {
-        setUserLimits(getDefaultUserLimits())
-        setIsLoading(false)
-        return
-      }
+        // Check if user is authenticated before making API call
+        if (!isSignedIn) {
+          setUserLimits(getDefaultUserLimits())
+          setIsLoading(false)
+          return
+        }
 
-      // Use optimized action that gets both plan and usage in one call
-      const result = await getUserPlanAndUsage()
+        // Use optimized action that gets both plan and usage in one call
+        const result = await getUserPlanAndUsage()
 
-      if (result.success && result.data) {
-        const data = result.data
-        const planDetails = getPlanDetails(data.planType as SubscriptionPlan)
-        const userType = planTypeToUserType(data.planType as SubscriptionPlan)
+        if (result.success && result.data) {
+          const data = result.data
+          const planDetails = getPlanDetails(data.planType as SubscriptionPlan)
+          const userType = planTypeToUserType(data.planType as SubscriptionPlan)
 
-        setUserLimits({
-          userType,
-          subscriptionPlan: data.planType as SubscriptionPlan,
-          currentUsage: data.currentUsage,
-          limit: data.planLimit,
-          usagePercentage: data.usagePercentage,
-          isAtLimit: data.currentUsage >= data.planLimit,
-          isNearLimit: data.usagePercentage >= 75,
-          isCritical: data.usagePercentage >= 90,
-          resetDate: data.resetDate,
-          isMonthlyLimit: data.isMonthlyLimit,
-          planName: planDetails.planKey,
-          planPrice: planDetails.price,
-          isCancelled: data.isCancelled,
-          cancelledAt: data.cancelledAt,
-          expiresAt: data.expiresAt,
-        })
-      } else {
+          setUserLimits({
+            userType,
+            subscriptionPlan: data.planType as SubscriptionPlan,
+            currentUsage: data.currentUsage,
+            limit: data.planLimit,
+            usagePercentage: data.usagePercentage,
+            isAtLimit: data.currentUsage >= data.planLimit,
+            isNearLimit: data.usagePercentage >= 75,
+            isCritical: data.usagePercentage >= 90,
+            resetDate: data.resetDate,
+            isMonthlyLimit: data.isMonthlyLimit,
+            planName: planDetails.planKey,
+            planPrice: planDetails.price,
+            isCancelled: data.isCancelled,
+            cancelledAt: data.cancelledAt,
+            expiresAt: data.expiresAt,
+          })
+        } else {
+          // Fallback to default state on error
+          console.error("Failed to get user data:", result.error)
+          setUserLimits(getDefaultUserLimits())
+        }
+      } catch (error) {
+        console.error("Failed to refresh user limits:", error)
         // Fallback to default state on error
-        console.error("Failed to get user data:", result.error)
         setUserLimits(getDefaultUserLimits())
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Failed to refresh user limits:", error)
-      // Fallback to default state on error
-      setUserLimits(getDefaultUserLimits())
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    },
+    [isSignedIn],
+  )
 
   // Subscribe to a plan - handles both free plan updates and Stripe redirects
   const subscribeToPlan = async (plan: SubscriptionPlan) => {
@@ -303,7 +309,7 @@ export function UserLimitsProvider({ children }: UserLimitsProviderProps) {
         setIsLoading(false)
       }
     }
-  }, [isLoaded, isSignedIn])
+  }, [isLoaded, isSignedIn, refreshLimits])
 
   const contextValue: UserLimitsContextType = {
     userLimits,

@@ -26,4 +26,4 @@ export function getGoogleProvider() {
 }
 
 // Export the default model ID for easy reference
-export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash-preview-05-20"
+export const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
